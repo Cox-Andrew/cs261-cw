@@ -1,3 +1,19 @@
+
+<!-- Problems 
+
+Editing forms will cause chaos if attendees have already answered questions. If the form is changed then the question object can still remain, but the original ordering of the form will be lost. Maybe copy every form/question when it is used in an event?
+
+
+-->
+
+
+
+
+
+
+
+
+
 # API Documentation
 
 ## Available to all: 
@@ -59,13 +75,15 @@ Request:
 ```DELETE /v0/series/{seriesID}```
 
 ### 2.	Create/Read/Update/Delete hosted events. 
-```GET /v0/event/{eventID}```\
+
+Get an event\
+```GET /v0/events/{eventID}```\
 Response:
 ```
 {
 	"eventID": 1243214,
 	"seriesID" : 2342341,
-	"formIDs": [12423142,4324324,5462354],
+	"eventFormIDs": [12423142,4324324,5462354],
 	"data": {
 		"title": "Event Title",
 		"description": "Description of Event."
@@ -73,7 +91,8 @@ Response:
 }
 ```
 
-```POST /v0/event```\
+Create an event\
+```POST /v0/events```\
 Request:
 ```
 {
@@ -92,7 +111,8 @@ Response:
 	"eventID": 1243214
 }
 ```
-```PUT /v0/event/{eventID}```\
+Edit an event\
+```PUT /v0/events/{eventID}```\
 Only items in the "data" section may be updated.\
 Request:
 ```
@@ -105,11 +125,48 @@ Request:
 	}
 }
 ```
-```DELETE /v0/event/{eventID}```
+Delete an event\
+```DELETE /v0/events/{eventID}```
 
+Add a form to an event\
+```POST /v0/event-forms```\
+Request:
+```
+{
+	"formID": 354234,
+	"preceding-event-form": 42389 \* May be null to be the first form*\
+}
+```
+Response:
+```
+{
+	"eventFormID": 42142
+}
+```
+
+Delete a form from an event\
+```DELETE /v0/event-forms/{eventFormID}```
 
 
 ### 3.	Create/Read/Update/Delete form templates (hosted series/event). 
+
+Get a list of a user's forms. Users may only access their own templates.\
+```GET /v0/forms?hostID={hostID}```\
+Response:
+```
+{
+	"formIDs": [534324, 521512, 534524]
+}
+```
+
+Get a form.\
+```GET /v0/forms/{formID}```
+
+Create a form.\
+Edit a form.\
+Delete a form.
+
+
 ### 4.	Get default forms.
 
 ```GET /v0/default-forms```\
@@ -140,7 +197,7 @@ Response:
 ```
 {
 	"eventID": 34414312,
-	"time-edited-since": "2020-01-22T19:33:02Z",
+	"time-updated-since": "2020-01-22T19:33:02Z",
 	"contains": 2,
 	"list": [
 		{
@@ -153,13 +210,15 @@ Response:
 			"answers": [
 				{
 					"questionID": 524753,
+					"answerID": 524753,
 					"mood-value": 0.432423523, /* may be null. Mood may be accessed in other ways. */
 					"is-edited": false,
 					"time-updated": "2020-01-22T19:33:05Z",
-					"response": "Response to question 1",
+					"response": "Response to question 1"
 				},
 				{
 					"questionID": 5345342,
+					"answerID": 524753,
 					"mood-value": null,
 					"is-edited": false,
 					"time-updated": "2020-01-22T19:33:05Z",
@@ -176,11 +235,12 @@ Response:
 			"is-edited": false,
 			"answers": [
 				{
-					"questionID": 524753,
+					"questionID": 1231421,
+					"answerID": 524753,
 					"mood-value": 0.432423523,
 					"is-edited": false,
 					"time-updated": "2020-01-22T19:33:05Z",
-					"response": "This is a general feedback response.",
+					"response": "This is a general feedback response."
 				}
 			]
 		}
@@ -188,8 +248,34 @@ Response:
 }
 ```
 
-### 7.	Get live feedback since specified time (hosted event). 
+### 7.	Get live feedback since specified time (hosted event).
+ ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}```\
+Time-updated-since is of the form "2020-01-22T19:33:05Z".\
+Response is of the same form as getting all feedback.
+
 ### 8.	Get live mood since specified time (hosted event). 
+```GET /v0/mood?eventID={eventID}&time-updated-since={time-updated-since}```\
+Response:
+```
+{
+	"eventID": 34414312,
+	"time-submitted-since": "2020-01-22T19:33:02Z",
+	"contains": 2,
+	"list": [
+		{
+			"time-submitted": "2020-01-22T19:33:05Z",
+			"mood-value": 0.432423523,
+			"answerID": 4324322 /* may be null if it was explicit feedback */
+		},
+		{
+			"time-submitted": "2020-01-22T19:33:05Z",
+			"mood-value": 0.842384,
+			"answerID": null
+		}
+
+	]
+}
+```
 ### 9.	Get analytics (hosted event). 
 ## Attendee request (available to authenticated users): 
 ### 1.	Register for event (with invite code). 
