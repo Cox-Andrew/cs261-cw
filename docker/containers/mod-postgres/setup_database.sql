@@ -7,55 +7,215 @@ GRANT ALL PRIVILEGES ON DATABASE mood TO mooduser;
 \c mood mooduser
 
 
-DROP TABLE IF EXISTS USERS CASCADE;
+--DROP TABLE IF EXISTS ATTENDEE CASCADE;
+--DROP TABLE IF EXISTS HOST CASCADE;
+--DROP TABLE IF EXISTS SERIES CASCADE;
+--DROP TABLE IF EXISTS EVENTS CASCADE;
+--DROP TABLE IF EXISTS EVENTFORMS CASCADE;
+--DROP TABLE IF EXISTS FORMS CASCADE;
+--DROP TABLE IF EXISTS QUESTIONS CASCADE;
+--DROP TABLE IF EXISTS ANSWERS CASCADE;
+--DROP TABLE IF EXISTS MOOD CASCADE;
+--DROP FUNCTION IF EXISTS CreateFeedback CASCADE;
 
-CREATE TABLE USERS (
-  UserID INTEGER,
-  FName VARCHAR(30) NOT NULL,
-  LName VARCHAR(30) NOT NULL,
-  PRIMARY KEY(UserID)
+CREATE TABLE ATTENDEE (
+  AttendeeID INTEGER PRIMARY KEY,
+  Email VARCHAR(50),
+  Pass VARCHAR(32),
+  AccountName VARCHAR(32),
+  Expires TIMESTAMP
 );
--- define a sequence to generate user ids
-CREATE SEQUENCE UsersUserID
+
+CREATE TABLE HOST (
+  HostID INTEGER PRIMARY KEY,
+  Email VARCHAR(50) NOT NULL CHECK (CHAR_LENGTH(Email) > 0),
+  Pass VARCHAR(32) NOT NULL CHECK (CHAR_LENGTH(Pass) > 0),
+  AccountName VARCHAR(32)
+);
+
+CREATE TABLE SERIES (
+  SeriesID INTEGER PRIMARY KEY,
+  HostID INTEGER NOT NULL,
+  Title VARCHAR(30) NOT NULL CHECK (CHAR_LENGTH(Title) > 0),
+  Description VARCHAR(140),
+  CONSTRAINT fk_HostID
+    FOREIGN KEY(HostID)
+      REFERENCES HOST(HostID)
+);
+
+CREATE TABLE EVENTS (
+  EventID INTEGER PRIMARY KEY,
+  SeriesID INTEGER NOT NULL,
+  Title VARCHAR(30) NOT NULL CHECK (CHAR_LENGTH(Title) > 0),
+  Description VARCHAR(140),
+  EventInterval INTERVAL NOT NULL,
+  CONSTRAINT fk_SeriesID
+    FOREIGN KEY(SeriesID)
+      REFERENCES SERIES(SeriesID)
+);
+
+CREATE TABLE FORMS (
+  FormID INTEGER PRIMARY KEY,
+  HostID INTEGER NOT NULL,
+  Title VARCHAR(30) NOT NULL CHECK (CHAR_LENGTH(Title) > 0),
+  Description VARCHAR(140),
+  CONSTRAINT fk_HostID
+    FOREIGN KEY(HostID)
+      REFERENCES HOST(HostID)
+);
+
+CREATE TABLE EVENTFORMS (
+  EventFormID INTEGER PRIMARY KEY,
+  EventID INTEGER NOT NULL,
+  FormID INTEGER NOT NULL,
+  NumInEvent INTEGER NOT NULL DEFAULT 1 CHECK(NumInEvent >= 0),
+  IsActive BOOLEAN NOT NULL DEFAULT FALSE,
+  CONSTRAINT fk_EventID
+    FOREIGN KEY(EventID)
+      REFERENCES EVENTS(EventID),
+  CONSTRAINT fk_FormID
+    FOREIGN KEY(FormID)
+      REFERENCES FORMS(FormID)
+);
+
+CREATE TABLE SUBMISSIONS (
+  SubmissionID INTEGER PRIMARY KEY,
+  AttendeeID INTEGER NOT NULL,
+  EventFormID INTEGER NOT NULL,
+  IsEdited BOOLEAN NOT NULL DEFAULT FALSE,
+  TimeSubmitted TIMESTAMP NOT NULL,
+  TimeEdited TIMESTAMP,
+  CONSTRAINT fk_AttendeeID
+    FOREIGN KEY(AttendeeID)
+      REFERENCES ATTENDEE(AttendeeID),
+  CONSTRAINT fk_EventFormID
+    FOREIGN KEY(EventFormID)
+      REFERENCES EVENTFORMS(EventFormID)
+);
+
+CREATE TABLE QUESTIONS (
+  QuestionID INTEGER PRIMARY KEY,
+  Type VARCHAR(8) NOT NULL CHECK (Type = 'long' OR Type = 'short' OR Type = 'multi' OR Type = 'rating'),
+  FormID INTEGER NOT NULL,
+  NumInForm INTEGER NOT NULL CHECK (NumInForm > 0),
+  Content VARCHAR(70),
+  Options VARCHAR(70),
+  CONSTRAINT fk_FormID
+    FOREIGN KEY(FormID)
+      REFERENCES FORMS(FormID)
+);
+
+-- assuming we have 5 emojis, Value is between 0 and 4
+CREATE TABLE MOOD (
+  MoodID INTEGER PRIMARY KEY,
+  EventID INTEGER NOT NULL,
+  Value FLOAT,
+  TimeSubmitted TIMESTAMP,
+  CONSTRAINT fk_EventID
+    FOREIGN KEY(EventID)
+      REFERENCES EVENTS(EventID)
+);
+
+
+CREATE TABLE ANSWERS (
+  AnswerID INTEGER PRIMARY KEY,
+  QuestionID INTEGER NOT NULL,
+  AttendeeID INTEGER,
+  EventFormID INTEGER NOT NULL,
+  MoodID  INTEGER NOT NULL,
+  IsEdited BOOLEAN NOT NULL DEFAULT FALSE,
+  TimeSubmitted TIMESTAMP,
+  Response VARCHAR(100) NOT NULL CHECK (CHAR_LENGTH(Response) > 0),
+  CONSTRAINT fk_QuestionID
+    FOREIGN KEY(QuestionID)
+      REFERENCES QUESTIONS(QuestionID),
+  CONSTRAINT fk_EventFormID
+    FOREIGN KEY(EventFormID)
+      REFERENCES EVENTFORMS(EventFormID),
+  CONSTRAINT fk_MoodID
+    FOREIGN KEY(MoodID)
+      REFERENCES MOOD(MoodID)
+);
+
+-- define a sequence to generate attendee ids
+CREATE SEQUENCE AttendeesAttendeeID
 START 1
 INCREMENT 1
 MINVALUE 1
-OWNED BY USERS.UserID;
+OWNED BY ATTENDEE.AttendeeID;
 
--- Give the db some users
-INSERT INTO
-    USERS(UserID, FName, LName)
-VALUES
-    (nextval('UsersUserID'),'Wilfredo', 'Caballero'),
-    (nextval('UsersUserID'),'Edouard', 'Mendy'),
-    (nextval('UsersUserID'),'Karlo', 'Ziger'),
-    (nextval('UsersUserID'),'Baba', 'Rahman'),
-    (nextval('UsersUserID'),'Dujon', 'Sterling'),
-    (nextval('UsersUserID'),'Antonio', 'Rudiger'),
-    (nextval('UsersUserID'),'Marcos', 'Alonso'),
-    (nextval('UsersUserID'),'Andreas', 'Christensen'),
-    (nextval('UsersUserID'),'Thiago', 'Silva'),
-    (nextval('UsersUserID'),'Fikayo', 'Tomori'),
-    (nextval('UsersUserID'),'Kurt', 'Zouma'),
-    (nextval('UsersUserID'),'Ben', 'Chilwell'),
-    (nextval('UsersUserID'),'Reece', 'James'),
-    (nextval('UsersUserID'),'Cesar', 'Azpilicueta'),
-    (nextval('UsersUserID'),'Dynel', 'Simeu'),
-    (nextval('UsersUserID'),'Charly', 'Musonda'),
-    (nextval('UsersUserID'),'Danny', 'Drinkwater'),
-    (nextval('UsersUserID'),'Christian', 'Pulisic'),
-    (nextval('UsersUserID'),'Mateo', 'Kovacic'),
-    (nextval('UsersUserID'),'Jason', 'Mount'),
-    (nextval('UsersUserID'),'Callum', 'Hudson-Odoi'),
-    (nextval('UsersUserID'),'Hakim', 'Ziyech'),
-    (nextval('UsersUserID'),'Billy', 'Gilmour'),
-    (nextval('UsersUserID'),'Kai', 'Havertz'),
-    (nextval('UsersUserID'),'George', 'McEachran'),
-    (nextval('UsersUserID'),'Henry', 'Lawrence'),
-    (nextval('UsersUserID'),'Lewis', 'Bate'),
-    (nextval('UsersUserID'),'Faustino', 'Anjorin'),
-    (nextval('UsersUserID'),'Myles', 'Peart-Harris'),
-    (nextval('UsersUserID'),'Harvey', 'Vale'),
-    (nextval('UsersUserID'),'Tammy', 'Abraham'),
-    (nextval('UsersUserID'),'Timo', 'Werner')
-    ;
+-- define a sequence to generate host ids
+CREATE SEQUENCE HostsHostID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY HOST.HostID;
+
+-- define a sequence to generate question ids
+CREATE SEQUENCE QuestionsQuestionID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY QUESTIONS.QuestionID;
+
+-- define a sequence to generate series ids
+CREATE SEQUENCE SeriesSeriesID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY SERIES.SeriesID;
+
+-- define a sequence to generate event ids
+CREATE SEQUENCE EventsEventID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY EVENTS.EventID;
+
+-- define a sequence to generate eventform ids
+CREATE SEQUENCE EventFormsEventFormID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY EVENTFORMS.EventFormID;
+
+-- define a sequence to generate form ids
+CREATE SEQUENCE FormsFormID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY FORMS.FormID;
+
+-- define a sequence to generate mood ids
+CREATE SEQUENCE MoodsMoodID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY MOOD.MoodID;
+
+-- define a sequence to generate answer ids
+CREATE SEQUENCE AnswersAnswerID
+START 1
+INCREMENT 1
+MINVALUE 1
+OWNED BY ANSWERS.AnswerID;
+
+INSERT INTO HOST(HostID, Email, Pass, AccountName)
+VALUES(0,'default@mail.com','password','generalhost');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(0,0,'General Feedback', 'Form for general feedback');
+
+CREATE FUNCTION CreateFeedback() RETURNS TRIGGER AS $CreateFeedback$
+  BEGIN
+    INSERT INTO EVENTFORMS(EventFormID, EventID, FormID, NumInEvent, IsActive)
+    -- is general feedback always active?
+    VALUES (nextval('EventFormsEventFormID'), NEW.EventID, 0, 0, TRUE);
+    RETURN NEW;
+  END;
+$CreateFeedback$ LANGUAGE plpgsql;
+
+CREATE TRIGGER CreateFeedback
+  AFTER INSERT ON EVENTS
+  FOR EACH ROW
+  EXECUTE FUNCTION CreateFeedback();
