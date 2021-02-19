@@ -52,6 +52,10 @@ public class Series extends HttpServlet {
 		//TODO test content-type header is application/json
 		String jsonData = postData.toString();
 		JSONParser postParser = new JSONParser();
+		int hostID = 0;
+		String data = "";
+		String title = "";
+		String description = "";
 		try {
 			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
 			/*
@@ -67,10 +71,10 @@ public class Series extends HttpServlet {
 			 * 
 			 * JSON looks like the above
 			 */
-			int hostID = Integer.valueOf(postObject.get("hostID").toString());
-			String data = postObject.get("data").toString();
-			String title = ((JSONObject) postObject.get("data")).get("title").toString();
-			String description = ((JSONObject) postObject.get("data")).get("description").toString();
+			hostID = Integer.valueOf(postObject.get("hostID").toString());
+			data = postObject.get("data").toString();
+			title = ((JSONObject) postObject.get("data")).get("title").toString();
+			description = ((JSONObject) postObject.get("data")).get("description").toString();
 			response.getWriter().append("\nhostID: " + hostID + "\n" + "data: " + data + "\n");
 			response.getWriter().append("title: " + title + "\n" + "description: " + description + "\n");
 		} catch(ParseException e) {
@@ -88,14 +92,47 @@ public class Series extends HttpServlet {
 		}
     	// JDBC connection to the database container
 		String dburl = "jdbc:postgresql://database.mood-net:5432/mood?user=mooduser&password=password";
-		try (Connection conn = DriverManager.getConnection(dburl);
-    		 Statement stmt = conn.createStatement();
-    		) {
-    		String query = "select fname, lname from users";
-    		ResultSet results = stmt.executeQuery(query);
+		/*
+		 * example insert
+		 * INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 1, 'SE Project', 'Software Engineering Project on Cybersecurity');
+		 */
+		PreparedStatement seriesInsert  = null;
+		ResultSet seriesKey = null;
+		int seriesID = 0;
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(dburl);
+			conn.setAutoCommit(false);
+    		String query = "INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'),?,?,?)";
+    		seriesInsert = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    		seriesInsert.setInt(1, hostID);
+    		seriesInsert.setString(2, title);
+    		seriesInsert.setString(3, description);
+			seriesInsert.executeUpdate();
+			seriesKey = seriesInsert.getGeneratedKeys();
+			seriesKey.next();
+			seriesID = seriesKey.getInt(1);
+			conn.commit();
+			conn.setAutoCommit(true);
 		} catch(SQLException e) {
 			//TODO
 			e.printStackTrace(response.getWriter());
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(response.getWriter());
+			}
+		} finally {
+			try {
+				if (seriesInsert != null) {
+						seriesInsert.close();
+				}
+				if (seriesKey != null) {
+						seriesKey.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(response.getWriter());
+			}
 		}
 	}
 	
