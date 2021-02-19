@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
+import java.sql.*;
 
 /**
  * Servlet implementation class Series
@@ -75,6 +76,25 @@ public class Series extends HttpServlet {
 		} catch(ParseException e) {
 			//TODO
 			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+		}
+		
+		//JDBC
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace(response.getWriter());
+		}
+    	// JDBC connection to the database container
+		String dburl = "jdbc:postgresql://database.mood-net:5432/mood?user=mooduser&password=password";
+		try (Connection conn = DriverManager.getConnection(dburl);
+    		 Statement stmt = conn.createStatement();
+    		) {
+    		String query = "select fname, lname from users";
+    		ResultSet results = stmt.executeQuery(query);
+		} catch(SQLException e) {
+			//TODO
 			e.printStackTrace(response.getWriter());
 		}
 	}
