@@ -15,15 +15,49 @@ Editing forms will cause chaos if attendees have already answered questions. If 
 
 # API Documentation
 
+For all endpoints where data is restricted, the user must have the appropriate tokens/etc I don't really know atm how this will work (TODO)
+
 ## Available to all: 
 ### 1.	Register for account. 
+```POST /v0/attendees```\
+```POST /v0/hosts```\
+Request
+```
+{
+	"email": "example@gmail.com",
+	"pass": "mypassword",
+	"account-name": "Joe Bloggs"
+}
+```
+Response:
+```
+{
+	"hostID": 32423423
+}
+```
+```
+{
+	"attendeeID": 42342343
+}
+```
 
 ### 2.	Authenticate.
-Use OAuth2.0/OpenID?
+Use OAuth2.0/OpenID?\
+Returns a token/something, TODO.
 
 ### 3.	Change name. 
+```PUT /v0/attendees/{attendeeID}```\
+```PUT /v0/hosts/{hostID}```\
+Request:
+```
+{
+	"account-name": "John Smith"
+}
+```
 
 ### 4.	Change anonymity. 
+For anonymous submissions, the request should leave attendeeID blank/null.\
+TODO: problem - the current system would not be able to authenticate attendees' requests for the mood of this feedback, as the attendeeID is not stored alongside anonymous requests.
 
 
 ## Host functionality (available to authenticated users): 
@@ -291,6 +325,7 @@ Response:
 	"invite-code": "123-123-123"
 }
 ```
+Note: the format of the invite codes is not yet defined
 
 
 
@@ -298,6 +333,7 @@ Response:
 ### 6.	Get all feedback (hosted event). 
 
 ```GET /v0/feedback?eventID={eventID}```\
+```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
 Note: Answers can be edited, so the client may already have received responses to these forms.\
 Response:
 ```
@@ -308,10 +344,12 @@ Response:
 	"list": [
 		{
 			"formID": 349981,
-			"submissionID": 4238492,
+			// "submissionID": 4238492,
+			// submission ID will no longer included, but still packaged like this to make it easier for the front end
 			"account-name": "John Smith", /* may be null for anonymous responses */
-			"time-submitted": "2020-01-22T19:33:05Z",
+			// "time-submitted": "2020-01-22T19:33:05Z",
 			"time-updated": "2020-01-22T19:33:05Z",
+			// time-updated specified the latest of the time-updated of the answers
 			"is-edited": false,
 			"answers": [
 				{
@@ -338,9 +376,9 @@ Response:
 		},
 		{
 			"formID": 0, /* general feedback */
-			"submissionID": 4238492,
+			// "submissionID": 4238492,
 			"account-name": "John Smith", /* may be null for anonymous responses */
-			"time-submitted": "2020-01-22T19:33:05Z",
+			// "time-submitted": "2020-01-22T19:33:05Z",
 			"time-updated": "2020-01-22T19:33:05Z",
 			"is-edited": false,
 			"answers": [
@@ -362,11 +400,13 @@ Response:
 
 ### 7.	Get live feedback since specified time (hosted event).
  ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}```\
+ ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
 Time-updated-since is of the form "2020-01-22T19:33:05Z".\
 Response is of the same kind as getting all feedback.
 
 ### 8.	Get live mood since specified time (hosted event). 
 ```GET /v0/mood?eventID={eventID}&time-updated-since={time-updated-since}```\
+```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
 Response:
 ```
 {
@@ -417,6 +457,7 @@ Request:
 {
 	"eventID": 3424323
 	"formID": 4234324,
+	"attendeeID": 34324234
 	/* time-submitted is not included - this is added by the server */
 	"list": [
 		{
@@ -437,8 +478,26 @@ Request:
 Response:
 ```
 {
-	"submissionID": 423432,
+	// "submissionID": 423432
 	"answerIDs": [7865347, 4231432]
+}
+```
+Attendees can also post single Answers:\
+```POST /v0/answers```\
+Request:
+```
+{
+	"attendeeID": 3423423,
+	"eventID": 4242342,
+	"questionID": 4234324,
+	"data": {
+		"response": "This is long answer question resonse."
+}
+```
+Response:
+```
+{
+	"answerID": 7865347
 }
 ```
 ### 5.	Submit general feedback (registered event). 
@@ -453,3 +512,24 @@ Request:
 	"mood-value": 0.432423523
 }
 ```
+### 7. Register to an event using an invite code
+```GET /v0/invite-code/{invite-code}```\
+Response:
+```
+{
+	"eventID": 2847823
+}
+```
+Also returns a cookie that is needed to access event-related endpoints, eg 
+```GET /v0/questions/{questionID}``` is only allowed if the user has registered to an event that contains that question.
+
+### 8. Other
+```GET /v0/series/{seriesID}```\
+```GET /v0/events/{eventID}```\
+```GET /v0/forms/{formID}```\
+```GET /v0/questions/{questionID}```\
+```GET /v0/feedback?eventID={eventID}&attendeeID={attendeeID}```\
+ ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}&attendeeID={attendeeID}```\
+ ```GET /v0/mood?eventID={eventID}&time-updated-since={time-updated-since}&attendeeID={attendeeID}```\
+
+
