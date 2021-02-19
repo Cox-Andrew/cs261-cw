@@ -60,14 +60,14 @@ public class Series extends HttpServlet {
 			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
 			/*
 			 * {
-			 *		"hostID" : 2342341,
+			 *		"hostID" : 0,
 			 *		"data": {
 			 *			"title": "Series Title",
 			 *			"description": "Description of Series."
 			 *		}
 			 *	}
 			 *
-			 * { "hostID" : 2342341, "data": { "title": "Series Title", "description": "Description of Series." }}
+			 * { "hostID" : 0, "data": { "title": "Series Title", "description": "Description of Series." }}
 			 * 
 			 * JSON looks like the above
 			 */
@@ -134,6 +134,18 @@ public class Series extends HttpServlet {
 				e.printStackTrace(response.getWriter());
 			}
 		}
+		/*
+		 * JSON Example Output
+		 * { "seriesID": 1 }
+		 */
+		
+		// tell the caller that this is JSON content (move to front)
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		JSONObject output = new JSONObject();
+		output.put("seriesID", seriesID);
+		response.getWriter().append(output.toJSONString());
 	}
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
