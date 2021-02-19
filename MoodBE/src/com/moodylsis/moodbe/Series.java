@@ -15,7 +15,7 @@ import java.sql.*;
 /**
  * Servlet implementation class Series
  */
-@WebServlet("/v0/series")
+@WebServlet({"/v0/series", "/v0/series/*"})
 public class Series extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
