@@ -85,7 +85,7 @@ Request:
 {
 	"hostID" : 2342341,
 	"data": {
-		"title’: "Series Title",
+		"title": "Series Title",
 		"description": "Description of Series."
 	}
 }
@@ -405,7 +405,7 @@ Time-updated-since is of the form "2020-01-22T19:33:05Z".\
 Response is of the same kind as getting all feedback.
 
 ### 8.	Get live mood since specified time (hosted event). 
-```GET /v0/mood?eventID={eventID}&time-updated-since={time-updated-since}```\
+```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}```\
 ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
 Response:
 ```
@@ -504,7 +504,7 @@ Response:
 ```POST /v0/submissions```\
 Some request info as above. Use the formID ```0```, which corresponds to the general feedback form.
 ### 6.	Submit explicit mood (registered event). 
-```POST /v0/mood```\
+```POST /v0/moods```\
 Request:
 ```
 {
@@ -530,6 +530,6 @@ Also returns a cookie that is needed to access event-related endpoints, eg
 ```GET /v0/questions/{questionID}```\
 ```GET /v0/feedback?eventID={eventID}&attendeeID={attendeeID}```\
  ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}&attendeeID={attendeeID}```\
- ```GET /v0/mood?eventID={eventID}&time-updated-since={time-updated-since}&attendeeID={attendeeID}```\
+ ```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}&attendeeID={attendeeID}```\
 
 
