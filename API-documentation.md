@@ -451,6 +451,7 @@ Use the ```GET``` methods defined in the host session.
 ### 3.	Get all forms for registered event. 
 Use the ```GET``` methods defined in the host session.
 ### 4.	Submit completed feedback form (registered event).
+<!-- 
 ```POST /v0/submissions```\
 Request:
 ```
@@ -481,8 +482,8 @@ Response:
 	// "submissionID": 423432
 	"answerIDs": [7865347, 4231432]
 }
-```
-Attendees can also post single Answers:\
+``` -->
+Attendees can also single Answers:\
 ```POST /v0/answers```\
 Request:
 ```
