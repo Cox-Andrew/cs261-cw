@@ -492,12 +492,21 @@ Request:
 	"questionID": 4234324,
 	"data": {
 		"response": "This is long answer question resonse."
+	}
 }
 ```
 Response:
 ```
 {
 	"answerID": 7865347
+}
+```
+
+```PUT /v0/answers/{answerID}```\
+Request:
+```
+"data": {
+	"response": "This is an edited response to a question."
 }
 ```
 ### 5.	Submit general feedback (registered event). 
