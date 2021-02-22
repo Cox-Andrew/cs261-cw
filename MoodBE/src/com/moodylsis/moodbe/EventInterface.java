@@ -19,7 +19,7 @@ public interface EventInterface {
 	
 	// POST /v0/events
 	/* Should return the ID of the new event, or null if not created */
-	public String newEvent(Connection conn, int seriesID, String title, String description, Date start, Date end);
+	public int newEvent(Connection conn, int seriesID, String title, String description, Date start, Date end);
 	
 	// POST /v0/events/{eventID}/forms
 	public boolean newEventForm(Connection conn, int eventID, int formID, int preceedingFormID, Date timeStart, Date timeEnd);
