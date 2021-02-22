@@ -1,7 +1,7 @@
 package com.moodylsis.moodbe;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,17 +9,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Servlet implementation class Event
- */
+// GET /v0/events/{eventID}
+// GET /v0/events/{eventID}/invite-code
+// GET /v0/event/{eventID}/analytics
+// POST /v0/events
+// POST /v0/events/{eventID}/forms
+// PUT /v0/events/{eventID}
+// DELETE /v0/events/{eventID}
+
+
 @WebServlet({"/v0/events", "/v0/events/*"})
-public class Event extends HttpServlet {
+public class EventRequest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Event() {
+    public EventRequest() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -99,8 +105,8 @@ public class Event extends HttpServlet {
 		// POST /v0/events/{eventID}/forms
 		
 		String eventId;
-
 		String pathInfo = request.getPathInfo();
+		BufferedReader requestPayload = request.getReader();
 		
 		// POST /v0/events
 		if (pathInfo == null) {
@@ -122,6 +128,58 @@ public class Event extends HttpServlet {
 		return;
 		
 		
+	}
+	
+	@Override
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		
+		BufferedReader requestPayload = request.getReader();
+		
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null) {
+		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		    return;
+		}
+		
+		String[] pathParts = pathInfo.split("/");
+		
+		// PUT /v0/events/{eventID}
+		if (pathParts.length == 2) {
+			String eventID = pathParts[1];
+			// call
+			return;
+		}
+		
+		
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		return;
+		
+	}
+	
+	@Override
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null) {
+		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		    return;
+		}
+		
+		String[] pathParts = pathInfo.split("/");
+		
+		// DELETE /v0/events/{eventID}
+		if (pathParts.length == 2) {
+			String eventID = pathParts[1];
+			// call
+			return;
+		}
+		
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		return;
 	}
 
 }
