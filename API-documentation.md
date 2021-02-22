@@ -227,7 +227,7 @@ Response:
 }
 ```
 Edit a form.\
-```POST /v0/forms/{formID}```\
+```PUT /v0/forms/{formID}```\
 Request:
 ```
 {
