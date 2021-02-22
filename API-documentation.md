@@ -257,7 +257,7 @@ Response:
 ```
 
 Create a question.\
-```POST /v0/forms```\
+```POST /v0/questions```\
 Request:
 ```
 {
