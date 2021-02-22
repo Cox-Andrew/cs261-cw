@@ -8,12 +8,13 @@ import javax.servlet.http.HttpServletResponse;
 public interface EventInterface {
 	
 	// GET /v0/events/{eventID}
-	public String get(Connection conn, int eventID);
+	public String getJSON(Connection conn, int eventID);
 	
 	// GET /v0/events/{eventID}/invite-code
 	public String getInviteCode(Connection conn, int eventID);
 	
 	// GET /v0/event/{eventID}/analytics
+	// don't know what this will return yet :(
 	public String getAnalytics(Connection conn, int eventID);
 	
 	// POST /v0/events
