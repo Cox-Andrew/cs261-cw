@@ -2,12 +2,16 @@ package com.moodylsis.moodbe;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.moodylsis.moodbe.integration.Event;
 
 // GET /v0/events/{eventID}
 // GET /v0/events/{eventID}/invite-code
@@ -20,6 +24,10 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet({"/v0/events", "/v0/events/*"})
 public class EventRequest extends HttpServlet {
+	
+	private static Event event = new Event();
+	private Connection conn;
+	
 	private static final long serialVersionUID = 1L;
        
     /**
@@ -27,6 +35,11 @@ public class EventRequest extends HttpServlet {
      */
     public EventRequest() {
         super();
+        
+        conn = DatabaseConnection.getConnection();
+        
+        // get database connection
+        
         // TODO Auto-generated constructor stub
     }
 
@@ -37,7 +50,7 @@ public class EventRequest extends HttpServlet {
 		
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
-		String eventId;
+		int eventID;
 
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null) {
@@ -52,11 +65,16 @@ public class EventRequest extends HttpServlet {
 		
 		
 		if (pathParts.length >= 2) {
-			eventId = pathParts[1];
 			
-			// attempt to parse the eventID?
-		
-		
+			String eventIDString = pathParts[1];
+			
+			// parse the eventID to int
+			try {
+				eventID = Integer.parseInt(eventIDString);
+			} catch (NumberFormatException e) {
+			    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				return;
+			}
 		
 		}
 		else {
@@ -68,7 +86,25 @@ public class EventRequest extends HttpServlet {
 		
 		// GET /v0/events/{eventID}
 		if (pathParts.length == 2) {
-			// call something
+			
+			String eventJSON;
+			
+			try {
+				/* this is where the next layer gets called */
+				eventJSON = event.getJSON(conn, eventID);
+				
+			} catch (SQLException e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				return;
+			}
+			
+			if (eventJSON == null) {
+				// event not found
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+			
+			response.getWriter().append(eventJSON);
 			return;
 		}
 		
