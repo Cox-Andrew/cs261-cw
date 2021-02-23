@@ -16,13 +16,13 @@ import java.sql.*;
  * Servlet implementation class Series
  */
 @WebServlet({"/v0/series", "/v0/series/*"})
-public class Series extends HttpServlet {
+public class SeriesRequest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Series() {
+    public SeriesRequest() {
         super();
         // TODO Auto-generated constructor stub
     }
