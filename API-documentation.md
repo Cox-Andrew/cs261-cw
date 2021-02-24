@@ -118,11 +118,14 @@ Delete a series\
 Get an event\
 ```GET /v0/events/{eventID}```\
 Response:
+<!-- eventFormIDs is only intended for the host to use to edit the form -->
+<!-- maybe it shouldn't appear when attendees send this command? -->
 ```
 {
 	"eventID": 1243214,
 	"seriesID" : 2342341,
 	"formIDs": [12423142,4324324,5462354],
+	"eventFormIDs": [312312,312312,2352234], 
 	"data": {
 		"title": "Event Title",
 		"description": "Description of Event."
@@ -168,18 +171,28 @@ Delete an event\
 ```DELETE /v0/events/{eventID}```
 
 Add a form to an event\
-```POST /v0/events/{eventID}/forms```\
+<!-- OLD VERSION: ```POST /v0/events/{eventID}/forms```\ -->
+```POST /v0/event-forms```\
 Request:
 ```
 {
+	"eventID": 432423,
 	"formID": 354234,
-	"preceding-formID": 42389 \* May be null to be the first form*\
+	"preceding-eventFormID": 42389 \* May be null to be the first form*\
+}
+```
+Response: <!--This response is new -->
+```
+{
+	"eventFormID": 3423423
 }
 ```
 
 
-Delete a form from an event\
-```DELETE /v0/events/{eventID}/forms/{formID}```
+Delete a form from an event
+<!-- OLD VERSION: ```DELETE /v0/events/{eventID}/forms/{formID}``` -->
+```DELETE /v0/event-forms/{eventFormID}```
+
 
 
 ### 3.	Create/Read/Update/Delete form templates (hosted series/event). 
@@ -318,7 +331,8 @@ Response:
 ```
 ### 5.	Get invite code (hosted event). 
 
-```GET /v0/events/{eventID}/invite-code```\
+<!-- OLD VERSION: ```GET /v0/events/{eventID}/invite-code```\ -->
+```GET /v0/invite-code?eventID={eventID} ```\
 Response:
 ```
 {
@@ -344,6 +358,7 @@ Response:
 	"list": [
 		{
 			"formID": 349981,
+			"eventFormID": 2432423,
 			// "submissionID": 4238492,
 			// submission ID will no longer included, but still packaged like this to make it easier for the front end
 			"account-name": "John Smith", /* may be null for anonymous responses */
@@ -376,6 +391,7 @@ Response:
 		},
 		{
 			"formID": 0, /* general feedback */
+			"eventFormID": 4243424
 			// "submissionID": 4238492,
 			"account-name": "John Smith", /* may be null for anonymous responses */
 			// "time-submitted": "2020-01-22T19:33:05Z",
@@ -428,7 +444,8 @@ Response:
 }
 ```
 ### 9.	Get analytics (hosted event).
-```GET /v0/event/{eventID}/analytics```\
+<!-- OLD VERSION: ```GET /v0/event/{eventID}/analytics```\ -->
+```GET /v0/analytics?eventID={eventID}```\
 Response:\
 TODO
 ## Attendee request (available to authenticated users): 
@@ -451,38 +468,7 @@ Use the ```GET``` methods defined in the host session.
 ### 3.	Get all forms for registered event. 
 Use the ```GET``` methods defined in the host session.
 ### 4.	Submit completed feedback form (registered event).
-<!-- 
-```POST /v0/submissions```\
-Request:
-```
-{
-	"eventID": 3424323
-	"formID": 4234324,
-	"attendeeID": 34324234
-	/* time-submitted is not included - this is added by the server */
-	"list": [
-		{
-			"questionID": 4234324,
-			"data": {
-				"response": "This is long answer question resonse."
-			}
-		},
-		{
-			"questionID": 423523,
-			"data": {
-				"response": "3", /* checkbox answer 3 selected */
-			}
-		}
-	]
-}
-``` 
-Response:
-```
-{
-	// "submissionID": 423432
-	"answerIDs": [7865347, 4231432]
-}
-``` -->
+
 Attendees can also single Answers:\
 ```POST /v0/answers```\
 Request:
@@ -490,6 +476,7 @@ Request:
 {
 	"attendeeID": 3423423,
 	"eventID": 4242342,
+	"eventFormID": 34234324
 	"questionID": 4234324,
 	"data": {
 		"response": "This is long answer question resonse."
@@ -511,8 +498,8 @@ Request:
 }
 ```
 ### 5.	Submit general feedback (registered event). 
-```POST /v0/submissions```\
-Some request info as above. Use the formID ```0```, which corresponds to the general feedback form.
+```POST /v0/answers/{answerID}```\
+Use the answerID corersponding to question in the general feedback form, which has formID ```0```.
 ### 6.	Submit explicit mood (registered event). 
 ```POST /v0/moods```\
 Request:
