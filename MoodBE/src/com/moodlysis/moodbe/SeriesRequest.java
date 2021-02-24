@@ -12,6 +12,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 import java.sql.*;
 
+import com.moodlysis.moodbe.integration.Series;
+
 /**
  * Servlet implementation class Series
  */
@@ -39,6 +41,16 @@ public class SeriesRequest extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (request.getServletPath().equals("/v0/series")) {
+			doNewSeries(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
+	}
+	
+	protected void doNewSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Series series = new Series(response.getWriter());
 		StringBuilder postData = new StringBuilder();
 		BufferedReader reader = request.getReader();
 		try {
@@ -49,7 +61,7 @@ public class SeriesRequest extends HttpServlet {
 		} finally {
 			reader.close();
 		}
-		//TODO test content-type header is application/json
+		//TODO test content-type header is application/json ( request.getContentType() )
 		String jsonData = postData.toString();
 		JSONParser postParser = new JSONParser();
 		int hostID = 0;
@@ -82,73 +94,29 @@ public class SeriesRequest extends HttpServlet {
 			response.getWriter().append(jsonData + "\n\n\n");
 			e.printStackTrace(response.getWriter());
 		}
-		
-		//JDBC
-		try {
-			Class.forName("org.postgresql.Driver");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace(response.getWriter());
-		}
-    	// JDBC connection to the database container
-		String dburl = "jdbc:postgresql://database.mood-net:5432/mood?user=mooduser&password=password";
-		/*
-		 * example insert
-		 * INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 1, 'SE Project', 'Software Engineering Project on Cybersecurity');
-		 */
-		PreparedStatement seriesInsert  = null;
-		ResultSet seriesKey = null;
-		int seriesID = 0;
-		Connection conn = null;
-		try {
-			conn = DriverManager.getConnection(dburl);
-			conn.setAutoCommit(false);
-    		String query = "INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'),?,?,?)";
-    		seriesInsert = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-    		seriesInsert.setInt(1, hostID);
-    		seriesInsert.setString(2, title);
-    		seriesInsert.setString(3, description);
-			seriesInsert.executeUpdate();
-			seriesKey = seriesInsert.getGeneratedKeys();
-			seriesKey.next();
-			seriesID = seriesKey.getInt(1);
-			conn.commit();
-			conn.setAutoCommit(true);
-		} catch(SQLException e) {
-			//TODO
-			e.printStackTrace(response.getWriter());
-			try {
-				conn.rollback();
-			} catch(SQLException er) {
-				er.printStackTrace(response.getWriter());
-			}
-		} finally {
-			try {
-				if (seriesInsert != null) {
-						seriesInsert.close();
-				}
-				if (seriesKey != null) {
-						seriesKey.close();
-				}
-			} catch(SQLException e) {
-				e.printStackTrace(response.getWriter());
-			}
-		}
-		/*
-		 * JSON Example Output
-		 * { "seriesID": 1 }
-		 */
+		//CALL JDBC
+		int seriesID = series.newSeries(title, description, hostID);
 		
 		// tell the caller that this is JSON content (move to front)
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		
-		JSONObject output = new JSONObject();
-		output.put("seriesID", seriesID);
-		response.getWriter().append(output.toJSONString());
+		if (seriesID != -1) {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			
+			//Write JSON
+			String output = series.getJSON(seriesID);
+			response.getWriter().append(output);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub, do not use doGet
+		doGet(request, response);
+	}
+	
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub, do not use doGet
 		doGet(request, response);
 	}
