@@ -1,4 +1,4 @@
-package com.moodylsis.moodbe;
+package com.moodlysis.moodbe;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.moodylsis.moodbe.integration.Event;
+import com.moodlysis.moodbe.integration.Event;
 
 // GET /v0/events/{eventID}
 // GET /v0/events/{eventID}/invite-code

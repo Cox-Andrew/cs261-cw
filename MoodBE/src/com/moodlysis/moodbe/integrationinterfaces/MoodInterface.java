@@ -1,4 +1,4 @@
-package com.moodylsis.moodbe.integrationinterfaces;
+package com.moodlysis.moodbe.integrationinterfaces;
 
 import java.sql.Connection;
 import java.sql.SQLException;

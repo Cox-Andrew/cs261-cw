@@ -1,4 +1,4 @@
-package com.moodylsis.moodbe.endpoints;
+package com.moodlysis.moodbe.endpoints;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;

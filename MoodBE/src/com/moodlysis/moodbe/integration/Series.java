@@ -1,9 +1,9 @@
-package com.moodylsis.moodbe.integration;
+package com.moodlysis.moodbe.integration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import com.moodylsis.moodbe.integrationinterfaces.SeriesInterface;
+import com.moodlysis.moodbe.integrationinterfaces.SeriesInterface;
 
 public class Series implements SeriesInterface {
 

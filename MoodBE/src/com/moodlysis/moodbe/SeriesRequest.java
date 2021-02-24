@@ -1,4 +1,4 @@
-package com.moodylsis.moodbe;
+package com.moodlysis.moodbe;
 
 import java.io.BufferedReader;
 import java.io.IOException;

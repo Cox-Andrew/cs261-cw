@@ -1,10 +1,10 @@
-package com.moodylsis.moodbe.integration;
+package com.moodlysis.moodbe.integration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 
-import com.moodylsis.moodbe.integrationinterfaces.AttendeeInterface;
+import com.moodlysis.moodbe.integrationinterfaces.AttendeeInterface;
 
 public class Attendee implements AttendeeInterface {
 

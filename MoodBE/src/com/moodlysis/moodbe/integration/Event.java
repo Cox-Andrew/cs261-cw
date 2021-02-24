@@ -1,10 +1,10 @@
-package com.moodylsis.moodbe.integration;
+package com.moodlysis.moodbe.integration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 
-import com.moodylsis.moodbe.integrationinterfaces.EventInterface;
+import com.moodlysis.moodbe.integrationinterfaces.EventInterface;
 
 public class Event implements EventInterface {
 

@@ -1,9 +1,9 @@
-package com.moodylsis.moodbe.integration;
+package com.moodlysis.moodbe.integration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import com.moodylsis.moodbe.integrationinterfaces.HostInterface;
+import com.moodlysis.moodbe.integrationinterfaces.HostInterface;
 
 public class Host implements HostInterface {
 
