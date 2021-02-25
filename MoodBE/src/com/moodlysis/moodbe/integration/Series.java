@@ -22,6 +22,13 @@ public class Series implements SeriesInterface {
 		this.conn = DatabaseConnection.getConnection();
 		this.writer = writer;
 	}
+	
+	public static class seriesInfo {
+		public int seriesID;
+		public int hostID;
+		public String title;
+		public String description;
+	}
 
 	@Override
 	public String getJSON(int seriesID) {
@@ -34,6 +41,63 @@ public class Series implements SeriesInterface {
 		JSONObject output = new JSONObject();
 		output.put("seriesID", seriesID);
 		return output.toJSONString();
+	}
+	
+	public String getJSON(seriesInfo info) {
+		JSONObject output = new JSONObject();
+		output.put("seriesID", info.seriesID);
+		output.put("hostID", info.hostID);
+		output.put("title", info.title);
+		output.put("description", info.description);
+		return output.toJSONString();
+	}
+	
+	
+	
+	public seriesInfo getSeries(int seriesID) {
+		seriesInfo info = new seriesInfo();
+		info.seriesID = seriesID;
+		PreparedStatement seriesGet  = null;
+		ResultSet table = null;
+		int hostID = -1;
+		String title = "";
+		String desc = "";
+		try {
+			conn.setAutoCommit(false);
+    		String query = "SELECT * FROM SERIES WHERE seriesID = ?";
+    		seriesGet = conn.prepareStatement(query);
+    		seriesGet.setInt(1, seriesID);
+			table = seriesGet.executeQuery();
+			table.next();
+			hostID = table.getInt("hostID");
+			title = table.getString("Title");
+			desc = table.getString("Description");
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+		} finally {
+			try {
+				if (seriesGet != null) {
+						seriesGet.close();
+				}
+				if (table != null) {
+						table.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+			}
+		}
+		info.hostID = hostID;
+		info.title = title;
+		info.description = desc;
+		return info;
 	}
 
 	@Override

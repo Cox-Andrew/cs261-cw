@@ -3,8 +3,22 @@ package com.moodlysis.moodbe.integrationinterfaces;
 import java.sql.SQLException;
 
 public interface SeriesInterface {
-	// GET /v0/series/{seriesID}
+	
 	public String getJSON(int seriesID);
+	
+	
+	// GET /v0/series/{seriesID}
+	/*
+	public static class seriesInfo {
+		public int seriesID;
+		public int hostID;
+		public String title;
+		public String description;
+	}
+	
+	public seriesInfo getSeries(int seriesID);
+	*/
+	
 	
 	// POST /v0/series
 	// I didn't put events:list in because the series should be created before the events

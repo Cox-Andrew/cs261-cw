@@ -35,6 +35,62 @@ public class SeriesRequest extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
+		if (request.getServletPath().equals("/v0/series/*")) {
+			doGetSeries(request, response);
+		}
+	}
+	
+	protected String readJSON(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		StringBuilder data = new StringBuilder();
+		BufferedReader reader = request.getReader();
+		try {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				data.append(line).append('\n');
+			}
+		} finally {
+			reader.close();
+		}
+		//TODO test content-type header is application/json ( request.getContentType() )
+		String jsonData = data.toString();
+		return jsonData;
+	}
+	
+	protected void doGetSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Series series = new Series(response.getWriter());
+		String jsonData = readJSON(request, response);
+		JSONParser getParser = new JSONParser();
+		int seriesID = -1;
+		try {
+			JSONObject getObject = (JSONObject) getParser.parse(jsonData);
+			/*
+			 * 
+			 */
+			seriesID = Integer.valueOf(getObject.get("seriesID").toString());
+			response.getWriter().append("\nseriesID " + seriesID + "\n");
+		} catch(ParseException e) {
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+		}
+		
+		Series.seriesInfo info = series.getSeries(seriesID);
+		int hostID = info.hostID;
+		String title = info.title;
+		String description = info.description;
+		
+		// tell the caller that this is JSON content (move to front)
+				if (hostID != -1 || title != "" || description != "") {
+					response.setContentType("application/json");
+					response.setCharacterEncoding("UTF-8");
+					
+					//Write JSON
+					String output = series.getJSON(info);
+					response.getWriter().append(output + "\n");
+				}
+				else {
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				}
+		
 	}
 
 	/**
@@ -51,20 +107,9 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doNewSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Series series = new Series(response.getWriter());
-		StringBuilder postData = new StringBuilder();
-		BufferedReader reader = request.getReader();
-		try {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				postData.append(line).append('\n');
-			}
-		} finally {
-			reader.close();
-		}
-		//TODO test content-type header is application/json ( request.getContentType() )
-		String jsonData = postData.toString();
+		String jsonData = readJSON(request, response);
 		JSONParser postParser = new JSONParser();
-		int hostID = 0;
+		int hostID = -1;
 		String data = "";
 		String title = "";
 		String description = "";
@@ -87,7 +132,7 @@ public class SeriesRequest extends HttpServlet {
 			data = postObject.get("data").toString();
 			title = ((JSONObject) postObject.get("data")).get("title").toString();
 			description = ((JSONObject) postObject.get("data")).get("description").toString();
-			response.getWriter().append("\nhostID: " + hostID + "\n" + "data: " + data + "\n");
+			response.getWriter().append("\nhostID: " + hostID + "\ndata: " + data + "\n");
 			response.getWriter().append("title: " + title + "\n" + "description: " + description + "\n");
 		} catch(ParseException e) {
 			//TODO
@@ -104,7 +149,7 @@ public class SeriesRequest extends HttpServlet {
 			
 			//Write JSON
 			String output = series.getJSON(seriesID);
-			response.getWriter().append(output);
+			response.getWriter().append(output + "\n");
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
