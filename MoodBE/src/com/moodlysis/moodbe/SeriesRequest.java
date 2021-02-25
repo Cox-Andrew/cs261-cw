@@ -17,7 +17,7 @@ import com.moodlysis.moodbe.integration.Series;
 /**
  * Servlet implementation class Series
  */
-@WebServlet({"/v0/series", "/v0/series/*"})
+@WebServlet(urlPatterns = {"/v0/series", "/v0/series/*"})
 public class SeriesRequest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -34,10 +34,10 @@ public class SeriesRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-		if (request.getServletPath().equals("/v0/series/*")) {
-			doGetSeries(request, response);
-		}
+		//if /v0/series
+		response.getWriter().append("Served at: ").append(request.getContextPath() + "\n");
+		//if  /v0/series/{seriesID}
+		doGetSeries(request, response);
 	}
 	
 	protected String readJSON(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -56,22 +56,15 @@ public class SeriesRequest extends HttpServlet {
 		return jsonData;
 	}
 	
+	protected int getIDFromPath(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String[] path = request.getPathTranslated().split("/");
+		int seriesID = Integer.valueOf(path[path.length - 1]);		
+		return seriesID;
+	}
+	
 	protected void doGetSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Series series = new Series(response.getWriter());
-		String jsonData = readJSON(request, response);
-		JSONParser getParser = new JSONParser();
-		int seriesID = -1;
-		try {
-			JSONObject getObject = (JSONObject) getParser.parse(jsonData);
-			/*
-			 * 
-			 */
-			seriesID = Integer.valueOf(getObject.get("seriesID").toString());
-			response.getWriter().append("\nseriesID " + seriesID + "\n");
-		} catch(ParseException e) {
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
-		}
+		int seriesID = getIDFromPath(request, response);
 		
 		Series.seriesInfo info = series.getSeries(seriesID);
 		int hostID = info.hostID;
