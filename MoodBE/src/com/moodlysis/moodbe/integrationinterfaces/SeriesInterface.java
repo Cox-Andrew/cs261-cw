@@ -4,21 +4,16 @@ import java.sql.SQLException;
 
 public interface SeriesInterface {
 	
+	//public interface seriesInfo {}
+	
 	public String getJSON(int seriesID);
 	
+	//public String getJSON(seriesInfo info);
 	
 	
 	// GET /v0/series/{seriesID}
-	/*
-	public static class seriesInfo {
-		public int seriesID;
-		public int hostID;
-		public String title;
-		public String description;
-	}
+	//public seriesInfo getSeries(int seriesID);
 	
-	public seriesInfo getSeries(int seriesID);
-	*/
 	
 	
 	// POST /v0/series

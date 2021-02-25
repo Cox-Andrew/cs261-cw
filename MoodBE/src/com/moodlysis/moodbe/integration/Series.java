@@ -23,6 +23,7 @@ public class Series implements SeriesInterface {
 		this.writer = writer;
 	}
 	
+	
 	public static class seriesInfo {
 		public int seriesID;
 		public int hostID;
@@ -64,7 +65,7 @@ public class Series implements SeriesInterface {
 		String desc = "";
 		try {
 			conn.setAutoCommit(false);
-    		String query = "SELECT * FROM SERIES WHERE seriesID = ?";
+    		String query = "SELECT * FROM SERIES WHERE SeriesID = ?";
     		seriesGet = conn.prepareStatement(query);
     		seriesGet.setInt(1, seriesID);
 			table = seriesGet.executeQuery();
@@ -85,10 +86,10 @@ public class Series implements SeriesInterface {
 		} finally {
 			try {
 				if (seriesGet != null) {
-						seriesGet.close();
+					seriesGet.close();
 				}
 				if (table != null) {
-						table.close();
+					table.close();
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
@@ -132,10 +133,10 @@ public class Series implements SeriesInterface {
 		} finally {
 			try {
 				if (seriesInsert != null) {
-						seriesInsert.close();
+					seriesInsert.close();
 				}
 				if (seriesKey != null) {
-						seriesKey.close();
+					seriesKey.close();
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
@@ -146,8 +147,39 @@ public class Series implements SeriesInterface {
 
 	@Override
 	public boolean editSeries(int seriesID, String newTitle, String newDesc) {
-		// TODO Auto-generated method stub
-		return false;
+		// TODO fix so if error occurs return false but still execute finally statement
+		PreparedStatement seriesEdit  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "UPDATE SERIES SET Title = ?, Description = ? WHERE SeriesID = ?";
+    		seriesEdit = conn.prepareStatement(query);
+    		seriesEdit.setString(1, newTitle);
+    		seriesEdit.setString(2, newDesc);
+    		seriesEdit.setInt(3, seriesID);
+    		seriesEdit.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (seriesEdit != null) {
+					seriesEdit.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

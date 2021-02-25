@@ -35,7 +35,7 @@ public class SeriesRequest extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//if /v0/series
-		response.getWriter().append("Served at: ").append(request.getContextPath() + "\n");
+		//response.getWriter().append("Served at: ").append(request.getContextPath() + "\n");
 		//if  /v0/series/{seriesID}
 		doGetSeries(request, response);
 	}
@@ -151,8 +151,53 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub, do not use doGet
-		doGet(request, response);
+		//doGet(request, response);
+		//if /v0/series/{seriesID}
+		doEditSeries(request, response);
 	}
+	
+	protected void doEditSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//doGet(request, response);
+		Series series = new Series(response.getWriter());
+		String jsonData = readJSON(request, response);
+		JSONParser putParser = new JSONParser();
+		int seriesID = getIDFromPath(request, response);
+		String data = "";
+		String title = "";
+		String description = "";
+		try {
+			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
+			/*
+			 * {
+			 *		"data": {
+			 *			"title": "New series Title",
+			 *			"description": "New description of Series."
+			 *		}
+			 *	}
+			 *
+			 * { "data": { "title": "New series Title", "description": "New description of Series." }}
+			 * 
+			 * JSON looks like the above
+			 */
+			data = putObject.get("data").toString();
+			title = ((JSONObject) putObject.get("data")).get("title").toString();
+			description = ((JSONObject) putObject.get("data")).get("description").toString();
+			response.getWriter().append("\ndata: " + data + "\n");
+			response.getWriter().append("title: " + title + "\n" + "description: " + description + "\n");
+		} catch(ParseException e) {
+			//TODO
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+		}
+		if (series.editSeries(seriesID, title, description)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			//put into response body what was wrong (can be handled in jdbc)
+		}
+	}
+	
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub, do not use doGet
