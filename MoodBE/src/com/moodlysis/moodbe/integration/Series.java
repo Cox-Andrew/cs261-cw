@@ -185,7 +185,36 @@ public class Series implements SeriesInterface {
 	@Override
 	public boolean deleteSeries(int seriesID) {
 		// TODO Auto-generated method stub
-		return false;
+		PreparedStatement seriesDelete  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "DELETE FROM SERIES WHERE SeriesID = ?";
+    		seriesDelete = conn.prepareStatement(query);
+    		seriesDelete.setInt(1, seriesID);
+    		seriesDelete.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (seriesDelete != null) {
+					seriesDelete.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

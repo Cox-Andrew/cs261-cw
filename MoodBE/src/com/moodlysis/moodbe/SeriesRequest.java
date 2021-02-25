@@ -72,17 +72,18 @@ public class SeriesRequest extends HttpServlet {
 		String description = info.description;
 		
 		// tell the caller that this is JSON content (move to front)
-				if (hostID != -1 || title != "" || description != "") {
-					response.setContentType("application/json");
-					response.setCharacterEncoding("UTF-8");
-					
-					//Write JSON
-					String output = series.getJSON(info);
-					response.getWriter().append(output + "\n");
-				}
-				else {
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				}
+		// make a proper check for description which isnt just empty string
+		if (hostID == -1 || title.equals("") /*|| description.equals("")*/) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		else {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			
+			//Write JSON
+			String output = series.getJSON(info);
+			response.getWriter().append(output + "\n");
+		}
 		
 	}
 
@@ -157,7 +158,6 @@ public class SeriesRequest extends HttpServlet {
 	}
 	
 	protected void doEditSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//doGet(request, response);
 		Series series = new Series(response.getWriter());
 		String jsonData = readJSON(request, response);
 		JSONParser putParser = new JSONParser();
@@ -188,12 +188,15 @@ public class SeriesRequest extends HttpServlet {
 			//TODO
 			response.getWriter().append(jsonData + "\n\n\n");
 			e.printStackTrace(response.getWriter());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			//return;
 		}
 		if (series.editSeries(seriesID, title, description)) {
 			response.setStatus(HttpServletResponse.SC_OK);
 		}
 		else {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
 			//put into response body what was wrong (can be handled in jdbc)
 		}
 	}
@@ -201,7 +204,23 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub, do not use doGet
-		doGet(request, response);
+		//if /v0/series
+		//response.getWriter().append("Served at: ").append(request.getContextPath() + "\n");
+		//if  /v0/series/{seriesID}
+		doDeleteSeries(request, response);
+	}
+	
+	protected void doDeleteSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Series series = new Series(response.getWriter());
+		int seriesID = getIDFromPath(request, response);
+		
+		if (series.deleteSeries(seriesID)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
+		}
 	}
 
 }
