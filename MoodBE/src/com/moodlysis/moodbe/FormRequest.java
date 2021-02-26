@@ -148,14 +148,14 @@ public class FormRequest extends HttpServlet {
 			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
 			/*
 			 * {
-			 *		"hostID" : 0,
+			 *		"hostID": 1,
 			 *		"data": {
-			 *			"title": "Series Title",
-			 *			"description": "Description of Series."
+			 *			"title": "Form title",
+			 *			"description": "Form description"
 			 *		}
 			 *	}
 			 *
-			 * { "hostID" : 0, "data": { "title": "Series Title", "description": "Description of Series." }}
+			 * {"hostID": 1,"data": {"title": "Form title","description": "Form description"}}
 			 * 
 			 * JSON looks like the above
 			 */

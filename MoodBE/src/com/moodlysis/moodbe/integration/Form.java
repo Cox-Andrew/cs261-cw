@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.GeneralRequest;
@@ -127,9 +128,45 @@ public class Form implements FormInterface {
 	}
 
 	@Override
-	public int newForm(int hostID, String formTitle, String formDescription) {
+	public int newForm(int hostID, String title, String desc) {
 		// TODO Auto-generated method stub
-		return -1;
+		PreparedStatement formInsert  = null;
+		ResultSet formKey = null;
+		int formID = -1;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'),?,?,?)";
+    		formInsert = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    		formInsert.setInt(1, hostID);
+    		formInsert.setString(2, title);
+    		formInsert.setString(3, desc);
+    		formInsert.executeUpdate();
+    		formKey = formInsert.getGeneratedKeys();
+    		formKey.next();
+    		formID = formKey.getInt(1);
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+		} finally {
+			try {
+				if (formInsert != null) {
+					formInsert.close();
+				}
+				if (formKey != null) {
+					formKey.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+			}
+		}
+		return formID;
 	}
 
 	@Override
