@@ -63,9 +63,41 @@ public class Host implements HostInterface {
 	}
 
 	@Override
-	public boolean editHost(int hostID, String name, String pass, String email) {
+	public boolean editHost(int hostID, String email, String pass, String account) {
 		// TODO Auto-generated method stub
-		return false;
+		PreparedStatement hostEdit  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "UPDATE HOST SET Email = ?, Pass = ?, AccountName = ? WHERE HostID = ?";
+    		hostEdit = conn.prepareStatement(query);
+    		hostEdit.setString(1, email);
+    		hostEdit.setString(2, pass);
+    		hostEdit.setString(3, account);
+    		hostEdit.setInt(4, hostID);
+    		hostEdit.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (hostEdit != null) {
+					hostEdit.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

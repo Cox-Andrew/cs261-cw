@@ -13,6 +13,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Host;
+import com.moodlysis.moodbe.integration.Series;
 import com.moodlysis.moodbe.GeneralRequest;
 
 /**
@@ -40,14 +41,6 @@ public class HostRequest extends HttpServlet {
 		JSONObject output = new JSONObject();
 		output.put("hostID", hostID);
 		return output.toJSONString();
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
@@ -106,6 +99,57 @@ public class HostRequest extends HttpServlet {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	/**
+	 * @see HttpServlet#doPut(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		//if /v0/series/{seriesID}
+		doEditHost(request, response);
+	}
+	
+	protected void doEditHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Host host = new Host(response.getWriter());
+		String jsonData = GeneralRequest.readJSON(request, response);
+		JSONParser putParser = new JSONParser();
+		int hostID = GeneralRequest.getIDFromPath(request, response);
+		String email = "";
+		String pass = "";
+		String account = "";
+		try {
+			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
+			/*
+			 * {
+			 *		"data": {
+			 *			"title": "New series Title",
+			 *			"description": "New description of Series."
+			 *		}
+			 *	}
+			 *
+			 * { "data": { "title": "New series Title", "description": "New description of Series." }}
+			 * 
+			 * JSON looks like the above
+			 */
+			email = putObject.get("email").toString();
+			pass = putObject.get("pass").toString();
+			account = putObject.get("account-name").toString();
+		} catch(ParseException e) {
+			//TODO
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			//return;
+		}
+		if (host.editHost(hostID, email, pass, account)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
+			//put into response body what was wrong (can be handled in jdbc)
 		}
 	}
 

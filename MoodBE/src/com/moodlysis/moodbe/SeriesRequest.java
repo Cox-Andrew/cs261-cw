@@ -153,7 +153,6 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub, do not use doGet
-		//doGet(request, response);
 		//if /v0/series/{seriesID}
 		doEditSeries(request, response);
 	}
