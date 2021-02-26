@@ -13,6 +13,7 @@ import org.json.simple.parser.*;
 import java.sql.*;
 
 import com.moodlysis.moodbe.integration.Series;
+import com.moodlysis.moodbe.GeneralRequest;
 
 /**
  * Servlet implementation class Series
@@ -40,31 +41,9 @@ public class SeriesRequest extends HttpServlet {
 		doGetSeries(request, response);
 	}
 	
-	protected String readJSON(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		StringBuilder data = new StringBuilder();
-		BufferedReader reader = request.getReader();
-		try {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				data.append(line).append('\n');
-			}
-		} finally {
-			reader.close();
-		}
-		//TODO test content-type header is application/json ( request.getContentType() )
-		String jsonData = data.toString();
-		return jsonData;
-	}
-	
-	protected int getIDFromPath(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String[] path = request.getPathTranslated().split("/");
-		int seriesID = Integer.valueOf(path[path.length - 1]);		
-		return seriesID;
-	}
-	
 	protected void doGetSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Series series = new Series(response.getWriter());
-		int seriesID = getIDFromPath(request, response);
+		int seriesID = GeneralRequest.getIDFromPath(request, response);
 		
 		Series.seriesInfo info = series.getSeries(seriesID);
 		int hostID = info.hostID;
@@ -101,7 +80,7 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doNewSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Series series = new Series(response.getWriter());
-		String jsonData = readJSON(request, response);
+		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int hostID = -1;
 		String data = "";
@@ -159,9 +138,9 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doEditSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Series series = new Series(response.getWriter());
-		String jsonData = readJSON(request, response);
+		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
-		int seriesID = getIDFromPath(request, response);
+		int seriesID = GeneralRequest.getIDFromPath(request, response);
 		String data = "";
 		String title = "";
 		String description = "";
@@ -212,7 +191,7 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doDeleteSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Series series = new Series(response.getWriter());
-		int seriesID = getIDFromPath(request, response);
+		int seriesID = GeneralRequest.getIDFromPath(request, response);
 		
 		if (series.deleteSeries(seriesID)) {
 			response.setStatus(HttpServletResponse.SC_OK);
