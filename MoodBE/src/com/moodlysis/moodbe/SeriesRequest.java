@@ -13,6 +13,7 @@ import org.json.simple.parser.*;
 import java.sql.*;
 
 import com.moodlysis.moodbe.integration.Series;
+import com.moodlysis.moodbe.integration.Series.seriesInfo;
 import com.moodlysis.moodbe.GeneralRequest;
 
 /**
@@ -29,6 +30,27 @@ public class SeriesRequest extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
+    
+    public String getJSON(int seriesID) {
+		// TODO Auto-generated method stub
+		/*
+		 * JSON Example Output
+		 * { "seriesID": 1 }
+		 */
+		
+		JSONObject output = new JSONObject();
+		output.put("seriesID", seriesID);
+		return output.toJSONString();
+	}
+	
+	public String getJSON(seriesInfo info) {
+		JSONObject output = new JSONObject();
+		output.put("seriesID", info.seriesID);
+		output.put("hostID", info.hostID);
+		output.put("title", info.title);
+		output.put("description", info.description);
+		return output.toJSONString();
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -60,7 +82,7 @@ public class SeriesRequest extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			
 			//Write JSON
-			String output = series.getJSON(info);
+			String output = getJSON(info);
 			response.getWriter().append(output + "\n");
 		}
 		
@@ -121,7 +143,7 @@ public class SeriesRequest extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			
 			//Write JSON
-			String output = series.getJSON(seriesID);
+			String output = getJSON(seriesID);
 			response.getWriter().append(output + "\n");
 		}
 		else {

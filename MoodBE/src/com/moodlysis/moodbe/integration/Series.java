@@ -30,28 +30,6 @@ public class Series implements SeriesInterface {
 		public String title;
 		public String description;
 	}
-
-	@Override
-	public String getJSON(int seriesID) {
-		// TODO Auto-generated method stub
-		/*
-		 * JSON Example Output
-		 * { "seriesID": 1 }
-		 */
-		
-		JSONObject output = new JSONObject();
-		output.put("seriesID", seriesID);
-		return output.toJSONString();
-	}
-	
-	public String getJSON(seriesInfo info) {
-		JSONObject output = new JSONObject();
-		output.put("seriesID", info.seriesID);
-		output.put("hostID", info.hostID);
-		output.put("title", info.title);
-		output.put("description", info.description);
-		return output.toJSONString();
-	}
 	
 	
 	

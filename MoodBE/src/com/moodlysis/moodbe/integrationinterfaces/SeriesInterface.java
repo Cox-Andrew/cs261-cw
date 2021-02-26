@@ -6,8 +6,6 @@ public interface SeriesInterface {
 	
 	//public interface seriesInfo {}
 	
-	public String getJSON(int seriesID);
-	
 	//public String getJSON(seriesInfo info);
 	
 	
