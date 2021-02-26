@@ -20,6 +20,59 @@ public class Host implements HostInterface {
 		this.writer = writer;
 	}
 	
+	public static class hostInfo {
+		public int hostID;
+		public String email;
+		public String pass;
+		public String account;
+	}
+	
+	public hostInfo getHost(int hostID) {
+		hostInfo info = new hostInfo();
+		info.hostID = hostID;
+		PreparedStatement hostGet  = null;
+		ResultSet table = null;
+		String email = "";
+		String pass = "";
+		String account = "";
+		try {
+			conn.setAutoCommit(false);
+    		String query = "SELECT * FROM HOST WHERE HostID = ?";
+    		hostGet = conn.prepareStatement(query);
+    		hostGet.setInt(1, hostID);
+			table = hostGet.executeQuery();
+			table.next();
+			email = table.getString("Email");
+			pass = table.getString("Pass");
+			account = table.getString("AccountName");
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+		} finally {
+			try {
+				if (hostGet != null) {
+					hostGet.close();
+				}
+				if (table != null) {
+					table.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+			}
+		}
+		info.email = email;
+		info.pass = pass;
+		info.account = account;
+		return info;
+	}
+	
 
 	@Override
 	public int newHost(String email, String pass, String account) {
@@ -91,6 +144,39 @@ public class Host implements HostInterface {
 			try {
 				if (hostEdit != null) {
 					hostEdit.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean deleteHost(int hostID) {
+		PreparedStatement hostDelete  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "DELETE FROM HOST WHERE HostID = ?";
+    		hostDelete = conn.prepareStatement(query);
+    		hostDelete.setInt(1, hostID);
+    		hostDelete.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (hostDelete != null) {
+					hostDelete.close();
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);

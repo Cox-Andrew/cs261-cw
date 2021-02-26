@@ -14,7 +14,7 @@ import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Host;
 import com.moodlysis.moodbe.integration.Series;
-import com.moodlysis.moodbe.GeneralRequest;
+
 
 /**
  * Servlet implementation class HostRequest
@@ -41,6 +41,48 @@ public class HostRequest extends HttpServlet {
 		JSONObject output = new JSONObject();
 		output.put("hostID", hostID);
 		return output.toJSONString();
+	}
+    
+    public String getJSON(Host.hostInfo info) {
+		JSONObject output = new JSONObject();
+		output.put("hostID", info.hostID);
+		output.put("email", info.email);
+		output.put("pass", info.pass);
+		output.put("account-name", info.account);
+		return output.toJSONString();
+	}
+    
+    /**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		//if  /v0/hosts/{hostID}
+		doGetHost(request, response);
+	}
+	
+	protected void doGetHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Host host = new Host(response.getWriter());
+		int hostID = GeneralRequest.getIDFromPath(request, response);
+		
+		Host.hostInfo info = host.getHost(hostID);
+		String email = info.email;
+		String pass = info.pass;
+		String account = info.account;
+		
+		// tell the caller that this is JSON content (move to front)
+		// make a proper check for account-name which isnt just empty string
+		if (email.equals("") || pass.equals("") /*|| account.equals("")*/) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		else {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			
+			//Write JSON
+			String output = getJSON(info);
+			response.getWriter().append(output + "\n");
+		}
 	}
 
 	/**
@@ -150,6 +192,25 @@ public class HostRequest extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			//assumes id not found
 			//put into response body what was wrong (can be handled in jdbc)
+		}
+	}
+	
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		//if /v0/series/{seriesID}
+		doDeleteHost(request, response);
+	}
+	
+	protected void doDeleteHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Host host = new Host(response.getWriter());
+		int hostID = GeneralRequest.getIDFromPath(request, response);
+		
+		if (host.deleteHost(hostID)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
 		}
 	}
 

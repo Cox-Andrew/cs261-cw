@@ -13,8 +13,7 @@ import org.json.simple.parser.*;
 import java.sql.*;
 
 import com.moodlysis.moodbe.integration.Series;
-import com.moodlysis.moodbe.integration.Series.seriesInfo;
-import com.moodlysis.moodbe.GeneralRequest;
+
 
 /**
  * Servlet implementation class Series
@@ -43,7 +42,7 @@ public class SeriesRequest extends HttpServlet {
 		return output.toJSONString();
 	}
 	
-	public String getJSON(seriesInfo info) {
+	public String getJSON(Series.seriesInfo info) {
 		JSONObject output = new JSONObject();
 		output.put("seriesID", info.seriesID);
 		output.put("hostID", info.hostID);

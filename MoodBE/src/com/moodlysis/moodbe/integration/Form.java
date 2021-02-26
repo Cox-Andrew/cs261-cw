@@ -1,38 +1,48 @@
 package com.moodlysis.moodbe.integration;
 
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.FormInterface;
 
 public class Form implements FormInterface {
+	
+	private Connection conn;
+	private PrintWriter writer;
+	
+	public Form(PrintWriter writer) {
+		this.conn = DatabaseConnection.getConnection();
+		this.writer = writer;
+	}
 
 	@Override
-	public int[] getFormIDsForHost(Connection conn, int hostID) throws SQLException {
+	public int[] getFormIDsForHost(int hostID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String getJSON(Connection conn, int formID) throws SQLException {
+	public String getForm(int formID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public int newForm(Connection conn, int hostID, String formTitle, String formDescription) throws SQLException {
+	public int newForm(int hostID, String formTitle, String formDescription) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public boolean editForm(Connection conn, int formID, String formTitle, String formDescription) throws SQLException {
+	public boolean editForm(int formID, String formTitle, String formDescription) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean deleteForm(Connection conn, int formID) throws SQLException {
+	public boolean deleteForm(int formID) {
 		// TODO Auto-generated method stub
 		return false;
 	}

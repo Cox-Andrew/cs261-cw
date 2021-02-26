@@ -1,7 +1,5 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
-import java.sql.SQLException;
-
 public interface SeriesInterface {
 	
 	//public interface seriesInfo {}
