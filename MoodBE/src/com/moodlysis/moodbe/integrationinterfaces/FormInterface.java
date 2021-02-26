@@ -7,7 +7,7 @@ public interface FormInterface {
 	public int[] getFormIDsForHost(int hostID);
 	
 	// GET /v0/forms/{formID}
-	public String getForm(int formID);
+	//public String getForm(int formID);
 	
 	// POST /v0/forms
 	public int newForm(int hostID, String formTitle, String formDescription);

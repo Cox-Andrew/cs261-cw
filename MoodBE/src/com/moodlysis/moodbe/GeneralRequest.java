@@ -30,5 +30,11 @@ public class GeneralRequest {
 		int ID = Integer.valueOf(path[path.length - 1]);		
 		return ID;
 	}
+	
+	public static int getIDFromQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String[] path = request.getPathTranslated().split("/");
+		int ID = Integer.valueOf(path[path.length - 1]);		
+		return ID;
+	}
 
 }
