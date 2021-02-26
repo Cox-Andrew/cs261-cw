@@ -56,8 +56,27 @@ Request:
 ```
 
 ### 4.	Change anonymity. 
-For anonymous submissions, the request should leave attendeeID blank/null.\
-TODO: problem - the current system would not be able to authenticate attendees' requests for the mood of this feedback, as the attendeeID is not stored alongside anonymous requests.
+<!-- For anonymous submissions, the request should leave attendeeID blank/null.\
+TODO: problem - the current system would not be able to authenticate attendees' requests for the mood of this feedback, as the attendeeID is not stored alongside anonymous requests. -->
+If a user is creating an anonymous response, the line "isAnonymous": true should be included in the answer post request.
+
+### 5. Get account details
+Only available to the user that is currently signed in.\
+```GET /v0/attendees/{attendeeID}```\
+```GET /v0/hosts/{hostID}```\
+Response:
+```
+{
+	"data": {
+		"email": "example@gmail.com",
+		"account-name": "Joe Bloggs"
+	}
+}
+```
+
+### 6. Delete account
+```DELETE /v0/attendees/{attendeeID}```\
+```DELETE /v0/hosts/{hostID}```
 
 
 ## Host functionality (available to authenticated users): 
@@ -362,6 +381,7 @@ Response:
 			// "submissionID": 4238492,
 			// submission ID will no longer included, but still packaged like this to make it easier for the front end
 			"account-name": "John Smith", /* may be null for anonymous responses */
+			"attendeeID": 3424234 /* always included so users may be blocked. */
 			// "time-submitted": "2020-01-22T19:33:05Z",
 			"time-updated": "2020-01-22T19:33:05Z",
 			// time-updated specified the latest of the time-updated of the answers
@@ -438,7 +458,8 @@ Response:
 		{
 			"time-submitted": "2020-01-22T19:33:05Z",
 			"mood-value": 0.842384,
-			"answerID": null
+			"answerID": null,
+			"attendeeID": 3432423 /* only included if it is an explicit mood, for the purpose of kicking attendees */
 		}
 	]
 }
@@ -448,6 +469,22 @@ Response:
 ```GET /v0/analytics?eventID={eventID}```\
 Response:\
 TODO
+
+### 10. Kick an attendee, deleting all their feedback from the session
+```DELETE /v0/event-attendees?eventID={eventID}&attendeeID={attendeeID}```
+
+### 11. Get the feedback profile for an answer
+Get the attendee ID and account-name for a response.\
+```GET /v0/feedback-profile?answerID={answerID}```\
+Response:
+```
+{
+	"attendeeID": 5452454,
+	"isAnonymous": false,
+	"account-name": 4324324 /* null if anonymous */
+}
+```
+
 ## Attendee request (available to authenticated users): 
 ### 1.	Register for event (with invite code). 
 ```POST /v0/register-event```\
@@ -479,7 +516,8 @@ Request:
 	"eventFormID": 34234324
 	"questionID": 4234324,
 	"data": {
-		"response": "This is long answer question resonse."
+		"response": "This is long answer question resonse.",
+		"isAnonymous": false
 	}
 }
 ```
@@ -494,7 +532,8 @@ Response:
 Request:
 ```
 "data": {
-	"response": "This is an edited response to a question."
+	"response": "This is an edited response to a question.",
+	"isAnonymous": false
 }
 ```
 ### 5.	Submit general feedback (registered event). 
