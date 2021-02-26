@@ -8,9 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.json.simple.JSONArray;
 
 import com.moodlysis.moodbe.integration.Form;
+import com.moodlysis.moodbe.integration.Series;
 
 /**
  * Servlet implementation class FormRequest
@@ -41,10 +44,12 @@ public class FormRequest extends HttpServlet {
     
     public String getJSON(Form.formInfo info) {
 		JSONObject output = new JSONObject();
+		JSONObject data = new JSONObject();
 		output.put("formID", info.formID);
 		output.put("hostID", info.hostID);
-		output.put("title", info.title);
-		output.put("description", info.description);
+		data.put("title", info.title);
+		data.put("description", info.description);
+		output.put("data", data);
 		return output.toJSONString();
 	}
     
@@ -72,6 +77,7 @@ public class FormRequest extends HttpServlet {
 	}
 	
 	protected void doGetForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//TODO get the question ids for the form
 		Form form = new Form(response.getWriter());
 		int formID = GeneralRequest.getIDFromPath(request, response);
 		
@@ -121,7 +127,62 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doGet(request, response);
+		if (request.getRequestURI().equals("/v0/forms")) {
+			doNewForm(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
+	}
+	
+	protected void doNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		Form form = new Form(response.getWriter());
+		String jsonData = GeneralRequest.readJSON(request, response);
+		JSONParser postParser = new JSONParser();
+		int hostID = -1;
+		String data = "";
+		String title = "";
+		String description = "";
+		try {
+			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
+			/*
+			 * {
+			 *		"hostID" : 0,
+			 *		"data": {
+			 *			"title": "Series Title",
+			 *			"description": "Description of Series."
+			 *		}
+			 *	}
+			 *
+			 * { "hostID" : 0, "data": { "title": "Series Title", "description": "Description of Series." }}
+			 * 
+			 * JSON looks like the above
+			 */
+			hostID = Integer.valueOf(postObject.get("hostID").toString());
+			data = postObject.get("data").toString();
+			title = ((JSONObject) postObject.get("data")).get("title").toString();
+			description = ((JSONObject) postObject.get("data")).get("description").toString();
+		} catch(ParseException e) {
+			//TODO
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+		}
+		//CALL JDBC
+		int formID = form.newForm(hostID, title, description);
+		
+		// tell the caller that this is JSON content (move to front)
+		if (formID != -1) {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			
+			//Write JSON
+			String output = getJSON(formID);
+			response.getWriter().append(output + "\n");
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	/**

@@ -44,10 +44,12 @@ public class SeriesRequest extends HttpServlet {
 	
 	public String getJSON(Series.seriesInfo info) {
 		JSONObject output = new JSONObject();
+		JSONObject data = new JSONObject();
 		output.put("seriesID", info.seriesID);
 		output.put("hostID", info.hostID);
-		output.put("title", info.title);
-		output.put("description", info.description);
+		data.put("title", info.title);
+		data.put("description", info.description);
+		output.put("data", data);
 		return output.toJSONString();
 	}
 
@@ -91,7 +93,7 @@ public class SeriesRequest extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (request.getServletPath().equals("/v0/series")) {
+		if (request.getRequestURI().equals("/v0/series")) {
 			doNewSeries(request, response);
 		}
 		else {

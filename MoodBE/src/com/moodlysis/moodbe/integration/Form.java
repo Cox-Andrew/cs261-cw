@@ -129,7 +129,7 @@ public class Form implements FormInterface {
 	@Override
 	public int newForm(int hostID, String formTitle, String formDescription) {
 		// TODO Auto-generated method stub
-		return 0;
+		return -1;
 	}
 
 	@Override
