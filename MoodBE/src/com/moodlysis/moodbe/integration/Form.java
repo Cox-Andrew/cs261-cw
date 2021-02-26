@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.moodlysis.moodbe.DatabaseConnection;
+import com.moodlysis.moodbe.GeneralRequest;
 import com.moodlysis.moodbe.integrationinterfaces.FormInterface;
 
 public class Form implements FormInterface {
@@ -26,11 +27,57 @@ public class Form implements FormInterface {
 		public String description;
 	}
 	
+	
+	
 
 	@Override
 	public int[] getFormIDsForHost(int hostID) {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement formsGet  = null;
+		ResultSet table = null;
+		int maxForms = 100;
+		int[] formIDs = new int[maxForms];
+		int i = 0;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "SELECT * FROM FORMS WHERE hostID = ?";
+    		formsGet = conn.prepareStatement(query);
+    		formsGet.setInt(1, hostID);
+			table = formsGet.executeQuery();
+			while(table.next()) {
+				formIDs[i] = table.getInt("formID");
+				i++;
+				if (i == maxForms) {
+					maxForms = maxForms * 2;
+					formIDs = GeneralRequest.extendArray(formIDs,maxForms);
+				}
+			}
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+		} finally {
+			try {
+				if (formsGet != null) {
+					formsGet.close();
+				}
+				if (table != null) {
+					table.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+			}
+		}
+		int[] returnIDs = new int[i];
+		for (int j = 0; j < i; j++) {
+			returnIDs[j] = formIDs[j];
+		}
+		return returnIDs;
 	}
 
 	public formInfo getForm(int formID) {

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 
 import com.moodlysis.moodbe.integration.Form;
 
@@ -49,9 +50,11 @@ public class FormRequest extends HttpServlet {
     
     public String getJSON(int[] formIDs) {
     	JSONObject output = new JSONObject();
+    	JSONArray forms = new JSONArray();
     	for (int i = 0; i < formIDs.length; i++) {
-    		output.put("formID", formIDs[i]);
-		}
+    		forms.add(formIDs[i]);
+    	}
+    	output.put("formID", forms);
     	return output.toJSONString();
     }
 
@@ -60,10 +63,12 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if  /v0/forms/{formID}
-		doGetForm(request, response);
-		//if /v0/forms?hostID={hostID}
-		//doGetHostForms
+		if (request.getRequestURI().matches("/v0/forms/(.*)")) {
+			doGetForm(request, response);
+		}
+		else if (request.getRequestURI().equals("/v0/forms")) {
+			doGetHostForms(request, response);
+		}
 	}
 	
 	protected void doGetForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

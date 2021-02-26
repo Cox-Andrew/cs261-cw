@@ -26,15 +26,24 @@ public class GeneralRequest {
 	}
 	
 	public static int getIDFromPath(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String[] path = request.getPathTranslated().split("/");
+		String[] path = request.getRequestURI().split("/");
 		int ID = Integer.valueOf(path[path.length - 1]);		
 		return ID;
 	}
 	
 	public static int getIDFromQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String[] path = request.getPathTranslated().split("/");
-		int ID = Integer.valueOf(path[path.length - 1]);		
+		//only works for one query, needs further development
+		String[] query = request.getQueryString().split("=");
+		int ID = Integer.valueOf(query[query.length-1]);		
 		return ID;
+	}
+	
+	public static int[] extendArray(int[] array, int newSize) {
+		int[] temp = new int[newSize];
+		for (int i = 0; i < array.length && i < newSize; i++) {
+			temp[i] = array[i];
+		}
+		return temp;
 	}
 
 }
