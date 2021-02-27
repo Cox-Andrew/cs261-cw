@@ -242,6 +242,21 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		//if  /v0/series/{seriesID}
+		doDeleteForm(request, response);
+	}
+	
+	protected void doDeleteForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Form form = new Form(response.getWriter());
+		int formID = GeneralRequest.getIDFromPath(request, response);
+		
+		if (form.deleteForm(formID)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
+		}
 	}
 
 }

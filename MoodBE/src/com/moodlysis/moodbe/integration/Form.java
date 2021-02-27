@@ -209,7 +209,36 @@ public class Form implements FormInterface {
 	@Override
 	public boolean deleteForm(int formID) {
 		// TODO Auto-generated method stub
-		return false;
+		PreparedStatement formDelete  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "DELETE FROM FORMS WHERE FormID = ?";
+    		formDelete = conn.prepareStatement(query);
+    		formDelete.setInt(1, formID);
+    		formDelete.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (formDelete != null) {
+					formDelete.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
