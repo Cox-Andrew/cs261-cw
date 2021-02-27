@@ -45,19 +45,28 @@ public class FormRequest extends HttpServlet {
     public String getJSON(Form.formInfo info) {
 		JSONObject output = new JSONObject();
 		JSONObject data = new JSONObject();
+		JSONArray questions = new JSONArray();
 		output.put("formID", info.formID);
 		output.put("hostID", info.hostID);
 		data.put("title", info.title);
 		data.put("description", info.description);
 		output.put("data", data);
+		if (info.questionIDs != null) {
+			for (int i = 0; i < info.questionIDs.length; i++) {
+	    		questions.add(info.questionIDs[i]);
+	    	}
+		}
+		output.put("questionIDs", questions);
 		return output.toJSONString();
 	}
     
     public String getJSON(int[] formIDs) {
     	JSONObject output = new JSONObject();
     	JSONArray forms = new JSONArray();
-    	for (int i = 0; i < formIDs.length; i++) {
-    		forms.add(formIDs[i]);
+    	if (formIDs != null) {
+	    	for (int i = 0; i < formIDs.length; i++) {
+	    		forms.add(formIDs[i]);
+	    	}
     	}
     	output.put("formID", forms);
     	return output.toJSONString();

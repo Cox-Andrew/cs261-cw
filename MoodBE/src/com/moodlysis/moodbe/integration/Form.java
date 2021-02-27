@@ -26,6 +26,7 @@ public class Form implements FormInterface {
 		public int hostID;
 		public String title;
 		public String description;
+		public int[] questionIDs;
 	}
 	
 	
@@ -40,12 +41,12 @@ public class Form implements FormInterface {
 		int i = 0;
 		try {
 			conn.setAutoCommit(false);
-    		String query = "SELECT * FROM FORMS WHERE hostID = ?";
+    		String query = "SELECT * FROM FORMS WHERE HostID = ?";
     		formsGet = conn.prepareStatement(query);
     		formsGet.setInt(1, hostID);
 			table = formsGet.executeQuery();
 			while(table.next()) {
-				formIDs[i] = table.getInt("formID");
+				formIDs[i] = table.getInt("FormID");
 				i++;
 				if (i == maxForms) {
 					maxForms = maxForms * 2;
@@ -85,10 +86,16 @@ public class Form implements FormInterface {
 		formInfo info = new formInfo();
 		info.formID = formID;
 		PreparedStatement formGet  = null;
+		PreparedStatement questionsGet = null;
 		ResultSet table = null;
+		ResultSet table2 = null;
 		int hostID = -1;
 		String title = "";
 		String desc = "";
+		int maxQuestions = 30;
+		int i = 0;
+		int[] questionIDs = new int[maxQuestions];
+		
 		try {
 			conn.setAutoCommit(false);
     		String query = "SELECT * FROM FORMS WHERE FormID = ?";
@@ -96,9 +103,21 @@ public class Form implements FormInterface {
     		formGet.setInt(1, formID);
 			table = formGet.executeQuery();
 			table.next();
-			hostID = table.getInt("hostID");
+			hostID = table.getInt("HostID");
 			title = table.getString("Title");
 			desc = table.getString("Description");
+			String query2 = "SELECT * FROM QUESTIONS WHERE FormID = ?";
+			questionsGet = conn.prepareStatement(query2);
+			questionsGet.setInt(1, formID);
+			table2 = questionsGet.executeQuery();
+			while (table2.next()) {
+				questionIDs[i] = table2.getInt("QuestionID");
+				i++;
+				if (i == maxQuestions) {
+					maxQuestions = maxQuestions * 2;
+					questionIDs = GeneralRequest.extendArray(questionIDs, maxQuestions);
+				}
+			}
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {
@@ -117,13 +136,24 @@ public class Form implements FormInterface {
 				if (table != null) {
 					table.close();
 				}
+				if (questionsGet != null) {
+					questionsGet.close();
+				}
+				if (table2 != null) {
+					table2.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
 			}
 		}
+		int[] returnIDs = new int[i];
+		for (int j = 0; j < i; j++) {
+			returnIDs[j] = questionIDs[j];
+		}
 		info.hostID = hostID;
 		info.title = title;
 		info.description = desc;
+		info.questionIDs = returnIDs;
 		return info;
 	}
 
