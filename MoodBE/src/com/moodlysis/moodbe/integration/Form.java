@@ -135,7 +135,7 @@ public class Form implements FormInterface {
 		int formID = -1;
 		try {
 			conn.setAutoCommit(false);
-    		String query = "INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'),?,?,?)";
+    		String query = "INSERT INTO FORMS VALUES (nextval('FormsFormID'),?,?,?)";
     		formInsert = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
     		formInsert.setInt(1, hostID);
     		formInsert.setString(2, title);
@@ -170,9 +170,40 @@ public class Form implements FormInterface {
 	}
 
 	@Override
-	public boolean editForm(int formID, String formTitle, String formDescription) {
+	public boolean editForm(int formID, String newTitle, String newDesc) {
 		// TODO Auto-generated method stub
-		return false;
+		PreparedStatement formEdit  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "UPDATE FORMS SET Title = ?, Description = ? WHERE FormID = ?";
+    		formEdit = conn.prepareStatement(query);
+    		formEdit.setString(1, newTitle);
+    		formEdit.setString(2, newDesc);
+    		formEdit.setInt(3, formID);
+    		formEdit.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (formEdit != null) {
+					formEdit.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

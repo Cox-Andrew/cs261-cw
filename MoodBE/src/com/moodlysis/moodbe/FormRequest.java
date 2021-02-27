@@ -190,7 +190,52 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		//if /v0/series/{seriesID}
+		doEditForm(request, response);
 	}
+	
+	protected void doEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Form form = new Form(response.getWriter());
+		String jsonData = GeneralRequest.readJSON(request, response);
+		JSONParser putParser = new JSONParser();
+		int formID = GeneralRequest.getIDFromPath(request, response);
+		String data = "";
+		String title = "";
+		String description = "";
+		try {
+			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
+			/*
+			 * {
+			 *		"data": {
+			 *			"title": "New form title",
+			 *			"description": "New form description"
+			 *		}
+			 *	}
+			 *
+			 * {"data": {"title": "New form title","description": "New form description"}}
+			 * 
+			 * JSON looks like the above
+			 */
+			data = putObject.get("data").toString();
+			title = ((JSONObject) putObject.get("data")).get("title").toString();
+			description = ((JSONObject) putObject.get("data")).get("description").toString();
+		} catch(ParseException e) {
+			//TODO
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			//return;
+		}
+		if (form.editForm(formID, title, description)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
+			//put into response body what was wrong (can be handled in jdbc)
+		}
+	}
+
 
 	/**
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
