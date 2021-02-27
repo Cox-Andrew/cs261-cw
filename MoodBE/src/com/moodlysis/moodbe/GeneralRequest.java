@@ -45,5 +45,15 @@ public class GeneralRequest {
 		}
 		return temp;
 	}
+	
+	public static int getAttendeeIDFromAuthToken(HttpServletRequest request) {
+		// TODO
+		return -1;
+	}
+	
+	public static int getHostIDFromAuthToken(HttpServletRequest request) {
+		// TODO
+		return -1;
+	}
 
 }
