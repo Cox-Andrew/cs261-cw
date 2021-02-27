@@ -1,22 +1,80 @@
 package com.moodlysis.moodbe.integration;
 
+import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.LinkedList;
 
+import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.AnswerInterface;
+import com.moodlysis.moodbe.integrationinterfaces.EventInterface.EventInfo;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public class Answer implements AnswerInterface {
+	
+	private Connection conn;
+	private PrintWriter writer;
+
+	public Answer(PrintWriter writer) {
+		this.conn = DatabaseConnection.getConnection();
+		this.writer = writer;
+	}
+
 
 	@Override
-	public boolean newAnswer(Connection conn, int questionID, int eventFormID, Date timeSubmitted, String response)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public int newAnswer(int attendeeID, int questionID, int eventFormID, LocalDateTime timeSubmitted, String response, boolean isAnonymous) throws MoodlysisInternalServerError {
+	
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+			// TODO validate all this crap
+//			"attendeeID": 3423423,
+//			"eventID": 4242342,
+//			"eventFormID": 34234324
+//			"questionID": 4234324
+			
+			strStmt = ""
+			+ "INSERT INTO Answers(AnswerID, QuestionID, AttendeeID, EventFormID, MoodID, IsEdited, TimeSubmitted, Response, IsAnonymous) \n"
+			+ "VALUES (nextval('AnswerAnswerID'),?,?,?,NULL,FALSE,?,?,?);";
+			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
+			stmt.setInt(1, questionID);
+			stmt.setInt(2, attendeeID);
+			stmt.setInt(3, eventFormID);
+			stmt.setTimestamp(4, Timestamp.valueOf(timeSubmitted));
+			stmt.setString(5, response);
+			stmt.setBoolean(6, isAnonymous);
+			stmt.executeUpdate();
+			ResultSet keys = stmt.getGeneratedKeys();
+			keys.next();
+			int answerID = keys.getInt(1);
+			conn.commit();
+			conn.setAutoCommit(true);
+			return answerID;
+			
+			
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			e.printStackTrace(writer);
+			throw new MoodlysisInternalServerError();
+		}
+		
 	}
 
 	@Override
-	public boolean editAnswer(Connection conn, int answerID, Date timeSubmitted, String response) throws SQLException {
+	public boolean editAnswer(int answerID, Date timeSubmitted, String response) throws SQLException {
 		// TODO Auto-generated method stub
 		return false;
 	}
