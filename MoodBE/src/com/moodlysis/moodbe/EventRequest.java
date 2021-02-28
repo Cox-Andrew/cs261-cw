@@ -122,7 +122,7 @@ public class EventRequest extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		if (!request.getRequestURI().equals("/v0/request")) {
+		if (!request.getRequestURI().equals("/v0/events")) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}

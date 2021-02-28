@@ -72,7 +72,7 @@ public class Event implements EventInterface {
 
 		} catch (SQLException e) {
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 	}
 	
