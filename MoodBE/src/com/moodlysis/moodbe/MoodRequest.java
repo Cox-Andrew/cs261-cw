@@ -15,12 +15,14 @@ import org.json.simple.JSONObject;
 
 import com.moodlysis.moodbe.integration.Answer;
 import com.moodlysis.moodbe.integration.Feedback;
+import com.moodlysis.moodbe.integration.Mood;
+import com.moodlysis.moodbe.integrationinterfaces.MoodInterface.MoodListInfo;
 import com.moodlysis.moodbe.requestexceptions.*;
 
 
 
-@WebServlet({"/v0/feedback", "/v0/feedback/*"})
-public class FeedbackRequest extends HttpServlet {
+@WebServlet({"/v0/moods", "/v0/moods/*"})
+public class MoodRequest extends HttpServlet {
 	
 	
 	private static final long serialVersionUID = 1L;
@@ -28,7 +30,7 @@ public class FeedbackRequest extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public FeedbackRequest() {
+    public MoodRequest() {
         super();
     }
     
@@ -37,6 +39,9 @@ public class FeedbackRequest extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 
 		String eventIDString = request.getParameter("eventID");
 		String attendeeIDString = request.getParameter("attendeeID");
@@ -61,13 +66,10 @@ public class FeedbackRequest extends HttpServlet {
 		}
 		
 		
+		Mood mood = new Mood(response.getWriter());
+		Mood.MoodListInfo moodListInfo = null;
 		
-		Feedback feedback = new Feedback(response.getWriter());
-		Feedback.FeedbackInfo feedbackInfo = null;
-		
-		// GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}
 		if (attendeeIDString == null && timeUpdatedSinceString != null) {
-			
 			LocalDateTime timeUpdatedSince;
 
 			try {
@@ -78,77 +80,48 @@ public class FeedbackRequest extends HttpServlet {
 				return;
 			}
 			
-			// TODO - uncomment when getHostIDFromAuthToken is implemented
-			int hostIDAuth = 0;
-//			int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
-			
-			if (hostIDAuth == -1) {
-				response.getWriter().append("Not signed in as a host");
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-				return;
-			}
-			
+			// TODO authentication
 			
 			try {
-				feedbackInfo = feedback.getFeedbackSince(eventID, timeUpdatedSince, hostIDAuth);
+				moodListInfo = mood.getMoodSince(eventID, timeUpdatedSince);
 			} catch (MoodlysisInternalServerError e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				e.printStackTrace();
 				return;
 			}	
 			
-		} else {
-			// TODO add other situations of attendeeIDString and timeUpdatedSinceString
-			response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-			return;
+			String responseJSON = getMoodListJSON(moodListInfo);
+			
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().print(responseJSON);
+			
 		}
 		
-		String responseJSON = getJSON(feedbackInfo);
-		
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(responseJSON);
-
-		
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	
 	}
 
 
 	@SuppressWarnings("unchecked")
-	private String getJSON(Feedback.FeedbackInfo info) {
-		
+	private String getMoodListJSON(MoodListInfo info) {
 		JSONObject output = new JSONObject();
 		output.put("eventID", info.eventID);
-		output.put("time-updated-since", info.timeUpdatedSince);
+		output.put("time-submitted-since", info.timeSubmittedSince);
 		output.put("contains", info.list.size());
-		
 		JSONArray list = new JSONArray();
-		for (Feedback.SubmissionInfo subInfo : info.list) {
-			JSONObject subObj = new JSONObject();
-			subObj.put("formID", subInfo.formID);
-			subObj.put("eventFormID", subInfo.eventFormID);
-			subObj.put("account-name", subInfo.accountName);
-			subObj.put("attendeeID", subInfo.attendeeID);
-			subObj.put("time-updated", subInfo.timeUpdated);
-			subObj.put("is-edited", subInfo.isEdited);
-			
-			JSONArray answers = new JSONArray();
-			for (Answer.AnswerInfo ansInfo : subInfo.answers) {
-				JSONObject ansObj = new JSONObject();
-				ansObj.put("questionID", ansInfo.questionID);
-				ansObj.put("answerID", ansInfo.answerID);
-				ansObj.put("mood-value", ansInfo.moodValue);
-				ansObj.put("is-edited", ansInfo.isEdited);
-				ansObj.put("time-updated", ansInfo.timeSubmitted);
-				JSONObject data = new JSONObject();
-				data.put("response", ansInfo.response);
-				ansObj.put("data", data);
-				answers.add(ansObj);
-			}
-			subObj.put("answers", answers);
+		for (Mood.MoodInfo moodInfo: info.list) {
+			JSONObject moodObj = new JSONObject();
+			moodObj.put("time-submitted", moodInfo.timeSubmitted.toString());
+			moodObj.put("mood-value", moodInfo.moodValue);
+			moodObj.put("answerID", moodInfo.answerID);
+			moodObj.put("attendeeID", moodInfo.attendeeID);
+			list.add(moodObj);
 		}
 		output.put("list", list);
 		return output.toJSONString();
 	}
+
 
 	
 
