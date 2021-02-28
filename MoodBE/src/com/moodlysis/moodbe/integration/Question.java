@@ -145,9 +145,108 @@ public class Question implements QuestionInterface {
 	}
 
 	@Override
-	public boolean editQuestion(int questionID, String questionType, int numInForm, String text, String options) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean editQuestionDetails(int questionID, String questionType, String text, String options) {
+		// TODO fix so if error occurs return false but still execute finally statement
+		PreparedStatement questionEdit  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "UPDATE QUESTIONS SET Type = ?, Content = ?, Options = ? WHERE QuestionID = ?";
+    		questionEdit = conn.prepareStatement(query);
+    		questionEdit.setString(1, questionType);
+    		questionEdit.setString(2, text);
+    		questionEdit.setString(3, options);
+    		questionEdit.setInt(4, questionID);
+    		questionEdit.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (questionEdit != null) {
+					questionEdit.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean editQuestionPosition(int questionID, int previousID) {
+		PreparedStatement questionEdit  = null;
+		PreparedStatement getNumInForm = null;
+		ResultSet table = null;
+		int numInForm = -1;
+		try {
+			conn.setAutoCommit(false);
+			if (previousID > 0) {
+				//Query makes sure forms of previous id and given question id are the same
+				//e.g. SELECT QUESTIONS.QuestionID, QUESTIONS.NumInForm FROM (SELECT * FROM QUESTIONS WHERE QuestionID = 4) AS QUESTION INNER JOIN QUESTIONS ON (QUESTION.FormID = QUESTIONS.FormID) WHERE QUESTIONS.QuestionID = 5 OR QUESTIONS.QuestionID = 4 ORDER BY QUESTIONS.NumInForm DESC;
+				String queryGetNumInForm = "SELECT QUESTIONS.QuestionID, QUESTIONS.NumInForm "
+										 + "FROM (SELECT * FROM QUESTIONS WHERE QuestionID = ?) AS QUESTION "
+										 + "INNER JOIN QUESTIONS ON (QUESTION.FormID = QUESTIONS.FormID) "
+										 + "WHERE QUESTIONS.QuestionID = ? OR QUESTIONS.QuestionID = ? "
+										 + "ORDER BY QUESTIONS.NumInForm DESC";
+				getNumInForm = conn.prepareStatement(queryGetNumInForm);
+				getNumInForm.setInt(1, questionID);
+				getNumInForm.setInt(2, previousID);
+				getNumInForm.setInt(3, questionID);
+				table = getNumInForm.executeQuery();
+				table.next();
+				if (table.getInt("QuestionID") == questionID) {
+					if (table.next()) {
+						//perhaps do check form number is from the previousID
+						numInForm = table.getInt("NumInForm") + 1;
+					}
+					else {
+						//TODO scenario where forms do not match
+					}
+				}
+				else if (table.getInt("QuestionID") == previousID) {
+					numInForm = table.getInt("NumInForm");
+				}
+			}
+			else if (previousID == 0) {
+				numInForm = 1;
+			}
+    		String queryUpdate = "UPDATE QUESTIONS SET NumInForm = ? WHERE QuestionID = ?";
+    		questionEdit = conn.prepareStatement(queryUpdate);
+    		questionEdit.setInt(1, numInForm);
+    		questionEdit.setInt(2, questionID);
+    		questionEdit.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (questionEdit != null) {
+					questionEdit.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

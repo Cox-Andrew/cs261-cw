@@ -13,6 +13,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Question;
+import com.moodlysis.moodbe.integration.Series;
 
 
 /**
@@ -172,6 +173,90 @@ public class QuestionRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		//if /v0/questions/{questionID}
+		doEditQuestion(request, response);
+		
+	}
+	
+	protected void doEditQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Question question = new Question(response.getWriter());
+		String jsonData = GeneralRequest.readJSON(request, response);
+		JSONParser putParser = new JSONParser();
+		int questionID = GeneralRequest.getIDFromPath(request, response);
+		String data = "";
+		String type = null;
+		String text = null;
+		String options = null;
+		int previousID = -1;
+		try {
+			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
+			/*
+			 * {
+			 *		"data": {
+			 *			"type": "rating",
+			 *			"text": "Choose one of the options",
+			 *			"options": null
+			 *		}
+			 *	}
+ 			 *
+			 *
+			 * {"data": {"type": "multi","text": "Choose one of the options","options": null}}
+			 * 
+			 * 
+			 * {
+			 *     "preceding-questionID": 2 
+			 * }
+			 * 
+			 * {"preceding-questionID": 2}
+			 * 
+			 * JSON looks like either of the above
+			 */
+			if (putObject.get("data") != null) {
+				data = putObject.get("data").toString();
+				type = "";
+				text = "";
+				options = "";
+				if (((JSONObject) putObject.get("data")).get("type") != null) {
+					type = ((JSONObject) putObject.get("data")).get("type").toString();
+				}
+				if (((JSONObject) putObject.get("data")).get("text") != null) {
+					text = ((JSONObject) putObject.get("data")).get("text").toString();
+				}
+				if (((JSONObject) putObject.get("data")).get("options") != null) {
+					options = ((JSONObject) putObject.get("data")).get("options").toString();
+				}
+			}
+			else if (putObject.get("preceding-questionID") != null) {
+				previousID = Integer.valueOf(putObject.get("preceding-questionID").toString());
+			}
+		} catch(ParseException e) {
+			//TODO
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			//return;
+		}
+		//TODO check if edit question content or edit position
+		if (previousID != -1) {
+			if (question.editQuestionPosition(questionID, previousID)) {
+				response.setStatus(HttpServletResponse.SC_OK);
+			}
+			else {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				//assumes id not found
+				//put into response body what was wrong (can be handled in jdbc)
+			}
+		}
+		else /*if type not null e.g.*/ {
+			if (question.editQuestionDetails(questionID, type, text, options)) {
+				response.setStatus(HttpServletResponse.SC_OK);
+			}
+			else {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				//assumes id not found
+				//put into response body what was wrong (can be handled in jdbc)
+			}
+		}
 	}
 
 	/**

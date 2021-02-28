@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.sql.Date;
-import java.util.Date;
+//import java.util.Date; RAISES ERROR
 import java.util.LinkedList;
 
 import com.moodlysis.moodbe.DatabaseConnection;

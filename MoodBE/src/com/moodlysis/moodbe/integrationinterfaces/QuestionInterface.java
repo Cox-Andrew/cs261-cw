@@ -14,7 +14,7 @@ public interface QuestionInterface {
 	
 	// PUT /v0/questions/{questionID}
 	// NOTE: again, the numInForm of other questions may need to be considered when editing
-	public boolean editQuestion(int questionID, String questionType, int numInForm, String text, String options);
+	public boolean editQuestionDetails(int questionID, String questionType, String text, String options);
 	
 	// DELETE /v0/questions/{questionID}
 	public boolean deleteQuestion(int questionID);

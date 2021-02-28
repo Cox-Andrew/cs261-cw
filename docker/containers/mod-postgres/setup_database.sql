@@ -209,3 +209,29 @@ CREATE TRIGGER CreateFeedback
   AFTER INSERT ON EVENTS
   FOR EACH ROW
   EXECUTE FUNCTION CreateFeedback();
+
+CREATE FUNCTION ShiftQuestions() RETURNS TRIGGER AS $ShiftQuestions$
+  BEGIN
+    IF NEW.NumInForm > OLD.NumInForm THEN
+      UPDATE QUESTIONS
+      SET NumInForm = NumInForm - 1
+      WHERE NumInForm <= NEW.NumInForm
+      AND NumInForm > OLD.NumInForm
+      AND FormID = NEW.FormID
+      AND (QuestionID != NEW.QuestionID);
+    ELSE
+      UPDATE QUESTIONS
+      SET NumInForm = NumInForm + 1
+      WHERE NumInForm >= NEW.NumInForm
+      AND NumInForm < OLD.NumInForm
+      AND FormID = NEW.FormID
+      AND (QuestionID != NEW.QuestionID);
+    END IF;
+    RETURN NEW;
+  END;
+$ShiftQuestions$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ShiftQuestions
+  AFTER UPDATE OF NumInForm ON QUESTIONS
+  FOR EACH ROW WHEN (pg_trigger_depth() = 0)
+  EXECUTE FUNCTION ShiftQuestions();
