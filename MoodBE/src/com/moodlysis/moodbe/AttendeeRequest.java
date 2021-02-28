@@ -74,7 +74,8 @@ public class AttendeeRequest extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		
 		// GET /v0/series/{seriesID}
-		if (request.getPathInfo().split("/").length != 2) {
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.split("/").length != 2) {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		    return;
 		}

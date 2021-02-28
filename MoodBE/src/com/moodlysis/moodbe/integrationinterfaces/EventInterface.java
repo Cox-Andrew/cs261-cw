@@ -3,6 +3,7 @@ package com.moodlysis.moodbe.integrationinterfaces;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpServletResponse;
@@ -44,5 +45,7 @@ public interface EventInterface {
 	
 	// DELETE /v0/events/{eventID}
 	public boolean deleteEvent(int eventID, int verificationHostID) throws MoodlysisForbidden, MoodlysisInternalServerError;
+	
+	public LinkedList<Integer> getSeriesEvents(int seriesID) throws MoodlysisBadRequest, MoodlysisInternalServerError;
 	
 }

@@ -2,6 +2,7 @@ package com.moodlysis.moodbe;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -84,15 +85,18 @@ public class EventRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
 		
-		// GET /v0/series/{seriesID}
-		if (request.getPathInfo().split("/").length != 2) {
+		int l = request.getPathInfo().split("/").length;
+		
+		if (!request.getRequestURI().equals("/v0/events")) {
+			doGetEventsWithSeriesID(request, response);
+			return;
+		} else if (request.getPathInfo().split("/").length != 2) {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		    return;
 		}
-		
+
+		// GET /v0/series/{seriesID}
 		int eventID = GeneralRequest.getIDFromPath(request, response);
 		
 		Event event = new Event(response.getWriter());
@@ -113,6 +117,53 @@ public class EventRequest extends HttpServlet {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().print(responseJSON);
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void doGetEventsWithSeriesID(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String seriesIDString = request.getParameter("seriesID");
+		if (seriesIDString == null) {
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		    return;
+		}
+		
+		int seriesID;
+		
+		// parse eventID
+		try {
+			seriesID = Integer.parseInt(seriesIDString);
+		} catch (NumberFormatException e) {
+			response.getWriter().print("unable to parse attendeeID");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		
+		LinkedList<Integer> eventIDs;
+		Event event = new Event(response.getWriter());
+		
+		try {
+			eventIDs = event.getSeriesEvents(seriesID);
+		} catch (MoodlysisBadRequest e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().print(e.toString());
+			return;
+		} catch (MoodlysisInternalServerError e) {
+			response.getWriter().print(e.toString());
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+		
+		JSONObject output = new JSONObject();
+		JSONArray eventIDsJSONArr = new JSONArray();
+		for (int eventID : eventIDs) {
+			eventIDsJSONArr.add(eventID);
+		}
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		output.put("eventIDs", eventIDsJSONArr);
+		response.getWriter().print(output.toJSONString());
 		
 	}
 
@@ -198,7 +249,8 @@ public class EventRequest extends HttpServlet {
 	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		if (request.getPathInfo().split("/").length != 2) {
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.split("/").length != 2) {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		    return;
 		}
@@ -263,7 +315,8 @@ public class EventRequest extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		if (request.getPathInfo().split("/").length != 2) {
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.split("/").length != 2) {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		    return;
 		}

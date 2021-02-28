@@ -269,6 +269,41 @@ public class Event implements EventInterface {
 		}
 	}
 
+	@Override
+	public LinkedList<Integer> getSeriesEvents(int seriesID) throws MoodlysisBadRequest, MoodlysisInternalServerError {
+		
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+			strStmt = ""
+			+ "SELECT eventID FROM Events \n"
+			+ "WHERE seriesID = ? \n"
+			+ "ORDER BY timeStart;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, seriesID);
+			rs = stmt.executeQuery();
+			
+			LinkedList<Integer> eventIDs = new LinkedList<Integer>();
+			
+			if (!rs.next()) {
+				throw new MoodlysisBadRequest("eventID not found");
+			} else do {
+				eventIDs.add(rs.getInt(1));
+			} while (rs.next());
+			
+			return eventIDs;
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace(writer);
+			throw new MoodlysisInternalServerError();
+		}
+		
+		
+	}
+
 
 
 }

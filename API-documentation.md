@@ -485,6 +485,15 @@ Response:
 }
 ```
 
+### 12. Get all eventIDs in a series
+`GET /v0/events?seriesID={seriesID}`\
+Response:
+```
+{
+	"eventIDs": [4324, 543534, 3453534]
+}
+```
+
 ## Attendee request (available to authenticated users): 
 ### 1.	Register for event (with invite code). 
 ```POST /v0/register-event```\
