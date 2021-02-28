@@ -5,9 +5,21 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.*;
 
 public interface AnswerInterface {
+	
+	public static class AnswerInfo {
+		public int answerID;
+		public int questionID;
+		public int attendeeID;
+		public int eventFormID;
+		public int moodID;
+		public float moodValue;
+		public boolean isEdited;
+		public LocalDateTime timeSubmitted;
+		public String response;
+	}
 	
 
 	// POST /v0/answers
@@ -17,4 +29,5 @@ public interface AnswerInterface {
 	// PUT /v0/answers/{answerID}
 	public boolean editAnswer(int answerID, Date timeSubmitted, String response) throws SQLException;
 
+	public AnswerInfo getAnswerInfo(int answerID, int verificationID, boolean verificationIDIsHost) throws MoodlysisInternalServerError, MoodlysisForbidden, MoodlysisBadRequest;
 }

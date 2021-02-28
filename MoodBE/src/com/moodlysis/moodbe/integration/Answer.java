@@ -14,6 +14,8 @@ import java.util.LinkedList;
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.AnswerInterface;
 import com.moodlysis.moodbe.integrationinterfaces.EventInterface.EventInfo;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisBadRequest;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisForbidden;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
@@ -78,5 +80,51 @@ public class Answer implements AnswerInterface {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
+	@Override
+	public AnswerInfo getAnswerInfo(int answerID, int verificationID, boolean verificationIDIsHost)
+			throws MoodlysisInternalServerError, MoodlysisForbidden, MoodlysisBadRequest {
+		
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+		
+			// TODO verification. If verificationIDIsHost is false, then the verificationID provided is an attendeeID
+
+			strStmt = ""
+			+ "SELECT (answerid, questionid, attendeeid, eventformid, moodid, isedited, timesubmitted, response) \n"
+			+ "FROM Answers \n"
+			+ "WHERE answerid = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, answerID);
+			rs = stmt.executeQuery();
+			if (!rs.next()) throw new MoodlysisBadRequest("answerID not found");
+			AnswerInfo answerInfo = new AnswerInfo();
+			answerInfo.answerID = rs.getInt("answerInfo");
+			answerInfo.questionID = rs.getInt("questionID");
+			answerInfo.attendeeID = rs.getInt("attendeeID");
+			answerInfo.eventFormID = rs.getInt("eventFormID");
+			answerInfo.moodID = rs.getInt("moodID");
+			answerInfo.isEdited = rs.getBoolean("isEdited");
+			answerInfo.timeSubmitted = rs.getTimestamp("timeSubmitted").toLocalDateTime();
+			answerInfo.response = rs.getString("response");
+			return answerInfo;
+			
+			
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			e.printStackTrace(writer);
+			throw new MoodlysisInternalServerError();
+		}
+		
+	}
+	
 
 }
