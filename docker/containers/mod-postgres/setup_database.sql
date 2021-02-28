@@ -212,26 +212,41 @@ CREATE TRIGGER CreateFeedback
 
 CREATE FUNCTION ShiftQuestions() RETURNS TRIGGER AS $ShiftQuestions$
   BEGIN
-    IF NEW.NumInForm > OLD.NumInForm THEN
-      UPDATE QUESTIONS
-      SET NumInForm = NumInForm - 1
-      WHERE NumInForm <= NEW.NumInForm
-      AND NumInForm > OLD.NumInForm
-      AND FormID = NEW.FormID
-      AND (QuestionID != NEW.QuestionID);
-    ELSE
+    IF tg_op = 'UPDATE' THEN
+      IF NEW.NumInForm > OLD.NumInForm THEN
+        UPDATE QUESTIONS
+        SET NumInForm = NumInForm - 1
+        WHERE NumInForm <= NEW.NumInForm
+        AND NumInForm > OLD.NumInForm
+        AND FormID = NEW.FormID
+        AND QuestionID != NEW.QuestionID;
+      ELSE
+        UPDATE QUESTIONS
+        SET NumInForm = NumInForm + 1
+        WHERE NumInForm >= NEW.NumInForm
+        AND NumInForm < OLD.NumInForm
+        AND FormID = NEW.FormID
+        AND QuestionID != NEW.QuestionID;
+      END IF;
+    ELSIF tg_op = 'INSERT' THEN
       UPDATE QUESTIONS
       SET NumInForm = NumInForm + 1
       WHERE NumInForm >= NEW.NumInForm
-      AND NumInForm < OLD.NumInForm
       AND FormID = NEW.FormID
-      AND (QuestionID != NEW.QuestionID);
+      AND QuestionID != NEW.QuestionID;
+    ELSIF tg_op = 'DELETE' THEN
+      UPDATE QUESTIONS
+      SET NumInForm = NumInForm - 1
+      WHERE NumInForm > OLD.NumInForm
+      AND FormID = OLD.FormID
+      AND QuestionID != OLD.QuestionID;
+      RETURN OLD;
     END IF;
     RETURN NEW;
   END;
 $ShiftQuestions$ LANGUAGE plpgsql;
 
 CREATE TRIGGER ShiftQuestions
-  AFTER UPDATE OF NumInForm ON QUESTIONS
+  BEFORE INSERT OR DELETE OR UPDATE OF NumInForm ON QUESTIONS
   FOR EACH ROW WHEN (pg_trigger_depth() = 0)
   EXECUTE FUNCTION ShiftQuestions();

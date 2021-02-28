@@ -209,7 +209,8 @@ public class Question implements QuestionInterface {
 						numInForm = table.getInt("NumInForm") + 1;
 					}
 					else {
-						//TODO scenario where forms do not match
+						//TODO scenario where forms do not match or questionID is set to be after itself
+						return false;
 					}
 				}
 				else if (table.getInt("QuestionID") == previousID) {
@@ -241,6 +242,12 @@ public class Question implements QuestionInterface {
 				if (questionEdit != null) {
 					questionEdit.close();
 				}
+				if (getNumInForm != null) {
+					getNumInForm.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
 				return false;
@@ -251,8 +258,36 @@ public class Question implements QuestionInterface {
 
 	@Override
 	public boolean deleteQuestion(int questionID) {
-		// TODO Auto-generated method stub
-		return false;
+		PreparedStatement questionDelete  = null;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "DELETE FROM QUESTIONS WHERE QuestionID = ?";
+    		questionDelete = conn.prepareStatement(query);
+    		questionDelete.setInt(1, questionID);
+    		questionDelete.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+				return false;
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+				return false;
+			}
+		} finally {
+			try {
+				if (questionDelete != null) {
+					questionDelete.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

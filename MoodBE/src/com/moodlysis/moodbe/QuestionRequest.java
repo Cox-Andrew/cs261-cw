@@ -263,7 +263,20 @@ public class QuestionRequest extends HttpServlet {
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		doDeleteQuestion(request, response);
+	}
+	
+	protected void doDeleteQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Question question = new Question(response.getWriter());
+		int questionID = GeneralRequest.getIDFromPath(request, response);
+		
+		if (question.deleteQuestion(questionID)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
+		}
 	}
 
 }
