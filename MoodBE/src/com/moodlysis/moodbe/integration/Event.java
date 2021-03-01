@@ -36,7 +36,7 @@ public class Event implements EventInterface {
 			rs = stmt.executeQuery();
 			
 			if (!rs.next()) {
-				throw new MoodlysisNotFound();
+				throw new MoodlysisNotFound("eventID not found");
 			} 
 			
 			EventInfo eventInfo = new EventInfo();
@@ -72,6 +72,7 @@ public class Event implements EventInterface {
 
 		} catch (SQLException e) {
 			e.printStackTrace(writer);
+			e.printStackTrace();
 			throw new MoodlysisInternalServerError(e.toString());
 		}
 	}
@@ -116,7 +117,7 @@ public class Event implements EventInterface {
 			rs = stmt.executeQuery();
 			if (!rs.next()) {
 				// no results, therefore host does not have permission
-				throw new MoodlysisForbidden("You do not have access to this event");
+				throw new MoodlysisForbidden("Not signed in as a host with ownership of this series");
 			}
 			
 			// otherwise insert the new values
@@ -148,7 +149,8 @@ public class Event implements EventInterface {
 				er.printStackTrace(this.writer);
 			}
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 
 		
@@ -216,7 +218,8 @@ public class Event implements EventInterface {
 				er.printStackTrace(this.writer);
 			}
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 	}
 
@@ -265,7 +268,8 @@ public class Event implements EventInterface {
 				er.printStackTrace(this.writer);
 			}
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 	}
 
@@ -298,7 +302,8 @@ public class Event implements EventInterface {
 			
 		} catch (SQLException e) {
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 		
 		

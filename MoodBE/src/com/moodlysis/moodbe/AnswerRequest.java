@@ -1,6 +1,7 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import javax.servlet.ServletException;
@@ -40,7 +41,7 @@ public class AnswerRequest extends HttpServlet{
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		if (!request.getRequestURI().equals("/v0/answers")) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "url not of form /v0/answers");
 			return;
 		}
 		
@@ -51,8 +52,7 @@ public class AnswerRequest extends HttpServlet{
 		try {
 			postObject = (JSONObject) postParser.parse(jsonData); 
 		} catch(ParseException e) {
-			response.getWriter().append("Invalid parse data");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parse data: " + e.toString());
 			return;
 		}
 		
@@ -65,30 +65,31 @@ public class AnswerRequest extends HttpServlet{
 		
 		try {
 			
-			attendeeID = (int) postObject.get("attendeeID");
-			eventID = (int) postObject.get("eventID");
-			eventFormID = (int) postObject.get("eventFormID");
-			questionID = (int) postObject.get("eventFormID");
+			attendeeID = (int) Integer.parseInt(postObject.get("attendeeID").toString());
+			eventID = (int)Integer.parseInt(postObject.get("eventID").toString());
+			eventFormID = (int) Integer.parseInt(postObject.get("eventFormID").toString());
+			questionID = (int) Integer.parseInt(postObject.get("questionID").toString());
 			JSONObject data = (JSONObject) postObject.get("data");
 			questionResponse = (String) data.get("response");
 			isAnonymous = (boolean) data.get("isAnonymous");
 			
 		} catch (Exception e) {
 			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "error on parsing json" + e.toString());
 			return;
 		}
 		
 		// get the current time
+		Instant now = Instant.now();
 		LocalDateTime timeSubmitted = LocalDateTime.now();
 		
 		Answer answer = new Answer(response.getWriter());
 		int answerID;
 		
 		try {
-			answerID = answer.newAnswer(attendeeID, questionID, eventFormID, timeSubmitted, questionResponse, isAnonymous);
+			answerID = answer.newAnswer(attendeeID, questionID, eventFormID, now, questionResponse, isAnonymous);
 		} catch (MoodlysisInternalServerError e){
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		}
 		

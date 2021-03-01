@@ -71,7 +71,8 @@ public class Attendee implements AttendeeInterface {
 				er.printStackTrace(this.writer);
 			}
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 		
 
@@ -121,6 +122,7 @@ public class Attendee implements AttendeeInterface {
 			
 		} catch (SQLException e) {
 			e.printStackTrace(writer);
+			e.printStackTrace();
 			throw new MoodlysisInternalServerError(e.toString());
 		}
 		

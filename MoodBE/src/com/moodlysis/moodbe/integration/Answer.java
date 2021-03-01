@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedList;
@@ -31,36 +32,73 @@ public class Answer implements AnswerInterface {
 
 
 	@Override
-	public int newAnswer(int attendeeID, int questionID, int eventFormID, LocalDateTime timeSubmitted, String response, boolean isAnonymous) throws MoodlysisInternalServerError {
+	public int newAnswer(int attendeeID, int questionID, int eventFormID, Instant now, String response, boolean isAnonymous) throws MoodlysisInternalServerError {
 	
+		// TODO this function also need to signal to the sentiment analysis module that an answer has been submitted
+		
+		
 		String strStmt;
 		PreparedStatement stmt;
 		ResultSet rs;
+		ResultSet keys;
 		
 		try {
+			
+			conn.setAutoCommit(false);
+			
 			// TODO validate all this crap
 //			"attendeeID": 3423423,
 //			"eventID": 4242342,
 //			"eventFormID": 34234324
 //			"questionID": 4234324
 			
+			
+			// insert a mood entry first so the insert into answers
+			// doesn't violate not null constraint on the mood
+			
+			// first need to find the eventID for the mood table
+			strStmt = ""
+			+ "SELECT eventID FROM EventForms \n"
+			+ "WHERE eventFormID = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, eventFormID);
+			rs = stmt.executeQuery();
+			rs.next();
+			int eventID = rs.getInt("eventID");
+			
+			
+			// create an entry in Mood for the sentiment analysis
+			strStmt = ""
+			+ "INSERT INTO Mood(moodid, eventID, value, timeSubmitted) \n"
+			+ "VALUES (nextval('moodsmoodid'), ?, NULL, ?);";
+			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
+			stmt.setInt(1, eventID);
+			stmt.setTimestamp(2, java.sql.Timestamp.from(now));
+			stmt.execute();
+			keys = stmt.getGeneratedKeys();
+			keys.next();
+			int moodID = keys.getInt(1);
+			
 			strStmt = ""
 			+ "INSERT INTO Answers(AnswerID, QuestionID, AttendeeID, EventFormID, MoodID, IsEdited, TimeSubmitted, Response, IsAnonymous) \n"
-			+ "VALUES (nextval('AnswerAnswerID'),?,?,?,NULL,FALSE,?,?,?);";
+			+ "VALUES (nextval('answersanswerid '),?,?,?,?,FALSE,?,?,?);";
 			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
 			stmt.setInt(1, questionID);
 			stmt.setInt(2, attendeeID);
 			stmt.setInt(3, eventFormID);
-			stmt.setTimestamp(4, Timestamp.valueOf(timeSubmitted));
-			stmt.setString(5, response);
-			stmt.setBoolean(6, isAnonymous);
+			stmt.setInt(4, moodID);
+			stmt.setTimestamp(5, Timestamp.from(now));
+			stmt.setString(6, response);
+			stmt.setBoolean(7, isAnonymous);
 			stmt.executeUpdate();
-			ResultSet keys = stmt.getGeneratedKeys();
+			keys = stmt.getGeneratedKeys();
 			keys.next();
 			int answerID = keys.getInt(1);
 			conn.commit();
 			conn.setAutoCommit(true);
 			return answerID;
+			
+			
 			
 			
 		} catch (SQLException e) {
@@ -70,7 +108,8 @@ public class Answer implements AnswerInterface {
 				er.printStackTrace(this.writer);
 			}
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 		
 	}
@@ -121,7 +160,8 @@ public class Answer implements AnswerInterface {
 				er.printStackTrace(this.writer);
 			}
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}
 		
 	}

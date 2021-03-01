@@ -46,8 +46,7 @@ public class FeedbackRequest extends HttpServlet {
 		
 		// must include eventID
 		if (eventIDString == null) {
-			response.getWriter().print("must include ?eventID=...");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "must include ?eventID=...");
 			return;
 		}
 		
@@ -55,8 +54,7 @@ public class FeedbackRequest extends HttpServlet {
 		try {
 			eventID = Integer.parseInt(eventIDString);
 		} catch (NumberFormatException e) {
-			response.getWriter().print("unable to parse attendeeID");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "unable to parse attendeeID: " + e.toString());
 			return;
 		}
 		
@@ -73,8 +71,7 @@ public class FeedbackRequest extends HttpServlet {
 			try {
 				timeUpdatedSince = LocalDateTime.parse(timeUpdatedSinceString);
 			} catch (DateTimeParseException e) {
-				response.getWriter().print("invalid timestamp format. Do something like this: 2007-12-03T10:15:30, or anything else that can be parsed by LocalDateTime.parse");
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "invalid timestamp format. Do something like this: 2007-12-03T10:15:30, or anything else that can be parsed by LocalDateTime.parse");
 				return;
 			}
 			
@@ -83,8 +80,7 @@ public class FeedbackRequest extends HttpServlet {
 //			int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
 			
 			if (hostIDAuth == -1) {
-				response.getWriter().append("Not signed in as a host");
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not signed in as a host");
 				return;
 			}
 			
@@ -92,7 +88,7 @@ public class FeedbackRequest extends HttpServlet {
 			try {
 				feedbackInfo = feedback.getFeedbackSince(eventID, timeUpdatedSince, hostIDAuth);
 			} catch (MoodlysisInternalServerError e) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "database error: " + e.toString());
 				e.printStackTrace();
 				return;
 			}	
@@ -145,6 +141,7 @@ public class FeedbackRequest extends HttpServlet {
 				answers.add(ansObj);
 			}
 			subObj.put("answers", answers);
+			list.add(subObj);
 		}
 		output.put("list", list);
 		return output.toJSONString();

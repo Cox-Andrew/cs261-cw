@@ -51,8 +51,7 @@ public class MoodRequest extends HttpServlet {
 		
 		// must include eventID
 		if (eventIDString == null) {
-			response.getWriter().print("must include ?eventID=...");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "must include ?eventID=...");
 			return;
 		}
 		
@@ -60,8 +59,7 @@ public class MoodRequest extends HttpServlet {
 		try {
 			eventID = Integer.parseInt(eventIDString);
 		} catch (NumberFormatException e) {
-			response.getWriter().print("unable to parse attendeeID");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "unable to parse eventID");
 			return;
 		}
 		
@@ -75,8 +73,7 @@ public class MoodRequest extends HttpServlet {
 			try {
 				timeUpdatedSince = LocalDateTime.parse(timeUpdatedSinceString);
 			} catch (DateTimeParseException e) {
-				response.getWriter().print("invalid timestamp format. Do something like this: 2007-12-03T10:15:30, or anything else that can be parsed by LocalDateTime.parse");
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "invalid timestamp format. Do something like this: 2007-12-03T10:15:30, or anything else that can be parsed by LocalDateTime.parse");
 				return;
 			}
 			
@@ -85,7 +82,7 @@ public class MoodRequest extends HttpServlet {
 			try {
 				moodListInfo = mood.getMoodSince(eventID, timeUpdatedSince);
 			} catch (MoodlysisInternalServerError e) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 				e.printStackTrace();
 				return;
 			}	

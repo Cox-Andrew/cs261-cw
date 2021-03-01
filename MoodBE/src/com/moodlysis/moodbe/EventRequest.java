@@ -92,7 +92,7 @@ public class EventRequest extends HttpServlet {
 			doGetEventsWithSeriesID(request, response);
 			return;
 		} else if (request.getPathInfo().split("/").length != 2) {
-		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		    response.sendError(HttpServletResponse.SC_NOT_FOUND, "must be of form /v0/events?seriesID={} or /v0/events/{eventID}");
 		    return;
 		}
 
@@ -105,10 +105,10 @@ public class EventRequest extends HttpServlet {
 		try {
 			eventInfo = event.getEventInfo(eventID);
 		} catch (MoodlysisNotFound e) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
 		} catch (MoodlysisInternalServerError e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		}
 		
@@ -125,7 +125,7 @@ public class EventRequest extends HttpServlet {
 		
 		String seriesIDString = request.getParameter("seriesID");
 		if (seriesIDString == null) {
-		    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing ?seriesID={}");
 		    return;
 		}
 		
@@ -136,7 +136,7 @@ public class EventRequest extends HttpServlet {
 			seriesID = Integer.parseInt(seriesIDString);
 		} catch (NumberFormatException e) {
 			response.getWriter().print("unable to parse attendeeID");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
 		
@@ -146,12 +146,12 @@ public class EventRequest extends HttpServlet {
 		try {
 			eventIDs = event.getSeriesEvents(seriesID);
 		} catch (MoodlysisBadRequest e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			response.getWriter().print(e.toString());
 			return;
 		} catch (MoodlysisInternalServerError e) {
 			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		}
 		
@@ -174,7 +174,7 @@ public class EventRequest extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		if (!request.getRequestURI().equals("/v0/events")) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "not of form /v0/events");
 			return;
 		}
 		
@@ -185,8 +185,7 @@ public class EventRequest extends HttpServlet {
 		try {
 			postObject = (JSONObject) postParser.parse(jsonData); 
 		} catch(ParseException e) {
-			response.getWriter().append("Invalid parse data");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "unable to parse: " + e.toString());
 			return;
 		}
 		
@@ -205,8 +204,7 @@ public class EventRequest extends HttpServlet {
 			timeEnd = LocalDateTime.parse((String) data.get("timeEnd"));
 			
 		} catch (Exception e) {
-			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
 		
@@ -216,8 +214,7 @@ public class EventRequest extends HttpServlet {
 //		int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
 		
 		if (hostIDAuth == -1) {
-			response.getWriter().append("Not signed in as a host");
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not signed in as a host");
 			return;
 		}
 		
@@ -227,11 +224,11 @@ public class EventRequest extends HttpServlet {
 		try {
 			eventID = event.newEvent(seriesID, title, description, timeStart, timeEnd, hostIDAuth);
 		} catch (MoodlysisInternalServerError e){
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		} catch (MoodlysisForbidden e) {
 			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
 		}
 		
@@ -251,7 +248,7 @@ public class EventRequest extends HttpServlet {
 		
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.split("/").length != 2) {
-		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "must be of form /v0/events/{eventID}");
 		    return;
 		}
 		
@@ -264,8 +261,7 @@ public class EventRequest extends HttpServlet {
 		try {
 			postObject = (JSONObject) postParser.parse(jsonData); 
 		} catch(ParseException e) {
-			response.getWriter().append("Invalid parse data");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unable to parse. " + e.toString());
 			return;
 		}
 		
@@ -281,8 +277,7 @@ public class EventRequest extends HttpServlet {
 			timeStart = LocalDateTime.parse((String) data.get("timeStart"));
 			timeEnd = LocalDateTime.parse((String) data.get("timeEnd"));
 		} catch (Exception e) {
-			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
 		
@@ -291,8 +286,7 @@ public class EventRequest extends HttpServlet {
 //		int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
 		
 		if (hostIDAuth == -1) {
-			response.getWriter().append("Not signed in as a host");
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "not signed in as a host");
 			return;
 		}
 		
@@ -301,11 +295,11 @@ public class EventRequest extends HttpServlet {
 		try {
 			event.editEvent(eventID, title, description, timeStart, timeEnd, hostIDAuth);
 		} catch (MoodlysisInternalServerError e){
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		} catch (MoodlysisForbidden e) {
 			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
 		}
 		
@@ -317,7 +311,7 @@ public class EventRequest extends HttpServlet {
 
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.split("/").length != 2) {
-		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		    response.sendError(HttpServletResponse.SC_NOT_FOUND, "must be of form /v0/events/{eventID}");
 		    return;
 		}
 		
@@ -328,8 +322,7 @@ public class EventRequest extends HttpServlet {
 //		int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
 		
 		if (hostIDAuth == -1) {
-			response.getWriter().append("Not signed in as a host");
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not signed in as a host");
 			return;
 		}
 		
@@ -337,11 +330,11 @@ public class EventRequest extends HttpServlet {
 		try {
 			event.deleteEvent(eventID, hostIDAuth);
 		} catch (MoodlysisInternalServerError e){
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		} catch (MoodlysisForbidden e) {
 			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
 		}
 		

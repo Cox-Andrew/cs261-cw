@@ -76,7 +76,7 @@ public class AttendeeRequest extends HttpServlet {
 		// GET /v0/series/{seriesID}
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.split("/").length != 2) {
-		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "must be of form /v0/attendee/{attendeeID}");
 		    return;
 		}
 		
@@ -89,24 +89,20 @@ public class AttendeeRequest extends HttpServlet {
 		int verificationAttendeeID = 0;
 //		int verificationAttendeeID = GeneralRequest.getAttendeeIDFromAuthToken(request);
 		if (verificationAttendeeID == -1) {
-			response.getWriter().append("Not signed in as an attendee");
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not signed in as an attendee");
 			return;
 		}
 		
 		try {
 			attendeeInfo = attendee.getAttendeeInfo(attendeeID, verificationAttendeeID);
 		} catch (MoodlysisNotFound e) {
-			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
 		} catch (MoodlysisInternalServerError e) {
-			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		} catch (MoodlysisForbidden e) {
-			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
 		}
 		
@@ -125,7 +121,7 @@ public class AttendeeRequest extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		if (!request.getRequestURI().equals("/v0/attendees")) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "POST must be of form /v0/attendees");
 			return;
 		}
 		
@@ -136,8 +132,7 @@ public class AttendeeRequest extends HttpServlet {
 		try {
 			postObject = (JSONObject) postParser.parse(jsonData); 
 		} catch(ParseException e) {
-			response.getWriter().append("Invalid parse data");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unable to parse data: " + e.toString());
 			return;
 		}
 		
@@ -151,8 +146,7 @@ public class AttendeeRequest extends HttpServlet {
 			accountName = (String) postObject.get("account-name");
 			
 		} catch (Exception e) {
-			response.getWriter().print(e.toString());
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
 		
@@ -163,7 +157,7 @@ public class AttendeeRequest extends HttpServlet {
 		try {
 			attendeeID = attendee.newAttendee(accountName, pass, email, null);
 		} catch (MoodlysisInternalServerError e){
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		}
 		

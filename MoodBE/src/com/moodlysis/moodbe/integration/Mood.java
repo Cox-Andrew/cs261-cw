@@ -76,7 +76,8 @@ public class Mood implements MoodInterface {
 			
 		} catch (SQLException e) {
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}	
 		
 	}

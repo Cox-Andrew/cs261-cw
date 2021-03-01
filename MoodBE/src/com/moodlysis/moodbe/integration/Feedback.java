@@ -58,12 +58,12 @@ public class Feedback implements FeedbackInterface {
 			+ "SELECT answerid, questionID, attendeeid, eventformid, answers.moodid, isedited, answers.timesubmitted, response, formID, numInForm, mood.value \n"
 			+ "FROM answers \n"
 			+ "NATURAL JOIN Questions  \n"
-			+ "JOIN Mood ON mood.moodID = answers.moodID \n"
+			+ "JOIN Mood on mood.moodID = answers.moodID \n"
 			+ "WHERE answers.timeSubmitted > ? \n"
 			+ "AND EXISTS ( \n"
 			+ "	SELECT FROM EventForms \n"
 			+ "	WHERE eventID = ? \n"
-			+ "	AND formID = formID \n"
+			+ "	AND EventForms.eventFormID = answers.eventFormID \n"
 			+ ") \n"
 			+ "ORDER BY formID, eventFormID, attendeeID, numInForm;";
 			stmt = conn.prepareStatement(strStmt);
@@ -94,7 +94,7 @@ public class Feedback implements FeedbackInterface {
 			//TODO------
 			submissionInfo.accountName = null;
 			submissionInfo.attendeeID = rs.getInt("attendeeID");
-			submissionInfo.timeUpdated = rs.getTimestamp("timeUpdated").toLocalDateTime();
+			submissionInfo.timeUpdated = rs.getTimestamp("timesubmitted").toLocalDateTime();
 			submissionInfo.isEdited = rs.getBoolean("isEdited");
 			submissionInfo.answers = new LinkedList<Answer.AnswerInfo>();
 			
@@ -111,7 +111,7 @@ public class Feedback implements FeedbackInterface {
 					//TODO------
 					submissionInfo.accountName = null;
 					submissionInfo.attendeeID = rs.getInt("attendeeID");
-					submissionInfo.timeUpdated = rs.getTimestamp("timeUpdated").toLocalDateTime();
+					submissionInfo.timeUpdated = rs.getTimestamp("timesubmitted").toLocalDateTime();
 					submissionInfo.isEdited = rs.getBoolean("isEdited");
 					submissionInfo.answers = new LinkedList<Answer.AnswerInfo>();
 				}
@@ -120,6 +120,8 @@ public class Feedback implements FeedbackInterface {
 				answerInfo.questionID = rs.getInt("questionID");
 				answerInfo.answerID = rs.getInt("answerID");
 				answerInfo.moodValue = rs.getFloat("value");
+				if (rs.wasNull())
+					answerInfo.moodValue = null;
 				answerInfo.isEdited = rs.getBoolean("isEdited");
 				answerInfo.timeSubmitted = rs.getTimestamp("timeSubmitted").toLocalDateTime();
 				answerInfo.response = rs.getString("response");
@@ -139,7 +141,8 @@ public class Feedback implements FeedbackInterface {
 			
 		} catch (SQLException e) {
 			e.printStackTrace(writer);
-			throw new MoodlysisInternalServerError();
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
 		}			
 		
 	}
