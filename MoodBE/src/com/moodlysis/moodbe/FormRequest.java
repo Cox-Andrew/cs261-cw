@@ -112,7 +112,7 @@ public class FormRequest extends HttpServlet {
 	
 	protected void doGetHostForms(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Form form = new Form(response.getWriter());
-		int hostID = GeneralRequest.getIDFromQuery(request, response);
+		int hostID = GeneralRequest.getIDFromQuery(request, response, "hostID");
 		
 		int[] formIDs = form.getFormIDsForHost(hostID);
 		
