@@ -13,7 +13,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.EventForm;
+import com.moodlysis.moodbe.integration.Form;
 import com.moodlysis.moodbe.integration.Question;
+import com.moodlysis.moodbe.integration.Series;
 
 /**
  * Servlet implementation class EventFormRequest
@@ -91,7 +93,52 @@ public class EventFormRequest extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doGet(request, response);
+		doNewEventForm(request, response);
+	}
+	
+	protected void doNewEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		EventForm eventForm = new EventForm(response.getWriter());
+		String jsonData = GeneralRequest.readJSON(request, response);
+		JSONParser postParser = new JSONParser();
+		int eventID = -1;
+		int formID = -1;
+		try {
+			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
+			/*
+			 *  {
+			 *  	"eventID": 2,
+			 *		"formID": 1,
+			 *		"preceding-eventFormID": 2 -- not implemented at the moment
+			 *	}
+			 *
+			 * {"eventID": 2,"formID": 1,"preceding-eventFormID": 2 }
+			 * {"eventID": 2,"formID": 1}
+			 * 
+			 * JSON looks like the above
+			 */
+			eventID = Integer.valueOf(postObject.get("eventID").toString());
+			formID = Integer.valueOf(postObject.get("formID").toString());
+
+		} catch(ParseException e) {
+			//TODO
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+		}
+		//CALL JDBC
+		int eventFormID = eventForm.newEventForm(eventID, formID, false);
+		
+		// tell the caller that this is JSON content (move to front)
+		if (eventFormID != -1) {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			
+			//Write JSON
+			String output = getJSON(eventFormID);
+			response.getWriter().append(output + "\n");
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	/**
@@ -99,13 +146,73 @@ public class EventFormRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		doEditEventForm(request, response);
+	}
+	
+	protected void doEditEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		EventForm eventForm = new EventForm(response.getWriter());
+		String jsonData = GeneralRequest.readJSON(request, response);
+		JSONParser putParser = new JSONParser();
+		int eventFormID = GeneralRequest.getIDFromPath(request, response);
+		int previousID = -1;
+		Boolean isActive = false;
+		try {
+			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
+			/*
+			 *  {
+			 *		"preceding-eventFormID": 2 -- (-2 for no change)
+			 *		"isActive": true
+			 *	}
+			 *
+			 * {"preceding-eventFormID": 2, "isActive": true }
+			 * 
+			 * 
+			 * JSON looks like the above
+			 */
+			if (putObject.get("isActive") != null) {
+				isActive = Boolean.parseBoolean(putObject.get("isActive").toString());
+			}
+			if (putObject.get("preceding-eventFormID") != null) {
+				previousID = Integer.parseInt(putObject.get("preceding-eventFormID").toString());
+			}
+		} catch(ParseException e) {
+			//TODO
+			response.getWriter().append(jsonData + "\n\n\n");
+			e.printStackTrace(response.getWriter());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			//return;
+		}
+		
+		if (eventForm.editEventForm(eventFormID, previousID, isActive)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
+			//put into response body what was wrong (can be handled in jdbc)
+		}
+		
 	}
 
 	/**
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		//if  /v0/event-forms/{eventFormID}
+		doDeleteEventForm(request, response);
+	}
+	
+	protected void doDeleteEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		EventForm eventForm = new EventForm(response.getWriter());
+		int eventFormID = GeneralRequest.getIDFromPath(request, response);
+		
+		if (eventForm.deleteEventForm(eventFormID)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			//assumes id not found
+		}
 	}
 
 }

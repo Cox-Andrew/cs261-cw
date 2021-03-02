@@ -174,8 +174,7 @@ public class QuestionRequest extends HttpServlet {
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//if /v0/questions/{questionID}
-		doEditQuestion(request, response);
-		
+		doEditQuestion(request, response);	
 	}
 	
 	protected void doEditQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

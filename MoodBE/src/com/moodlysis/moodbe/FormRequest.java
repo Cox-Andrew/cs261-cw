@@ -199,7 +199,7 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if /v0/series/{seriesID}
+		//if /v0/forms/{formID}
 		doEditForm(request, response);
 	}
 	
@@ -251,7 +251,7 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if  /v0/series/{seriesID}
+		//if  /v0/forms/{formID}
 		doDeleteForm(request, response);
 	}
 	
