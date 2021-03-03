@@ -58,9 +58,13 @@ public class EventFormRequest extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//if  /v0/series/{seriesID}
-		doGetEventForm(request, response);
+		// TODO Catch /v0/event-forms/
+		if (request.getRequestURI().matches("/v0/event-forms/([1-9])([0-9]*)")) {
+			doGetEventForm(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doGetEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -93,7 +97,12 @@ public class EventFormRequest extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doNewEventForm(request, response);
+		if (request.getRequestURI().equals("/v0/event-forms")) {
+			doNewEventForm(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doNewEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -146,7 +155,12 @@ public class EventFormRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doEditEventForm(request, response);
+		if (request.getRequestURI().matches("/v0/event-forms/([1-9])([0-9]*)")) {
+			doEditEventForm(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doEditEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -198,8 +212,12 @@ public class EventFormRequest extends HttpServlet {
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//if  /v0/event-forms/{eventFormID}
-		doDeleteEventForm(request, response);
+		if (request.getRequestURI().matches("/v0/event-forms/([1-9])([0-9]*)")) {
+			doDeleteEventForm(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doDeleteEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

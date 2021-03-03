@@ -68,8 +68,12 @@ public class QuestionRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if  /v0/series/{seriesID}
-		doGetQuestion(request, response);
+		if (request.getRequestURI().matches("/v0/questions/([1-9])([0-9]*)")) {
+			doGetQuestion(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doGetQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -173,8 +177,12 @@ public class QuestionRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if /v0/questions/{questionID}
-		doEditQuestion(request, response);	
+		if (request.getRequestURI().matches("/v0/questions/([1-9])([0-9]*)")) {
+			doEditQuestion(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doEditQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -262,7 +270,12 @@ public class QuestionRequest extends HttpServlet {
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doDeleteQuestion(request, response);
+		if (request.getRequestURI().matches("/v0/questions/([1-9])([0-9]*)")) {
+			doDeleteQuestion(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doDeleteQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

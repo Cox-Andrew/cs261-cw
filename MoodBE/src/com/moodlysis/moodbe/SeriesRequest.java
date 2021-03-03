@@ -58,10 +58,12 @@ public class SeriesRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if /v0/series
-		//response.getWriter().append("Served at: ").append(request.getContextPath() + "\n");
-		//if  /v0/series/{seriesID}
-		doGetSeries(request, response);
+		if (request.getRequestURI().matches("/v0/series/([1-9])([0-9]*)")) {
+			doGetSeries(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doGetSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -154,8 +156,12 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub, do not use doGet
-		//if /v0/series/{seriesID}
-		doEditSeries(request, response);
+		if (request.getRequestURI().matches("/v0/series/([1-9])([0-9]*)")) {
+			doEditSeries(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doEditSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -205,10 +211,12 @@ public class SeriesRequest extends HttpServlet {
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub, do not use doGet
-		//if /v0/series
-		//response.getWriter().append("Served at: ").append(request.getContextPath() + "\n");
-		//if  /v0/series/{seriesID}
-		doDeleteSeries(request, response);
+		if (request.getRequestURI().matches("/v0/series/([1-9])([0-9]*)")) {
+			doDeleteSeries(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doDeleteSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
