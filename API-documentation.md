@@ -19,8 +19,8 @@ For all endpoints where data is restricted, the user must have the appropriate t
 
 ## Available to all: 
 ### 1.	Register for account. 
-```POST /v0/attendees```\
-```POST /v0/hosts```\
+```POST /v0/attendees``` Working\
+```POST /v0/hosts``` Working\
 Request
 ```
 {
@@ -46,8 +46,8 @@ Use OAuth2.0/OpenID?\
 Returns a token/something, TODO.
 
 ### 3.	Change name. 
-```PUT /v0/attendees/{attendeeID}```\
-```PUT /v0/hosts/{hostID}```\
+```PUT /v0/attendees/{attendeeID}``` Not implemented\
+```PUT /v0/hosts/{hostID}```405 Method Not Allowed?\
 Request:
 ```
 {
@@ -62,8 +62,8 @@ If a user is creating an anonymous response, the line "isAnonymous": true should
 
 ### 5. Get account details
 Only available to the user that is currently signed in.\
-```GET /v0/attendees/{attendeeID}```\
-```GET /v0/hosts/{hostID}```\
+```GET /v0/attendees/{attendeeID}```403 Forbidden - You are not signed in as this user\
+```GET /v0/hosts/{hostID}```org.postgresql.util.PSQLException: ResultSet not positioned properly, perhaps you need to call next. \
 Response:
 ```
 {
@@ -75,15 +75,15 @@ Response:
 ```
 
 ### 6. Delete account
-```DELETE /v0/attendees/{attendeeID}```\
-```DELETE /v0/hosts/{hostID}```
+```DELETE /v0/attendees/{attendeeID}``` Not implemented\
+```DELETE /v0/hosts/{hostID}``` Not implemented
 
 
 ## Host functionality (available to authenticated users): 
 ### 1.	Create/Read/Update/Delete hosted series. 
 
 Get a series\
-```GET /v0/series/{seriesID}```\
+```GET /v0/series/{seriesID}``` Working\
 Response:
 ```
 {
@@ -98,7 +98,7 @@ Response:
 ```
 
 Create a new series\
-```POST /v0/series```\
+```POST /v0/series``` Working - output a bit messy\
 Request:
 ```
 {
@@ -117,7 +117,7 @@ Response:
 ```
 
 Edit a series\
-```PUT /v0/series/{seriesID}```\
+```PUT /v0/series/{seriesID}``` Working\
 Only items in the "data" section may be updated.\
 Request:
 ```
@@ -129,7 +129,7 @@ Request:
 }
 ```
 Delete a series\
-```DELETE /v0/series/{seriesID}```
+```DELETE /v0/series/{seriesID}``` Working
 
 
 ### 2.	Create/Read/Update/Delete hosted events. 
@@ -190,26 +190,38 @@ Delete an event\
 ```DELETE /v0/events/{eventID}```
 
 Add a form to an event\
-<!-- OLD VERSION: ```POST /v0/events/{eventID}/forms```\ -->
 ```POST /v0/event-forms```\
 Request:
 ```
 {
 	"eventID": 432423,
 	"formID": 354234,
+	"time-start": null,
+	"time-end": null,
+	"is-active": false,
 	"preceding-eventFormID": 42389 \* May be null to be the first form*\
 }
 ```
-Response: <!--This response is new -->
+Response:
 ```
 {
 	"eventFormID": 3423423
 }
 ```
 
+Activate or change start and and times of an EventForm\
+`PUT /v0/event-forms/{eventFormID}`\
+Request:
+```
+{
+	"time-start": null,
+	"time-end": null,
+	"is-active": true,
+	"preceding-eventFormID": 42389 \* May be null to be the first form*\
+}
+```
 
 Delete a form from an event
-<!-- OLD VERSION: ```DELETE /v0/events/{eventID}/forms/{formID}``` -->
 ```DELETE /v0/event-forms/{eventFormID}```
 
 
