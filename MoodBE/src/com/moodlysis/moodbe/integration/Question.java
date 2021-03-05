@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
-import com.moodlysis.moodbe.integration.Series.seriesInfo;
 import com.moodlysis.moodbe.integrationinterfaces.QuestionInterface;
 
 public class Question implements QuestionInterface {

@@ -143,7 +143,6 @@
         border: 0px solid transparent;
         padding: 0px 25px;
         font-family: "poppins", sans-serif;
-        color: rgb(240, 240, 240);
         text-decoration: none;
         letter-spacing: 3px;
         font-weight: bold;
@@ -220,16 +219,15 @@
   {
     text-decoration: none;
     color: rgb(240,240,240);
-    /* padding: 5vh; */
+    padding: 70px 0;
     font-size: 20px;
     line-height: 10vh;
     text-align: center;
-
     flex: 1 0 auto;
     width: 100%;
     height: 100%;
     /* margin: 0 auto; */
-    padding: 30px 40px;
+    /* padding: 30px 40px; */
     box-sizing: border-box;
     border-radius: 8px;
     box-shadow: 0 0 20px rgb(190, 190, 190);

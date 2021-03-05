@@ -27,14 +27,14 @@ public class GeneralRequest {
 	
 	public static int getIDFromPath(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String[] path = request.getRequestURI().split("/");
-		int ID = Integer.valueOf(path[path.length - 1]);		
+		int ID = Integer.parseInt(path[path.length - 1]);		
 		return ID;
 	}
 	
-	public static int getIDFromQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//only works for one query, needs further development
-		String[] query = request.getQueryString().split("=");
-		int ID = Integer.valueOf(query[query.length-1]);		
+	public static int getIDFromQuery(HttpServletRequest request, HttpServletResponse response, String value) throws ServletException, IOException {
+		//only works for one query, needs further development and error handling
+		String IDString = request.getParameter(value);
+		int ID = Integer.parseInt(IDString);		
 		return ID;
 	}
 	

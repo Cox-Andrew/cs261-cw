@@ -27,3 +27,19 @@ function template2() {
 function showDiv() {
   document.getElementById("msg").style.display= " block";
 }
+function submitTemplate1() {
+  var q1 = document.getElementById('q1').value;
+  var q2 = document.getElementById('q2').value;
+  var q3 = document.getElementById('q3').value;
+  alert('Template saved');
+
+  // Call backend function here
+}
+function submitTemplate2() {
+  var ques1 = document.getElementById('ques1').value;
+  var ques2 = document.getElementById('ques2').value;
+  var ques3 = document.getElementById('ques3').value;
+  alert('Template saved');
+
+  // Call backend function here
+}

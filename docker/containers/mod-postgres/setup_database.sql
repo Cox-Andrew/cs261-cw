@@ -250,3 +250,44 @@ CREATE TRIGGER ShiftQuestions
   BEFORE INSERT OR DELETE OR UPDATE OF NumInForm ON QUESTIONS
   FOR EACH ROW WHEN (pg_trigger_depth() = 0)
   EXECUTE FUNCTION ShiftQuestions();
+
+CREATE FUNCTION ShiftEventForms() RETURNS TRIGGER AS $ShiftEventForms$
+  BEGIN
+    IF tg_op = 'UPDATE' THEN
+      IF NEW.NumInEvent > OLD.NumInEvent THEN
+        UPDATE EVENTFORMS
+        SET NumInEvent = NumInEvent - 1
+        WHERE NumInEvent <= NEW.NumInEvent
+        AND NumInEvent > OLD.NumInEvent
+        AND EventID = NEW.EventID
+        AND EventFormID != NEW.EventFormID;
+      ELSE
+        UPDATE EVENTFORMS
+        SET NumInEvent = NumInEvent + 1
+        WHERE NumInEvent >= NEW.NumInEvent
+        AND NumInEvent < OLD.NumInEvent
+        AND EventID = NEW.EventID
+        AND EventFormID != NEW.EventFormID;
+      END IF;
+    ELSIF tg_op = 'INSERT' THEN
+      UPDATE EVENTFORMS
+      SET NumInEvent = NumInEvent + 1
+      WHERE NumInEvent >= NEW.NumInEvent
+      AND EventID = NEW.EventID
+      AND EventFormID != NEW.EventFormID;
+    ELSIF tg_op = 'DELETE' THEN
+      UPDATE EVENTFORMS
+      SET NumInEvent = NumInEvent - 1
+      WHERE NumInEvent > OLD.NumInEvent
+      AND EventID = OLD.EventID
+      AND EventFormID != OLD.EventFormID;
+      RETURN OLD;
+    END IF;
+    RETURN NEW;
+  END;
+$ShiftEventForms$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ShiftEventForms
+  BEFORE INSERT OR DELETE OR UPDATE OF NumInEvent ON EVENTFORMS
+  FOR EACH ROW WHEN (pg_trigger_depth() = 0)
+  EXECUTE FUNCTION ShiftEventForms();

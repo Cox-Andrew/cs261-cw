@@ -68,6 +68,15 @@ public class Answer implements AnswerInterface {
 			
 			
 			// create an entry in Mood for the sentiment analysis
+			// want to do analysis before insertion here 
+			// value = getSentiment(response);
+			/* 
+			 * int getSentiment(String text) {
+			 *     jsonResponse = URL("http://sentiment.mood-net/analyse?text=" + text);
+			 *     int value = Integer.valueOf(jsonResponse.parse().get().toString());
+			 *     return value;
+			 * }
+			 */
 			strStmt = ""
 			+ "INSERT INTO Mood(moodid, eventID, value, timeSubmitted) \n"
 			+ "VALUES (nextval('moodsmoodid'), ?, NULL, ?);";

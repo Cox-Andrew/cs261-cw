@@ -37,19 +37,19 @@
     <div class="content">
       <div class="join-meeting">
         <h1>Join a meeting</h1>
-        <form name="myForm" action="ParticipantPage.html" method="POST">
+        <form name="myForm" action="" onsubmit="return submitForm()" method="POST">
           <label>Meeting Id: </label>
           <div class="txtb">
-            <input type="text" name="mname" placeholder="Meeting Id" required>
+            <input type="text" name="mname" id="mname" placeholder="Meeting Id" required>
           </div>
 
           <label>Name: </label>      
           <div class="txtb">
-            <input type="text" name="name" placeholder="Name">
+            <input type="text" name="name" id="name" placeholder="Name">
           </div>
           <br>
           <div class="checkbox">
-            <input type="checkbox" name="anonymous" placeholder="Anonymous">
+            <input type="checkbox" name="anonymous" id="anonymous" placeholder="Anonymous">
             Anonymous
           </div>
           <br>
@@ -65,5 +65,6 @@
       </div>
     </footer>
     <script src="app.js"></script>
+    <script src="JoinMeeting.js"></script>
   </body>
 </html>

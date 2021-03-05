@@ -57,8 +57,12 @@ public class HostRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if  /v0/hosts/{hostID}
-		doGetHost(request, response);
+		if (request.getRequestURI().matches("/v0/hosts/([1-9])([0-9]*)")) {
+			doGetHost(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doGetHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -149,8 +153,12 @@ public class HostRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if /v0/series/{seriesID}
-		doEditHost(request, response);
+		if (request.getRequestURI().matches("/v0/hosts/([1-9])([0-9]*)")) {
+			doEditHost(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doEditHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -164,14 +172,13 @@ public class HostRequest extends HttpServlet {
 		try {
 			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
 			/*
-			 * {
-			 *		"data": {
-			 *			"title": "New series Title",
-			 *			"description": "New description of Series."
-			 *		}
+			 *  {
+			 *   	"email": "example@gmail.com",
+			 *		"pass": "mypassword",
+			 *		"account-name": "Joe Bloggs"
 			 *	}
 			 *
-			 * { "data": { "title": "New series Title", "description": "New description of Series." }}
+			 * { "email": "example@gmail.com", "pass": "mypassword", "account-name": "Joe Bloggs"}
 			 * 
 			 * JSON looks like the above
 			 */
@@ -197,8 +204,12 @@ public class HostRequest extends HttpServlet {
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if /v0/series/{seriesID}
-		doDeleteHost(request, response);
+		if (request.getRequestURI().matches("/v0/hosts/([1-9])([0-9]*)")) {
+			doDeleteHost(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doDeleteHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

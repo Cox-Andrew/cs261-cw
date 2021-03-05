@@ -46,13 +46,13 @@
       <div class  = "template1" id  = "template1">
         <div class = "form">
           <h3>Template 1</h3>
-          <form id = "GForm" onsubmit="alert('Template saved');">
+          <form id = "temp1" onsubmit="return submitTemplate1();">
             <label>Question 1<br></label>
-            <textarea class = "textarea" rows="2" cols="15" placeholder=" "></textarea>
+            <textarea class = "textarea" id = "q1" rows="2" cols="15" placeholder=" "></textarea>
             <label>Question 2<br></label>
-            <textarea class = "textarea" rows="2" cols="15" placeholder=" "></textarea>
+            <textarea class = "textarea" id = "q2" rows="2" cols="15" placeholder=" "></textarea>
             <label>Question 3<br></label>
-            <textarea class = "textarea" rows="2" cols="15" placeholder=" "></textarea>
+            <textarea class = "textarea" id = "q3" rows="2" cols="15" placeholder=" "></textarea>
             <input type = "submit" class = "submitTemp1" value="Save">
           </form>
         </div>
@@ -61,13 +61,13 @@
       <div class = "template2" id  = "template2">
         <div class = "form">
           <h3>Template 2</h3>
-          <form id="CForm" action="#" method="POST" onsubmit="alert('Template saved');">
+          <form id="temp2" onsubmit="return submitTemplate2();">
             <label>Question 1<br></label> 
-            <textarea class = "textarea" rows="2" cols="15" placeholder=" "></textarea>
+            <textarea class = "textarea" id = "ques1" rows="2" cols="15" placeholder=" "></textarea>
             <label>Question 2<br></label> 
-            <textarea class = "textarea" rows="2" cols="15" placeholder=" "></textarea>
+            <textarea class = "textarea" id = "ques2" rows="2" cols="15" placeholder=" "></textarea>
             <label>Question 3<br></label> 
-            <textarea class = "textarea" rows="2" cols="15" placeholder=" "></textarea>
+            <textarea class = "textarea" id = "ques3" rows="2" cols="15" placeholder=" "></textarea>
             <br>
             <input type = "submit" class = "submitTemp2" value="Save">
           </form>        

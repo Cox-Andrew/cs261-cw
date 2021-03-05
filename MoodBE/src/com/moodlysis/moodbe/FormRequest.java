@@ -77,11 +77,14 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		if (request.getRequestURI().matches("/v0/forms/(.*)")) {
+		if (request.getRequestURI().matches("/v0/forms/([1-9])([0-9]*)")) {
 			doGetForm(request, response);
 		}
 		else if (request.getRequestURI().equals("/v0/forms")) {
 			doGetHostForms(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
 	
@@ -112,7 +115,7 @@ public class FormRequest extends HttpServlet {
 	
 	protected void doGetHostForms(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Form form = new Form(response.getWriter());
-		int hostID = GeneralRequest.getIDFromQuery(request, response);
+		int hostID = GeneralRequest.getIDFromQuery(request, response, "hostID");
 		
 		int[] formIDs = form.getFormIDsForHost(hostID);
 		
@@ -199,8 +202,12 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if /v0/series/{seriesID}
-		doEditForm(request, response);
+		if (request.getRequestURI().matches("/v0/forms/([1-9])([0-9]*)")) {
+			doEditForm(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -251,8 +258,12 @@ public class FormRequest extends HttpServlet {
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//if  /v0/series/{seriesID}
-		doDeleteForm(request, response);
+		if (request.getRequestURI().matches("/v0/forms/([1-9])([0-9]*)")) {
+			doDeleteForm(request, response);
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 	
 	protected void doDeleteForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
