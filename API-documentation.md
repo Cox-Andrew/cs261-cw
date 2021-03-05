@@ -135,7 +135,7 @@ Delete a series\
 ### 2.	Create/Read/Update/Delete hosted events. 
 
 Get an event\
-```GET /v0/events/{eventID}```\
+```GET /v0/events/{eventID}```HTTP ERROR 400 missing ?seriesID={}\
 Response:
 <!-- eventFormIDs is only intended for the host to use to edit the form -->
 <!-- maybe it shouldn't appear when attendees send this command? -->
@@ -153,7 +153,7 @@ Response:
 ```
 
 Create an event\
-```POST /v0/events```\
+```POST /v0/events``` 400 java.lang.ClassCastException: class java.lang.Long cannot be cast to class java.lang.Integer\
 Request:
 ```
 {
@@ -173,7 +173,7 @@ Response:
 }
 ```
 Edit an event\
-```PUT /v0/events/{eventID}```\
+```PUT /v0/events/{eventID}``` 400 Bad Request\
 Only items in the "data" section may be updated.\
 Request:
 ```
@@ -187,10 +187,10 @@ Request:
 }
 ```
 Delete an event\
-```DELETE /v0/events/{eventID}```
+```DELETE /v0/events/{eventID}``` 403 Forbidden
 
 Add a form to an event\
-```POST /v0/event-forms```\
+```POST /v0/event-forms``` Working, but always inserts at the end of an event regardless of preceding-eventFormID\
 Request:
 ```
 {
@@ -210,7 +210,8 @@ Response:
 ```
 
 Activate or change start and and times of an EventForm\
-`PUT /v0/event-forms/{eventFormID}`\
+`PUT /v0/event-forms/{eventFormID}` org.postgresql.util.PSQLException: ERROR: new row for relation "eventforms" violates check constraint "eventforms_numinevent_check"\
+
 Request:
 ```
 {
@@ -222,14 +223,14 @@ Request:
 ```
 
 Delete a form from an event
-```DELETE /v0/event-forms/{eventFormID}```
+```DELETE /v0/event-forms/{eventFormID}``` Working
 
 
 
 ### 3.	Create/Read/Update/Delete form templates (hosted series/event). 
 
 Get a list of a user's forms. Users may only access their own templates.\
-```GET /v0/forms?hostID={hostID}```\
+```GET /v0/forms?hostID={hostID}``` Working\
 Response:
 ```
 {
@@ -238,7 +239,7 @@ Response:
 ```
 
 Get a form.\
-```GET /v0/forms/{formID}```\
+```GET /v0/forms/{formID}``` Working\
 Response:
 ```
 {
@@ -253,7 +254,7 @@ Response:
 
 
 Create a form.\
-```POST /v0/forms```\
+```POST /v0/forms``` Working\
 Request:
 ```
 {
@@ -271,7 +272,7 @@ Response:
 }
 ```
 Edit a form.\
-```PUT /v0/forms/{formID}```\
+```PUT /v0/forms/{formID}``` Working \
 Request:
 ```
 {
@@ -283,10 +284,10 @@ Request:
 ```
 
 Delete a form.\
-```DELETE /v0/forms/{formID}```
+```DELETE /v0/forms/{formID}``` Working
 
 Get a question.\
-```GET /v0/questions/{questionID}```\
+```GET /v0/questions/{questionID}``` java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null \
 Response:
 ```
 {
@@ -301,7 +302,7 @@ Response:
 ```
 
 Create a question.\
-```POST /v0/questions```\
+```POST /v0/questions``` Working, but returns the question options before the questionID? It returns `["Option 1","Option 2","Option 3"]{"questionID":18}`. Also seems to ignore preceding-questionID\
 Request:
 ```
 {
@@ -326,7 +327,7 @@ Response:
 ```
 
 Edit a question.\
-```PUT /v0/questions/{questionID}```\
+```PUT /v0/questions/{questionID}``` Working.\
 Request:
 ```
 {
@@ -338,7 +339,7 @@ Request:
 }
 ```
 Edit the position of a question. The question that originally followed preceding-questionID is moved to after questionID:\
-```PUT /v0/questions/{questionID}```\
+```PUT /v0/questions/{questionID}``` Working\
 Request
 ```
 {
@@ -347,13 +348,13 @@ Request
 ```
 
 Delete a question.\
-```DELETE /v0/questions/{questionID}```
+```DELETE /v0/questions/{questionID}``` Working
 
 
 
 ### 4.	Get default forms.
 
-```GET /v0/default-forms```\
+```GET /v0/default-forms``` 404 Not Found\
 Response:
 ```
 {
@@ -363,7 +364,7 @@ Response:
 ### 5.	Get invite code (hosted event). 
 
 <!-- OLD VERSION: ```GET /v0/events/{eventID}/invite-code```\ -->
-```GET /v0/invite-code?eventID={eventID} ```\
+```GET /v0/invite-code?eventID={eventID} ```404 Not Found\
 Response:
 ```
 {
@@ -377,7 +378,7 @@ Note: the format of the invite codes is not yet defined
 
 ### 6.	Get all feedback (hosted event). 
 
-```GET /v0/feedback?eventID={eventID}```\
+```GET /v0/feedback?eventID={eventID}``` 501 Not Implemented\
 ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
 Note: Answers can be edited, so the client may already have received responses to these forms.\
 Response:
@@ -447,14 +448,14 @@ Response:
 ```
 
 ### 7.	Get live feedback since specified time (hosted event).
- ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}```\
- ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
+ ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}``` java.lang.NullPointerException: Cannot read field "eventID" because "info" is null\
+ ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ``` 501 Not Implemented\
 Time-updated-since is of the form "2020-01-22T19:33:05Z".\
 Response is of the same kind as getting all feedback.
 
 ### 8.	Get live mood since specified time (hosted event). 
-```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}```\
-```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
+```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}``` 501 Not Implemented\
+```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ``` 501 Not Implemented\
 Response:
 ```
 {
@@ -483,11 +484,11 @@ Response:\
 TODO
 
 ### 10. Kick an attendee, deleting all their feedback from the session
-```DELETE /v0/event-attendees?eventID={eventID}&attendeeID={attendeeID}```
+```DELETE /v0/event-attendees?eventID={eventID}&attendeeID={attendeeID}``` 405 Method Not Allowed
 
 ### 11. Get the feedback profile for an answer
 Get the attendee ID and account-name for a response.\
-```GET /v0/feedback-profile?answerID={answerID}```\
+```GET /v0/feedback-profile?answerID={answerID}``` Not implemented yet\
 Response:
 ```
 {
@@ -498,7 +499,7 @@ Response:
 ```
 
 ### 12. Get all eventIDs in a series
-`GET /v0/events?seriesID={seriesID}`\
+`GET /v0/events?seriesID={seriesID}` java.lang.NullPointerException: Cannot invoke "String.split(String)" because the return value of "javax.servlet.http.HttpServletRequest.getPathInfo()" is null \
 Response:
 ```
 {
@@ -508,7 +509,7 @@ Response:
 
 ## Attendee request (available to authenticated users): 
 ### 1.	Register for event (with invite code). 
-```POST /v0/register-event```\
+```POST /v0/register-event``` Invite codes are not implemented yet\
 Request:
 ```
 {
@@ -528,7 +529,7 @@ Use the ```GET``` methods defined in the host session.
 ### 4.	Submit completed feedback form (registered event).
 
 Attendees can also submit single Answers:\
-```POST /v0/answers```\
+```POST /v0/answers``` Working, although time might be a bit messed up\
 Request:
 ```
 {
@@ -549,7 +550,7 @@ Response:
 }
 ```
 
-```PUT /v0/answers/{answerID}```\
+```PUT /v0/answers/{answerID}``` 200 OK, but nothing happens in the database! \
 Request:
 ```
 "data": {
@@ -558,10 +559,10 @@ Request:
 }
 ```
 ### 5.	Submit general feedback (registered event). 
-```POST /v0/answers```\
+```POST /v0/answers``` \
 Use the questionID corersponding to question in the general feedback form, which has formID ```0```.
 ### 6.	Submit explicit mood (registered event). 
-```POST /v0/moods```\
+```POST /v0/moods``` 405 Method Not Allowed\
 Request:
 ```
 {
@@ -570,7 +571,7 @@ Request:
 }
 ```
 ### 7. Register to an event using an invite code
-```GET /v0/invite-code/{invite-code}```\
+```GET /v0/invite-code/{invite-code}``` invite codes are not implemented\
 Response:
 ```
 {
