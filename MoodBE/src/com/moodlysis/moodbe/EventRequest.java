@@ -75,6 +75,8 @@ public class EventRequest extends HttpServlet {
 		JSONObject data = new JSONObject();
 		data.put("title", info.title);
 		data.put("description", info.description);
+		
+		output.put("data", data);
 
 		return output.toJSONString();
 		
