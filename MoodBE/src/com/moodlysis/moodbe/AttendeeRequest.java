@@ -250,66 +250,6 @@ public class AttendeeRequest extends HttpServlet {
 		
 		return;
 		
-		// TODO
-//		if (request.getPathInfo().split("/").length != 2) {
-//		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-//		    return;
-//		}
-//		
-//		int eventID = GeneralRequest.getIDFromPath(request, response);
-//		
-//		String jsonData = GeneralRequest.readJSON(request, response);
-//		JSONParser postParser = new JSONParser();
-//		JSONObject postObject;
-//		
-//		try {
-//			postObject = (JSONObject) postParser.parse(jsonData); 
-//		} catch(ParseException e) {
-//			response.getWriter().append("Invalid parse data");
-//			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-//			return;
-//		}
-//		
-//		String title;
-//		String description;
-//		LocalDateTime timeStart;
-//		LocalDateTime timeEnd;
-//		
-//		try {
-//			JSONObject data = (JSONObject) postObject.get("data");
-//			title = (String) data.get("title");
-//			description = (String) data.get("description");
-//			timeStart = LocalDateTime.parse((String) data.get("timeStart"));
-//			timeEnd = LocalDateTime.parse((String) data.get("timeEnd"));
-//		} catch (Exception e) {
-//			response.getWriter().print(e.toString());
-//			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-//			return;
-//		}
-//		
-//		// TODO - uncomment when getHostIDFromAuthToken is implemented
-//		int hostIDAuth = 0;
-////		int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
-//		
-//		if (hostIDAuth == -1) {
-//			response.getWriter().append("Not signed in as a host");
-//			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-//			return;
-//		}
-//		
-//		
-//		Event event = new Event(response.getWriter());
-//		try {
-//			event.editEvent(eventID, title, description, timeStart, timeEnd, hostIDAuth);
-//		} catch (MoodlysisInternalServerError e){
-//			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//			return;
-//		} catch (MoodlysisForbidden e) {
-//			response.getWriter().print(e.toString());
-//			response.sendError(HttpServletResponse.SC_FORBIDDEN);
-//			return;
-//		}
-		
 		
 	}
 	
