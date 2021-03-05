@@ -527,14 +527,14 @@ Use the ```GET``` methods defined in the host session.
 Use the ```GET``` methods defined in the host session.
 ### 4.	Submit completed feedback form (registered event).
 
-Attendees can also single Answers:\
+Attendees can also submit single Answers:\
 ```POST /v0/answers```\
 Request:
 ```
 {
 	"attendeeID": 3423423,
 	"eventID": 4242342,
-	"eventFormID": 34234324
+	"eventFormID": 34234324,
 	"questionID": 4234324,
 	"data": {
 		"response": "This is long answer question resonse.",
