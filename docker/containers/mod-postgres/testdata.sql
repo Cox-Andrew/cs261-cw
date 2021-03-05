@@ -25,18 +25,18 @@ INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 3, 'DB Project', 'Deutsche
 INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 2, 'New Tech', '');
 INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 5, 'Test', 'Test series');
 --
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Requirements', 'First meeting for the project planning', '1 hour');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 1', 'First prototype presentation', '2 hours 30 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 2', 'Second prototype presentation', '2 hours 30 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 2, 'Workshop AI', 'Workshop on how AI can help DB', '1 hour');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 3, 'Prototype Q&A', 'Questions about the prototype can be asked', '30 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 4, 'Finance Plan', 'DB Finance Plan Presentation', '1 hour');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 1', 'DB Project Methodology', '30 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 2', 'DB Project Sprint 1', '30 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Client Q&A', 'Q&A about Project', '45 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 1', 'Lecture on Econometrics', '50 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 2', 'Lecture on the Stock Market', '50 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 7, 'Test 1', 'First Test of the Series', '1 hour');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Requirements', 'First meeting for the project planning', TIMESTAMP '2020-1-11 13:30:0', TIMESTAMP '2020-1-11 13:30:0' + INTERVAL '45 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 1', 'First prototype presentation', TIMESTAMP '2021-6-14 13:30:0', TIMESTAMP '2021-6-14 13:30:0' + INTERVAL '45 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 2', 'Second prototype presentation', TIMESTAMP '2021-4-16 17:0:0', TIMESTAMP '2021-4-16 17:0:0' + INTERVAL '120 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 2, 'Workshop AI', 'Workshop on how AI can help DB', TIMESTAMP '2020-7-12 14:30:0', TIMESTAMP '2020-7-12 14:30:0' + INTERVAL '60 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 3, 'Prototype Q&A', 'Questions about the prototype can be asked', TIMESTAMP '2021-10-8 11:0:0', TIMESTAMP '2021-10-8 11:0:0' + INTERVAL '90 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 4, 'Finance Plan', 'DB Finance Plan Presentation', TIMESTAMP '2020-9-4 15:0:0', TIMESTAMP '2020-9-4 15:0:0' + INTERVAL '30 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 1', 'DB Project Methodology', TIMESTAMP '2021-10-22 14:0:0', TIMESTAMP '2021-10-22 14:0:0' + INTERVAL '60 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 2', 'DB Project Sprint 1', TIMESTAMP '2021-2-25 16:30:0', TIMESTAMP '2021-2-25 16:30:0' + INTERVAL '90 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Client Q&A', 'Q&A about Project', TIMESTAMP '2021-12-25 12:0:0', TIMESTAMP '2021-12-25 12:0:0' + INTERVAL '120 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 1', 'Lecture on Econometrics', TIMESTAMP '2020-5-15 10:0:0', TIMESTAMP '2020-5-15 10:0:0' + INTERVAL '90 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 2', 'Lecture on the Stock Market', TIMESTAMP '2021-1-17 14:30:0', TIMESTAMP '2021-1-17 14:30:0' + INTERVAL '30 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 7, 'Test 1', 'First Test of the Series', TIMESTAMP '2021-9-16 10:30:0', TIMESTAMP '2021-9-16 10:30:0' + INTERVAL '60 minutes');
 --
 INSERT INTO FORMS VALUES (nextval('FormsFormID'), 1, 'Requirements Validity', '');
 INSERT INTO FORMS VALUES (nextval('FormsFormID'), 1, 'Quality of Presentation', '');
@@ -76,23 +76,22 @@ INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'long', 7, 1, 'Tes
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'short', 7, 2, 'Test Short Question');
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'multi', 7, 3, 'Test Multi Question', 'Option 1, Option 2, Option 3');
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'rating', 7, 4, 'Test Rating Question', '1, 2, 3, 4, 5');
-/*
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 0.4, '2020-05-12 10:15:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 0.0, '2020-05-12 10:46:10');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, 0.0, '2021-07-31 11:14:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, -0.7, '2021-07-31 13:09:25');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 0.3, '2021-08-13 11:06:01');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, -0.2, '2021-08-13 12:56:57');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 0.5, '2021-08-13 13:29:48');
+--
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 2.4, '2020-05-12 10:15:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 3.0, '2020-05-12 10:46:10');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, 4.0, '2021-07-31 11:14:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, 3.7, '2021-07-31 13:09:25');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 1.3, '2021-08-13 11:06:01');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 2.2, '2021-08-13 12:56:57');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 2.5, '2021-08-13 13:29:48');
 INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 4, 0.4, '2021-03-25 19:59:33');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 5, -0.9, '2021-01-11 16:20:08');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 6, 0.0, '2020-12-30 09:40:39');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 7, -0.6, '2021-01-06 10:12:23');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 8, 0.0, '2021-01-27 10:24:22');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, -0.2, '2021-05-17 10:24:22');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, 0.0, '2021-05-17 10:44:22');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 10, -0.5, '2021-11-10 10:06:11');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 11, 0.8, '2021-11-21 10:52:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 0.0, '2021-01-01 00:00:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 0.3, '2021-01-01 00:30:00');
-*/
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 5, 3.9, '2021-01-11 16:20:08');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 6, 1.0, '2020-12-30 09:40:39');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 7, 3.6, '2021-01-06 10:12:23');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 8, 4.0, '2021-01-27 10:24:22');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, 2.2, '2021-05-17 10:24:22');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, 4.0, '2021-05-17 10:44:22');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 10, 2.5, '2021-11-10 10:06:11');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 11, 2.8, '2021-11-21 10:52:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 4.0, '2021-01-01 00:00:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 1.3, '2021-01-01 00:30:00');
