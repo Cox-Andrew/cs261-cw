@@ -47,7 +47,7 @@ Returns a token/something, TODO.
 
 ### 3.	Change name. 
 ```PUT /v0/attendees/{attendeeID}``` Working\
-```PUT /v0/hosts/{hostID}```405 Method Not Allowed?\
+```PUT /v0/hosts/{hostID}```Working\
 Request:
 ```
 {
