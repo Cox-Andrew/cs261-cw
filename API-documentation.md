@@ -354,13 +354,8 @@ Delete a question.\
 
 ### 4.	Get default forms.
 
-```GET /v0/default-forms``` 404 Not Found\
-Response:
-```
-{
-	"formIDs": [534324, 521512, 534524]
-}
-```
+Get the forms of user with userID `0`.
+
 ### 5.	Get invite code (hosted event). 
 
 <!-- OLD VERSION: ```GET /v0/events/{eventID}/invite-code```\ -->
