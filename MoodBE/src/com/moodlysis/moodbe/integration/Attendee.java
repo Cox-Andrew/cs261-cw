@@ -238,4 +238,44 @@ public class Attendee implements AttendeeInterface {
 		
 	}
 
+
+
+	@Override
+	public boolean deleteAttendee(int attendeeID, int verificationAttendeeID)
+			throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError {
+		
+		// TODO uncomment once login is sorted
+//		if (attendeeID != verificationAttendeeID) {
+//			throw new MoodlysisForbidden("You are not signed in as this user");
+//		}
+		
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+			conn.setAutoCommit(false);
+			strStmt = ""
+			+ "DELETE FROM attendee \n"
+			+ "WHERE attendeeID = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, attendeeID);
+			stmt.executeUpdate();
+			conn.commit();
+			
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			e.printStackTrace(writer);
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
+		}
+		
+		
+		return false;
+	}
+
 }

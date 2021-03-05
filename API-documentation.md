@@ -84,7 +84,7 @@ Response:
 ```
 
 ### 6. Delete account
-```DELETE /v0/attendees/{attendeeID}``` Not implemented\
+```DELETE /v0/attendees/{attendeeID}``` Working\
 ```DELETE /v0/hosts/{hostID}``` Working
 
 

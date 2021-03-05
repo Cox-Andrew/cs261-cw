@@ -256,36 +256,42 @@ public class AttendeeRequest extends HttpServlet {
 	@Override 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		// TODO
-//		if (request.getPathInfo().split("/").length != 2) {
-//		    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-//		    return;
-//		}
-//		
-//		int eventID = GeneralRequest.getIDFromPath(request, response);
-//		
-//		// TODO
-//		int hostIDAuth = 0;
-////		int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
-//		
-//		if (hostIDAuth == -1) {
-//			response.getWriter().append("Not signed in as a host");
-//			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-//			return;
-//		}
-//		
-//		Event event = new Event(response.getWriter());
-//		try {
-//			event.deleteEvent(eventID, hostIDAuth);
-//		} catch (MoodlysisInternalServerError e){
-//			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//			return;
-//		} catch (MoodlysisForbidden e) {
-//			response.getWriter().print(e.toString());
-//			response.sendError(HttpServletResponse.SC_FORBIDDEN);
-//			return;
-//		}
-//		
+		
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.split("/").length != 2) {
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "must be of form /v0/attendee/{attendeeID}");
+		    return;
+		}
+
+		int attendeeID = GeneralRequest.getIDFromPath(request, response);
+		
+		Attendee attendee = new Attendee(response.getWriter());
+
+		// extract attendeeID from cookie TODO
+		int verificationAttendeeID = 0;
+//		int verificationAttendeeID = GeneralRequest.getAttendeeIDFromAuthToken(request);
+		if (verificationAttendeeID == -1) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not signed in as an attendee");
+			return;
+		}
+		
+		
+		try {
+			// can either change account name only, or change everything
+			attendee.deleteAttendee(attendeeID, verificationAttendeeID);
+		} catch (MoodlysisInternalServerError e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		} catch (MoodlysisForbidden e) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
+			return;
+		}
+		
+		
+		return;
 		
 	}
 

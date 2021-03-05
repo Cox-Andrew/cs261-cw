@@ -30,4 +30,5 @@ public interface AttendeeInterface {
 	
 	public boolean editAttendeeName(int attendeeID, String newName, int verificationAttendeeID) throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError;
 	
+	public boolean deleteAttendee(int attendeeID, int verificationAttendeeID) throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError;
 }
