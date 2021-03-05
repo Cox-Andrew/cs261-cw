@@ -78,20 +78,15 @@ public class Attendee implements AttendeeInterface {
 
 	}
 
-	@Override
-	public boolean editAttendee(Connection conn, int attendeeID, String name, String pass, String email, Date expires)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public AttendeeInfo getAttendeeInfo(int attendeeID, int verificationAttendeeID)
 			throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError {
 		
-		if (attendeeID != verificationAttendeeID) {
-			throw new MoodlysisForbidden("You are not signed in as this user");
-		}
+		// TODO uncomment once login is sorted
+//		if (attendeeID != verificationAttendeeID) {
+//			throw new MoodlysisForbidden("You are not signed in as this user");
+//		}
 		
 		String strStmt;
 		PreparedStatement stmt;
@@ -126,6 +121,120 @@ public class Attendee implements AttendeeInterface {
 			throw new MoodlysisInternalServerError(e.toString());
 		}
 		
+		
+	}
+
+
+
+	@Override
+	public boolean editAttendee(int attendeeID, String name, String pass, String email, int verificationAttendeeID) throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError {
+		
+		System.out.println("why isn't this working2");
+		
+		// TODO uncomment once login is sorted
+//		if (attendeeID != verificationAttendeeID) {
+//			throw new MoodlysisForbidden("You are not signed in as this user");
+//		}
+		
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+			conn.setAutoCommit(false);
+			
+			strStmt = ""
+			+ "SELECT FROM attendee \n"
+			+ "WHERE attendeeID = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, attendeeID);
+			rs = stmt.executeQuery();
+			if (!rs.next()) {
+				throw new MoodlysisNotFound("Attendee not found.");
+			}
+			
+			strStmt = ""
+			+ "UPDATE attendee \n"
+			+ "SET email = ?, pass = ?, accountname = ? \n"
+			+ "WHERE attendeeID = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setString(1, email);
+			stmt.setString(2, pass);
+			stmt.setString(3, name);
+			stmt.setInt(4, attendeeID);
+			stmt.executeUpdate();
+			conn.commit();
+			return true;
+			
+			
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			e.printStackTrace(writer);
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
+		}
+		
+		
+		
+	}
+
+
+
+	@Override
+	public boolean editAttendeeName(int attendeeID, String newName, int verificationAttendeeID)
+			throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError {
+				
+		// TODO uncomment once login is sorted
+//		if (attendeeID != verificationAttendeeID) {
+//			throw new MoodlysisForbidden("You are not signed in as this user");
+//		}
+		
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+			conn.setAutoCommit(false);
+			
+			strStmt = ""
+			+ "SELECT FROM attendee \n"
+			+ "WHERE attendeeID = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, attendeeID);
+
+			rs= stmt.executeQuery();
+			if (!rs.next()) {
+				throw new MoodlysisNotFound("Attendee not found.");
+			}
+
+			
+			strStmt = ""
+			+ "UPDATE attendee \n"
+			+ "SET accountname = ? \n"
+			+ "WHERE attendeeID = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setString(1, newName);
+			stmt.setInt(2, attendeeID);
+			stmt.executeUpdate();
+			
+			conn.commit();
+			return true;
+			
+			
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			e.printStackTrace(writer);
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
+		}
 		
 	}
 

@@ -26,7 +26,8 @@ public interface AttendeeInterface {
 	// POST /v0/attendees
 	public int newAttendee(String name, String pass, String email, LocalDateTime expires) throws MoodlysisInternalServerError;
 	
-	public boolean editAttendee(Connection conn, int attendeeID, String name, String pass, String email, Date expires) throws SQLException;
+	public boolean editAttendee(int attendeeID, String name, String pass, String email, int verificationAttendeeID) throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError;
 	
-
+	public boolean editAttendeeName(int attendeeID, String newName, int verificationAttendeeID) throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError;
+	
 }

@@ -46,12 +46,21 @@ Use OAuth2.0/OpenID?\
 Returns a token/something, TODO.
 
 ### 3.	Change name. 
-```PUT /v0/attendees/{attendeeID}``` Not implemented\
+```PUT /v0/attendees/{attendeeID}``` Working\
 ```PUT /v0/hosts/{hostID}```405 Method Not Allowed?\
 Request:
 ```
 {
 	"account-name": "John Smith"
+}
+```
+Users may also change their emails and passwords using the same endpoint\
+Request:
+```
+{
+	"account-name": "John Smith",
+	"email": "new@email.com",
+	"pass": "newPassword"
 }
 ```
 
