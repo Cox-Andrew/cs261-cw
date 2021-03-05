@@ -7,17 +7,17 @@ GRANT ALL PRIVILEGES ON DATABASE mood TO mooduser;
 \c mood mooduser
 
 
-DROP TABLE IF EXISTS ATTENDEE CASCADE;
-DROP TABLE IF EXISTS HOST CASCADE;
-DROP TABLE IF EXISTS SERIES CASCADE;
-DROP TABLE IF EXISTS EVENTS CASCADE;
-DROP TABLE IF EXISTS EVENTFORMS CASCADE;
-DROP TABLE IF EXISTS FORMS CASCADE;
-DROP TABLE IF EXISTS QUESTIONS CASCADE;
-DROP TABLE IF EXISTS ANSWERS CASCADE;
-DROP TABLE IF EXISTS MOOD CASCADE;
-DROP FUNCTION IF EXISTS CreateFeedback CASCADE;
-DROP FUNCTION IF EXISTS DeleteSeries CASCADE;
+--DROP TABLE IF EXISTS ATTENDEE CASCADE;
+--DROP TABLE IF EXISTS HOST CASCADE;
+--DROP TABLE IF EXISTS SERIES CASCADE;
+--DROP TABLE IF EXISTS EVENTS CASCADE;
+--DROP TABLE IF EXISTS EVENTFORMS CASCADE;
+--DROP TABLE IF EXISTS FORMS CASCADE;
+--DROP TABLE IF EXISTS QUESTIONS CASCADE;
+--DROP TABLE IF EXISTS ANSWERS CASCADE;
+--DROP TABLE IF EXISTS MOOD CASCADE;
+--DROP FUNCTION IF EXISTS CreateFeedback CASCADE;
+--DROP FUNCTION IF EXISTS DeleteSeries CASCADE;
 
 CREATE TABLE ATTENDEE (
   AttendeeID INTEGER PRIMARY KEY,
@@ -50,7 +50,7 @@ CREATE TABLE EVENTS (
   Title VARCHAR(30) NOT NULL CHECK (CHAR_LENGTH(Title) > 0),
   Description VARCHAR(140),
   TimeStart TIMESTAMP NOT NULL,
-  TimeEnd TIMESTAMP NOT NULL
+  TimeEnd TIMESTAMP NOT NULL,
   CONSTRAINT fk_SeriesID
     FOREIGN KEY(SeriesID)
       REFERENCES SERIES(SeriesID) ON DELETE CASCADE
@@ -191,15 +191,6 @@ INCREMENT 1
 MINVALUE 1
 OWNED BY ANSWERS.AnswerID;
 
-INSERT INTO HOST(HostID, Email, Pass, AccountName)
-VALUES(0,'default@mail.com','password','generalhost');
-
-INSERT INTO FORMS(FormID, HostID, Title, Description)
-VALUES(0,0,'General Feedback', 'Form for general feedback');
-
-INSERT INTO QUESTIONS
-VALUES(0,'long',0,1,'General Feedback');
-
 CREATE FUNCTION CreateFeedback() RETURNS TRIGGER AS $CreateFeedback$
   BEGIN
     INSERT INTO EVENTFORMS(EventFormID, EventID, FormID, NumInEvent, IsActive)
@@ -295,3 +286,65 @@ CREATE TRIGGER ShiftEventForms
   BEFORE INSERT OR DELETE OR UPDATE OF NumInEvent ON EVENTFORMS
   FOR EACH ROW WHEN (pg_trigger_depth() = 0)
   EXECUTE FUNCTION ShiftEventForms();
+
+
+
+INSERT INTO HOST(HostID, Email, Pass, AccountName)
+VALUES(0,'default@mail.com','password','generalhost');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(0,0,'General Feedback', 'Form for general feedback');
+
+INSERT INTO QUESTIONS
+VALUES(0,'long',0,1,'General Feedback');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(nextval('FormsFormID'),0,'Beginning of event','Template for beginning of events');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'multi',1,1,'Can you hear everything correctly?', '["Yes","No"]');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'multi',1,2,'Can you see everything correctly?', '["Yes","No"]');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(nextval('FormsFormID'),0,'Middle of event','Template for middle of events');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'short',2,1,'How do you feel about the presentation so far?');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'long',2,2,'Is there anything you would like to mention before continuing?');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(nextval('FormsFormID'),0,'End of event','Template for end of events');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'rating',3,1,'How would you rate this event?');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'long',3,2,'What could be improved?');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(nextval('FormsFormID'),0,'Q&A Template','Template for asking questions');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'long',4,1,'Do you have any questions?');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(nextval('FormsFormID'),0,'Review/Demo Template','Template for reviewing something');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'long',5,1,'What could be improved?');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'rating',5,2,'How would you rate this?');
+
+INSERT INTO FORMS(FormID, HostID, Title, Description)
+VALUES(nextval('FormsFormID'),0,'Project Template','Template for questions and feelings on a project');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'long',6,1,'Is there anything you do not understand or would like to mention?');
+
+INSERT INTO QUESTIONS
+VALUES(nextval('QuestionsQuestionID'),'long',6,2,'How do you feel about the project?');
