@@ -558,8 +558,8 @@ Request:
 }
 ```
 ### 5.	Submit general feedback (registered event). 
-```POST /v0/answers/{answerID}```\
-Use the answerID corersponding to question in the general feedback form, which has formID ```0```.
+```POST /v0/answers```\
+Use the questionID corersponding to question in the general feedback form, which has formID ```0```.
 ### 6.	Submit explicit mood (registered event). 
 ```POST /v0/moods```\
 Request:
