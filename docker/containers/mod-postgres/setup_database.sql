@@ -95,7 +95,7 @@ CREATE TABLE QUESTIONS (
 CREATE TABLE MOOD (
   MoodID INTEGER PRIMARY KEY,
   EventID INTEGER NOT NULL,
-  Value FLOAT,
+  Value DOUBLE PRECISION NOT NULL CHECK (Value >= -1), CHECK (Value <= 1),
   TimeSubmitted TIMESTAMP,
   CONSTRAINT fk_EventID
     FOREIGN KEY(EventID)
@@ -195,6 +195,9 @@ VALUES(0,'default@mail.com','password','generalhost');
 
 INSERT INTO FORMS(FormID, HostID, Title, Description)
 VALUES(0,0,'General Feedback', 'Form for general feedback');
+
+INSERT INTO QUESTIONS
+VALUES(0,'long',0,1,'General Feedback');
 
 CREATE FUNCTION CreateFeedback() RETURNS TRIGGER AS $CreateFeedback$
   BEGIN
