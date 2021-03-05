@@ -44,8 +44,8 @@ public class Event implements EventInterface {
 			eventInfo.seriesID = rs.getInt("seriesID");
 			eventInfo.title = rs.getString("title");
 			eventInfo.description = rs.getString("description");
-			eventInfo.timeStart = rs.getDate("timeEnd");
-			eventInfo.timeEnd = rs.getDate("timeEnd");
+			eventInfo.timeStart = rs.getTimestamp("timeStart").toLocalDateTime();
+			eventInfo.timeEnd = rs.getTimestamp("timeEnd").toLocalDateTime();
 			
 			// find the formIDs and eventFormIDs in the event
 			strStmt = ""

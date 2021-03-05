@@ -55,7 +55,9 @@ public class EventRequest extends HttpServlet {
 			"eventFormIDs": [312312,312312,2352234], 
 			"data": {
 				"title": "Event Title",
-				"description": "Description of Event."
+				"description": "Description of Event.",
+				"time-start": "2020-01-22T19:33:05Z",
+				"time-end": "2020-01-22T19:33:05Z"
 			}
 		}*/
     	
@@ -75,6 +77,8 @@ public class EventRequest extends HttpServlet {
 		JSONObject data = new JSONObject();
 		data.put("title", info.title);
 		data.put("description", info.description);
+		data.put("time-start", info.timeStart.toString());
+		data.put("time-end", info.timeEnd.toString());
 		
 		output.put("data", data);
 

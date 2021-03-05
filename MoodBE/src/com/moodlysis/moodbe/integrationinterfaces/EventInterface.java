@@ -19,8 +19,8 @@ public interface EventInterface {
 		public int[] eventFormIDs;
 		public String title;
 		public String description;
-		public Date timeStart;
-		public Date timeEnd;
+		public LocalDateTime timeStart;
+		public LocalDateTime timeEnd;
 	}
 	
 	// GET /v0/events/{eventID}

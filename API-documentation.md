@@ -156,7 +156,9 @@ Response:
 	"eventFormIDs": [312312,312312,2352234], 
 	"data": {
 		"title": "Event Title",
-		"description": "Description of Event."
+		"description": "Description of Event.",
+		"time-start": "2020-01-22T19:33:05Z",
+		"time-end": "2020-01-22T19:33:05Z",
 	}
 }
 ```
