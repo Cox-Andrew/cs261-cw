@@ -144,7 +144,7 @@ Delete a series\
 ### 2.	Create/Read/Update/Delete hosted events. 
 
 Get an event\
-```GET /v0/events/{eventID}```HTTP ERROR 400 missing ?seriesID={}\
+```GET /v0/events/{eventID}``` Working\
 Response:
 <!-- eventFormIDs is only intended for the host to use to edit the form -->
 <!-- maybe it shouldn't appear when attendees send this command? -->

@@ -30,7 +30,7 @@ public class Event implements EventInterface {
 		
 		try {
 			conn.setAutoCommit(false);
-			strStmt = "SELECT * FROM Event WHERE EventID = ?";
+			strStmt = "SELECT * FROM Events WHERE EventID = ?";
 			stmt = conn.prepareStatement(strStmt);
 			stmt.setInt(1, eventID);
 			rs = stmt.executeQuery();
@@ -50,7 +50,8 @@ public class Event implements EventInterface {
 			// find the formIDs and eventFormIDs in the event
 			strStmt = ""
 			+ "SELECT Forms.formID, EventForms.eventFormID  \n"
-			+ "FROM Forms, EventForms \n"
+			+ "FROM Forms  \n"
+			+ "JOIN EventForms ON EventForms.FormID = Forms.FormID \n"
 			+ "WHERE eventID = ? \n"
 			+ "ORDER BY EventForms.numInEvent;";
 			stmt = conn.prepareStatement(strStmt);
@@ -66,7 +67,7 @@ public class Event implements EventInterface {
 			}
 			
 			eventInfo.formIDs = formIDs.stream().mapToInt(i->i).toArray();
-			eventInfo.eventFormIDs = formIDs.stream().mapToInt(i->i).toArray();
+			eventInfo.eventFormIDs = eventFormIDs.stream().mapToInt(i->i).toArray();
 			
 			return eventInfo;
 
