@@ -72,7 +72,7 @@ If a user is creating an anonymous response, the line "isAnonymous": true should
 ### 5. Get account details
 Only available to the user that is currently signed in.\
 ```GET /v0/attendees/{attendeeID}``` Working\
-```GET /v0/hosts/{hostID}```org.postgresql.util.PSQLException: ResultSet not positioned properly, perhaps you need to call next. \
+```GET /v0/hosts/{hostID}``` Working \
 Response:
 ```
 {
