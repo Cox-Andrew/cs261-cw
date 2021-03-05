@@ -76,22 +76,23 @@ INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'long', 7, 1, 'Tes
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'short', 7, 2, 'Test Short Question');
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'multi', 7, 3, 'Test Multi Question', 'Option 1, Option 2, Option 3');
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'rating', 7, 4, 'Test Rating Question', '1, 2, 3, 4, 5');
---
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 2.4, '2020-05-12 10:15:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 3.0, '2020-05-12 10:46:10');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, 4.0, '2021-07-31 11:14:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, 3.7, '2021-07-31 13:09:25');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 1.3, '2021-08-13 11:06:01');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 2.2, '2021-08-13 12:56:57');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 2.5, '2021-08-13 13:29:48');
+/*
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 0.4, '2020-05-12 10:15:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, 0.0, '2020-05-12 10:46:10');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, 0.0, '2021-07-31 11:14:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 2, -0.7, '2021-07-31 13:09:25');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 0.3, '2021-08-13 11:06:01');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, -0.2, '2021-08-13 12:56:57');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 3, 0.5, '2021-08-13 13:29:48');
 INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 4, 0.4, '2021-03-25 19:59:33');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 5, 3.9, '2021-01-11 16:20:08');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 6, 1.0, '2020-12-30 09:40:39');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 7, 3.6, '2021-01-06 10:12:23');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 8, 4.0, '2021-01-27 10:24:22');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, 2.2, '2021-05-17 10:24:22');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, 4.0, '2021-05-17 10:44:22');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 10, 2.5, '2021-11-10 10:06:11');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 11, 2.8, '2021-11-21 10:52:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 4.0, '2021-01-01 00:00:00');
-INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 1.3, '2021-01-01 00:30:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 5, -0.9, '2021-01-11 16:20:08');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 6, 0.0, '2020-12-30 09:40:39');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 7, -0.6, '2021-01-06 10:12:23');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 8, 0.0, '2021-01-27 10:24:22');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, -0.2, '2021-05-17 10:24:22');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 9, 0.0, '2021-05-17 10:44:22');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 10, -0.5, '2021-11-10 10:06:11');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 11, 0.8, '2021-11-21 10:52:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 0.0, '2021-01-01 00:00:00');
+INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 0.3, '2021-01-01 00:30:00');
+*/
