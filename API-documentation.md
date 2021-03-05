@@ -354,7 +354,7 @@ Delete a question.\
 
 ### 4.	Get default forms.
 
-Get the forms of user with userID `0`.
+Get the forms of host with hostID `0`.
 
 ### 5.	Get invite code (hosted event). 
 
