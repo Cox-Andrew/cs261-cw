@@ -11,6 +11,19 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedList;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.json.simple.JSONArray;
+
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.AnswerInterface;
@@ -28,6 +41,33 @@ public class Answer implements AnswerInterface {
 	public Answer(PrintWriter writer) {
 		this.conn = DatabaseConnection.getConnection();
 		this.writer = writer;
+	}
+	
+	public Double getSentiment(String text) throws IOException, MalformedURLException {
+		JSONParser parser = new JSONParser();
+		Double neg = 0.0;
+		Double pos = 0.0;
+		URL url = new URL("http://pythonapp.mood-net/v0/analyse?text=" + text);
+		HttpURLConnection con = (HttpURLConnection)url.openConnection();
+		con.setRequestMethod("GET");
+		con.setDoOutput(true);
+		StringBuilder response = new StringBuilder();
+		try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
+			String responseLine = null;
+			while ((responseLine = br.readLine()) != null) {
+				response.append(responseLine.trim());
+			}
+		}
+		try {
+			JSONObject mood = (JSONObject) parser.parse(response.toString());
+			neg = Double.valueOf(mood.get("neg").toString());
+			pos = Double.valueOf(mood.get("pos").toString());
+		} catch (ParseException e) {
+			e.printStackTrace(this.writer);
+		}
+		
+		Double value = pos - neg;
+		return value;
 	}
 
 
@@ -70,19 +110,23 @@ public class Answer implements AnswerInterface {
 			// create an entry in Mood for the sentiment analysis
 			// want to do analysis before insertion here 
 			// value = getSentiment(response);
-			/* 
-			 * int getSentiment(String text) {
-			 *     jsonResponse = URL("http://sentiment.mood-net/analyse?text=" + text);
-			 *     int value = Integer.valueOf(jsonResponse.parse().get().toString());
-			 *     return value;
-			 * }
-			 */
+			Double value = 0.0;
+			try {
+				value = getSentiment(response);
+			} catch (MalformedURLException e) {
+				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
+			} catch (IOException er) {
+				er.printStackTrace();
+				throw new MoodlysisInternalServerError(er.toString());
+			}
 			strStmt = ""
 			+ "INSERT INTO Mood(moodid, eventID, value, timeSubmitted) \n"
-			+ "VALUES (nextval('moodsmoodid'), ?, NULL, ?);";
+			+ "VALUES (nextval('moodsmoodid'), ?, ?, ?);";
 			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
 			stmt.setInt(1, eventID);
-			stmt.setTimestamp(2, java.sql.Timestamp.from(now));
+			stmt.setDouble(2, value);
+			stmt.setTimestamp(3, java.sql.Timestamp.from(now));
 			stmt.execute();
 			keys = stmt.getGeneratedKeys();
 			keys.next();
