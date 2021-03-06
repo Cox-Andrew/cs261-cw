@@ -10,6 +10,7 @@ import java.sql.Statement;
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.GeneralRequest;
 import com.moodlysis.moodbe.integrationinterfaces.FormInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 
 public class Form implements FormInterface {
 	
@@ -20,20 +21,9 @@ public class Form implements FormInterface {
 		this.conn = DatabaseConnection.getConnection();
 		this.writer = writer;
 	}
-	
-	public static class formInfo {
-		public int formID;
-		public int hostID;
-		public String title;
-		public String description;
-		public int[] questionIDs;
-	}
-	
-	
-	
 
 	@Override
-	public int[] getFormIDsForHost(int hostID) {
+	public int[] getFormIDsForHost(int hostID) throws MoodlysisInternalServerError {
 		PreparedStatement formsGet  = null;
 		ResultSet table = null;
 		int maxForms = 100;
@@ -63,6 +53,7 @@ public class Form implements FormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formsGet != null) {
@@ -73,6 +64,7 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		int[] returnIDs = new int[i];
@@ -82,7 +74,7 @@ public class Form implements FormInterface {
 		return returnIDs;
 	}
 
-	public formInfo getForm(int formID) {
+	public formInfo getForm(int formID) throws MoodlysisInternalServerError {
 		formInfo info = new formInfo();
 		info.formID = formID;
 		PreparedStatement formGet  = null;
@@ -131,6 +123,7 @@ public class Form implements FormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formGet != null) {
@@ -147,6 +140,7 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		int[] returnIDs = new int[i];
@@ -161,7 +155,7 @@ public class Form implements FormInterface {
 	}
 
 	@Override
-	public int newForm(int hostID, String title, String desc) {
+	public int newForm(int hostID, String title, String desc) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		PreparedStatement formInsert  = null;
 		ResultSet formKey = null;
@@ -187,6 +181,7 @@ public class Form implements FormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formInsert != null) {
@@ -197,13 +192,14 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return formID;
 	}
 
 	@Override
-	public boolean editForm(int formID, String newTitle, String newDesc) {
+	public boolean editForm(int formID, String newTitle, String newDesc) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		PreparedStatement formEdit  = null;
 		try {
@@ -221,11 +217,10 @@ public class Form implements FormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formEdit != null) {
@@ -233,14 +228,14 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteForm(int formID) {
+	public boolean deleteForm(int formID) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		PreparedStatement formDelete  = null;
 		try {
@@ -256,11 +251,10 @@ public class Form implements FormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formDelete != null) {
@@ -268,7 +262,7 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

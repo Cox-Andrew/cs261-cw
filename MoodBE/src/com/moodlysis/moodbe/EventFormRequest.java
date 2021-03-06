@@ -7,15 +7,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.EventForm;
-import com.moodlysis.moodbe.integration.Form;
-import com.moodlysis.moodbe.integration.Question;
-import com.moodlysis.moodbe.integration.Series;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 
 /**
  * Servlet implementation class EventFormRequest
@@ -32,6 +29,7 @@ public class EventFormRequest extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
+    @SuppressWarnings("unchecked")
     public String getJSON(int eventFormID) {
 		// TODO Auto-generated method stub
 		/*
@@ -44,6 +42,7 @@ public class EventFormRequest extends HttpServlet {
 		return output.toJSONString();
 	}
 	
+    @SuppressWarnings("unchecked")
 	public String getJSON(EventForm.eventFormInfo info) {
 		JSONObject output = new JSONObject();
 		output.put("eventFormID", info.eventFormID);
@@ -71,11 +70,17 @@ public class EventFormRequest extends HttpServlet {
 		EventForm eventForm = new EventForm(response.getWriter());
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
 		
-		EventForm.eventFormInfo info = eventForm.getEventForm(eventFormID);
+		EventForm.eventFormInfo info;
+		try {
+			info = eventForm.getEventForm(eventFormID);
+		} catch (MoodlysisInternalServerError e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		}
 		int eventID = info.eventID;
 		int formID = info.formID;
 		int numInEvent = info.numInEvent;
-		Boolean isActive = info.isActive;
+		//Boolean isActive = info.isActive;
 		
 		// tell the caller that this is JSON content (move to front)
 		// make a proper check for isActive which isnt just false
@@ -130,11 +135,17 @@ public class EventFormRequest extends HttpServlet {
 
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
 		//CALL JDBC
-		int eventFormID = eventForm.newEventForm(eventID, formID, false);
+		int eventFormID;
+		try {
+			eventFormID = eventForm.newEventForm(eventID, formID, false);
+		} catch (MoodlysisInternalServerError e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		}
 		
 		// tell the caller that this is JSON content (move to front)
 		if (eventFormID != -1) {
@@ -191,19 +202,16 @@ public class EventFormRequest extends HttpServlet {
 			}
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			//return;
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
 		
-		if (eventForm.editEventForm(eventFormID, previousID, isActive)) {
+		try {
+			eventForm.editEventForm(eventFormID, previousID, isActive);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
-			//put into response body what was wrong (can be handled in jdbc)
+		} catch (MoodlysisInternalServerError e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
 		}
 		
 	}
@@ -224,12 +232,12 @@ public class EventFormRequest extends HttpServlet {
 		EventForm eventForm = new EventForm(response.getWriter());
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
 		
-		if (eventForm.deleteEventForm(eventFormID)) {
+		try {
+			eventForm.deleteEventForm(eventFormID);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
+		} catch (MoodlysisInternalServerError e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
 		}
 	}
 

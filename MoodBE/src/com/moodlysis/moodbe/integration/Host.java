@@ -9,6 +9,7 @@ import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.HostInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 
 public class Host implements HostInterface {
 	
@@ -20,14 +21,8 @@ public class Host implements HostInterface {
 		this.writer = writer;
 	}
 	
-	public static class hostInfo {
-		public int hostID;
-		public String email;
-		public String pass;
-		public String account;
-	}
-	
-	public hostInfo getHost(int hostID) {
+	@Override
+	public hostInfo getHost(int hostID) throws MoodlysisInternalServerError {
 		hostInfo info = new hostInfo();
 		info.hostID = hostID;
 		PreparedStatement hostGet  = null;
@@ -55,6 +50,7 @@ public class Host implements HostInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (hostGet != null) {
@@ -65,6 +61,7 @@ public class Host implements HostInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		info.email = email;
@@ -75,7 +72,7 @@ public class Host implements HostInterface {
 	
 
 	@Override
-	public int newHost(String email, String pass, String account) {
+	public int newHost(String email, String pass, String account) throws MoodlysisInternalServerError {
 		PreparedStatement hostInsert  = null;
 		ResultSet hostKey = null;
 		int hostID = -1;
@@ -100,6 +97,7 @@ public class Host implements HostInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (hostInsert != null) {
@@ -110,13 +108,14 @@ public class Host implements HostInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return hostID;
 	}
 
 	@Override
-	public boolean editHost(int hostID, String email, String pass, String account) {
+	public boolean editHost(int hostID, String email, String pass, String account) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		PreparedStatement hostEdit  = null;
 		try {
@@ -135,11 +134,10 @@ public class Host implements HostInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (hostEdit != null) {
@@ -147,13 +145,14 @@ public class Host implements HostInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 	
-	public boolean deleteHost(int hostID) {
+	@Override
+	public boolean deleteHost(int hostID) throws MoodlysisInternalServerError {
 		PreparedStatement hostDelete  = null;
 		try {
 			conn.setAutoCommit(false);
@@ -168,11 +167,10 @@ public class Host implements HostInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (hostDelete != null) {
@@ -180,7 +178,7 @@ public class Host implements HostInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

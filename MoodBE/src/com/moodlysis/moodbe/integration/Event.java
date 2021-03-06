@@ -44,6 +44,9 @@ public class Event implements EventInterface {
 			eventInfo.seriesID = rs.getInt("seriesID");
 			eventInfo.title = rs.getString("title");
 			eventInfo.description = rs.getString("description");
+			if (rs.wasNull()) {
+				eventInfo.description = "";
+			}
 			eventInfo.timeStart = rs.getTimestamp("timeStart").toLocalDateTime();
 			eventInfo.timeEnd = rs.getTimestamp("timeEnd").toLocalDateTime();
 			

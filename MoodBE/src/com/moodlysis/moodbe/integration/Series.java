@@ -1,16 +1,14 @@
 package com.moodlysis.moodbe.integration;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.io.PrintWriter;
 
-import org.json.simple.JSONObject;
-
 import com.moodlysis.moodbe.integrationinterfaces.SeriesInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.DatabaseConnection;
 
 public class Series implements SeriesInterface {
@@ -23,17 +21,8 @@ public class Series implements SeriesInterface {
 		this.writer = writer;
 	}
 	
-	
-	public static class seriesInfo {
-		public int seriesID;
-		public int hostID;
-		public String title;
-		public String description;
-	}
-	
-	
-	
-	public seriesInfo getSeries(int seriesID) {
+	@Override
+	public seriesInfo getSeries(int seriesID) throws MoodlysisInternalServerError {
 		seriesInfo info = new seriesInfo();
 		info.seriesID = seriesID;
 		PreparedStatement seriesGet  = null;
@@ -64,6 +53,7 @@ public class Series implements SeriesInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesGet != null) {
@@ -74,6 +64,7 @@ public class Series implements SeriesInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		info.hostID = hostID;
@@ -83,7 +74,7 @@ public class Series implements SeriesInterface {
 	}
 
 	@Override
-	public int newSeries(String title, String desc, int hostID) {
+	public int newSeries(String title, String desc, int hostID) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		//JDBC
 
@@ -111,6 +102,7 @@ public class Series implements SeriesInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesInsert != null) {
@@ -121,13 +113,14 @@ public class Series implements SeriesInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return seriesID;
 	}
 
 	@Override
-	public boolean editSeries(int seriesID, String newTitle, String newDesc) {
+	public boolean editSeries(int seriesID, String newTitle, String newDesc) throws MoodlysisInternalServerError {
 		// TODO fix so if error occurs return false but still execute finally statement
 		PreparedStatement seriesEdit  = null;
 		try {
@@ -148,8 +141,8 @@ public class Series implements SeriesInterface {
 				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesEdit != null) {
@@ -157,14 +150,14 @@ public class Series implements SeriesInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteSeries(int seriesID) {
+	public boolean deleteSeries(int seriesID) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		PreparedStatement seriesDelete  = null;
 		try {
@@ -180,11 +173,10 @@ public class Series implements SeriesInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesDelete != null) {
@@ -192,7 +184,7 @@ public class Series implements SeriesInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

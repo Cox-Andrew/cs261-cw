@@ -9,6 +9,7 @@ import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.EventFormInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 
 public class EventForm implements EventFormInterface {
 
@@ -21,18 +22,8 @@ public class EventForm implements EventFormInterface {
 		this.writer = writer;
 	}
 	
-	
-	public static class eventFormInfo {
-		public int eventFormID;
-		public int eventID;
-		public int formID;
-		public int numInEvent;
-		public Boolean isActive;
-	}
-	
-	
-	
-	public eventFormInfo getEventForm(int eventFormID) {
+	@Override
+	public eventFormInfo getEventForm(int eventFormID) throws MoodlysisInternalServerError {
 		eventFormInfo info = new eventFormInfo();
 		info.eventFormID = eventFormID;
 		PreparedStatement eventFormGet  = null;
@@ -62,6 +53,7 @@ public class EventForm implements EventFormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormGet != null) {
@@ -72,6 +64,7 @@ public class EventForm implements EventFormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		info.eventID = eventID;
@@ -82,7 +75,7 @@ public class EventForm implements EventFormInterface {
 	}
 
 	@Override
-	public int newEventForm(int eventID, int formID, Boolean isActive) {
+	public int newEventForm(int eventID, int formID, Boolean isActive) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		//JDBC
 
@@ -124,6 +117,7 @@ public class EventForm implements EventFormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormInsert != null) {
@@ -140,13 +134,14 @@ public class EventForm implements EventFormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return eventFormID;
 	}
 
 	@Override
-	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) {
+	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) throws MoodlysisInternalServerError {
 		// TODO fix so if error occurs return false but still execute finally statement
 		// previousID -2 to continue without changing the position
 		PreparedStatement eventFormEdit  = null;
@@ -209,11 +204,10 @@ public class EventForm implements EventFormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormEdit != null) {
@@ -227,14 +221,14 @@ public class EventForm implements EventFormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteEventForm(int eventFormID) {
+	public boolean deleteEventForm(int eventFormID) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		PreparedStatement eventFormDelete  = null;
 		try {
@@ -250,11 +244,10 @@ public class EventForm implements EventFormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormDelete != null) {
@@ -262,7 +255,7 @@ public class EventForm implements EventFormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

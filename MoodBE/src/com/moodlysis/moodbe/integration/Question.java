@@ -9,6 +9,7 @@ import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.QuestionInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 
 public class Question implements QuestionInterface {
 
@@ -20,16 +21,8 @@ public class Question implements QuestionInterface {
 		this.writer = writer;
 	}
 	
-	public static class questionInfo {
-		public int questionID;
-		public int formID;
-		public String type;
-		public String text;
-		public String options;
-		public int numInForm;
-	}
-	
-	public questionInfo getQuestion(int questionID) {
+	@Override
+	public questionInfo getQuestion(int questionID) throws MoodlysisInternalServerError {
 		questionInfo info = new questionInfo();
 		info.questionID = questionID;
 		PreparedStatement questionGet  = null;
@@ -67,6 +60,7 @@ public class Question implements QuestionInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionGet != null) {
@@ -77,6 +71,7 @@ public class Question implements QuestionInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		info.formID = formID;
@@ -88,7 +83,7 @@ public class Question implements QuestionInterface {
 	}
 
 	@Override
-	public int newQuestion(int formID, String questionType, String text, String options) {
+	public int newQuestion(int formID, String questionType, String text, String options) throws MoodlysisInternalServerError {
 		PreparedStatement numInFormGet  = null;
 		ResultSet table = null;
 		PreparedStatement questionInsert  = null;
@@ -128,6 +123,7 @@ public class Question implements QuestionInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionInsert != null) {
@@ -144,13 +140,14 @@ public class Question implements QuestionInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return questionID;
 	}
 
 	@Override
-	public boolean editQuestionDetails(int questionID, String questionType, String text, String options) {
+	public boolean editQuestionDetails(int questionID, String questionType, String text, String options) throws MoodlysisInternalServerError {
 		// TODO fix so if error occurs return false but still execute finally statement
 		PreparedStatement questionEdit  = null;
 		try {
@@ -169,11 +166,10 @@ public class Question implements QuestionInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionEdit != null) {
@@ -181,13 +177,13 @@ public class Question implements QuestionInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 	
-	public boolean editQuestionPosition(int questionID, int previousID) {
+	public boolean editQuestionPosition(int questionID, int previousID) throws MoodlysisInternalServerError {
 		PreparedStatement questionEdit  = null;
 		PreparedStatement getNumInForm = null;
 		ResultSet table = null;
@@ -237,11 +233,10 @@ public class Question implements QuestionInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionEdit != null) {
@@ -255,14 +250,14 @@ public class Question implements QuestionInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteQuestion(int questionID) {
+	public boolean deleteQuestion(int questionID) throws MoodlysisInternalServerError {
 		PreparedStatement questionDelete  = null;
 		try {
 			conn.setAutoCommit(false);
@@ -277,11 +272,10 @@ public class Question implements QuestionInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionDelete != null) {
@@ -289,7 +283,7 @@ public class Question implements QuestionInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
