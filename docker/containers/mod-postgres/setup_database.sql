@@ -51,7 +51,7 @@ CREATE TABLE EVENTS (
   Description VARCHAR(140),
   TimeStart TIMESTAMP NOT NULL,
   TimeEnd TIMESTAMP NOT NULL,
-  InviteCode VARCHAR(10) UNIQUE NOT NULL,
+  InviteCode VARCHAR(10) UNIQUE,
   CONSTRAINT fk_SeriesID
     FOREIGN KEY(SeriesID)
       REFERENCES SERIES(SeriesID) ON DELETE CASCADE
@@ -299,9 +299,29 @@ CREATE TRIGGER ShiftEventForms
   FOR EACH ROW WHEN (pg_trigger_depth() = 0)
   EXECUTE FUNCTION ShiftEventForms();
 
---CREATE FUNCTION GenerateInviteCode() RETURNS TRIGGER AS $GenerateInviteCode$
-  --string_agg (substr('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', ceil (random() * 62)::integer, 1), '')
---$GenerateInviteCode$;
+CREATE FUNCTION GetInviteCode() RETURNS TRIGGER AS $GetInviteCode$
+  DECLARE
+    IC VARCHAR(10);
+  BEGIN
+    LOOP
+      IC := SUBSTRING(MD5(''||NOW()::TEXT||RANDOM()::TEXT) FOR 8);
+      BEGIN
+        UPDATE EVENTS
+        SET InviteCode = IC
+        WHERE EVENTS.EventID = NEW.EventID;
+        EXIT;
+      EXCEPTION WHEN unique_violation THEN
+      END;
+    END LOOP;
+    RETURN NEW;
+  END;
+$GetInviteCode$ LANGUAGE plpgsql;
+
+CREATE TRIGGER GetInviteCode
+  AFTER INSERT ON EVENTS
+  FOR EACH ROW
+  EXECUTE FUNCTION GetInviteCode();
+
 
 INSERT INTO HOST(HostID, Email, Pass, AccountName)
 VALUES(0,'default@mail.com','password','generalhost');
