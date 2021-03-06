@@ -106,6 +106,9 @@ public class Form implements FormInterface {
 			hostID = table.getInt("HostID");
 			title = table.getString("Title");
 			desc = table.getString("Description");
+			if (table.wasNull()) {
+				desc = "";
+			}
 			String query2 = "SELECT * FROM QUESTIONS WHERE FormID = ?";
 			questionsGet = conn.prepareStatement(query2);
 			questionsGet.setInt(1, formID);

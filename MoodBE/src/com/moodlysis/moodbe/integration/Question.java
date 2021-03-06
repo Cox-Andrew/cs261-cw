@@ -50,7 +50,13 @@ public class Question implements QuestionInterface {
 			numInForm = table.getInt("NumInForm");
 			type = table.getString("Type");
 			text = table.getString("Content");
+			if (table.wasNull()) {
+				text = "";
+			}
 			options = table.getString("Options");
+			if (table.wasNull()) {
+				options = "";
+			}
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {

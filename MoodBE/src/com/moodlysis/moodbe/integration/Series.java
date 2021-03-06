@@ -51,6 +51,9 @@ public class Series implements SeriesInterface {
 			hostID = table.getInt("hostID");
 			title = table.getString("Title");
 			desc = table.getString("Description");
+			if (table.wasNull()) {
+				desc = "";
+			}
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {
