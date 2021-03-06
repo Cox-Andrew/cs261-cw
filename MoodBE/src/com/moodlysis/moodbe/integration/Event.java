@@ -178,29 +178,30 @@ public class Event implements EventInterface {
 		try {
 			conn.setAutoCommit(false);
 			
-			// check that the host has permission, AND that the event exists
-			strStmt = ""
-			+ "SELECT FROM Events \n"
-			+ "WHERE Events.eventID = ? \n"
-			+ "AND EXISTS ( \n"
-			+ "	SELECT FROM Series \n"
-			+ "	WHERE Series.seriesID = Events.seriesID \n"
-			+ "	AND hostID = ? \n"
-			+ ");";
-			stmt = conn.prepareStatement(strStmt);
-			stmt.setInt(1, eventID);
-			stmt.setInt(2, verificationHostID);
-			rs = stmt.executeQuery();
-			if (!rs.next()) {
-				// no results, therefore host does not have permission
-				throw new MoodlysisForbidden("You do not have access to this event, or the event does not exist");
-			}
+			// TODO uncomment when login working
+//			// check that the host has permission, AND that the event exists
+//			strStmt = ""
+//			+ "SELECT FROM Events \n"
+//			+ "WHERE Events.eventID = ? \n"
+//			+ "AND EXISTS ( \n"
+//			+ "	SELECT FROM Series \n"
+//			+ "	WHERE Series.seriesID = Events.seriesID \n"
+//			+ "	AND hostID = ? \n"
+//			+ ");";
+//			stmt = conn.prepareStatement(strStmt);
+//			stmt.setInt(1, eventID);
+//			stmt.setInt(2, verificationHostID);
+//			rs = stmt.executeQuery();
+//			if (!rs.next()) {
+//				// no results, therefore host does not have permission
+//				throw new MoodlysisForbidden("You do not have access to this event, or the event does not exist");
+//			}
 			
 			strStmt = ""
 			+ "UPDATE Events  \n"
 			+ "SET title = ?, description = ?, timeStart = ?, timeEnd = ? \n"
 			+ "WHERE eventID = ?";
-			
+			stmt = conn.prepareStatement(strStmt);
 			stmt.setString(1, newTitle);
 			stmt.setString(2, newDescription);
 			stmt.setTimestamp(3, Timestamp.valueOf(newStart));

@@ -184,7 +184,7 @@ Response:
 }
 ```
 Edit an event\
-```PUT /v0/events/{eventID}``` 400 Bad Request\
+```PUT /v0/events/{eventID}``` Working\
 Only items in the "data" section may be updated.\
 Request:
 ```
