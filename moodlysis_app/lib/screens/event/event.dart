@@ -16,7 +16,7 @@ class EventScreen extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              "Hey! Welcome to event " + args.event,
+              "Hey! Welcome to ${args.event.title}",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
             ),
             SizedBox(

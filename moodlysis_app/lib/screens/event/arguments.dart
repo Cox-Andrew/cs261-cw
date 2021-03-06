@@ -1,4 +1,6 @@
+import 'package:moodlysis_app/models/event.dart';
+
 class EventScreenArgs {
-  final String event;
+  final Event event;
   EventScreenArgs(this.event);
 }
