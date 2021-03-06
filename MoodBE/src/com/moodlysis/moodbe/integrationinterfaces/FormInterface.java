@@ -1,6 +1,7 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public interface FormInterface {
 	
@@ -17,16 +18,16 @@ public interface FormInterface {
 	public int[] getFormIDsForHost(int hostID) throws MoodlysisInternalServerError;
 	
 	// GET /v0/forms/{formID}
-	public formInfo getForm(int formID) throws MoodlysisInternalServerError;
+	public formInfo getForm(int formID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// POST /v0/forms
 	public int newForm(int hostID, String formTitle, String formDescription) throws MoodlysisInternalServerError;
 	
 	// PUT /v0/forms/{formID}
-	public boolean editForm(int formID, String formTitle, String formDescription) throws MoodlysisInternalServerError;
+	public boolean editForm(int formID, String formTitle, String formDescription) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// DELETE /v0/forms/{formID}
-	public boolean deleteForm(int formID) throws MoodlysisInternalServerError;
+	public boolean deleteForm(int formID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	
 }

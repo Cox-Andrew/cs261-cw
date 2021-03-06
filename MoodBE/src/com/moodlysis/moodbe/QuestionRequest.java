@@ -14,6 +14,7 @@ import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Question;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 
 /**
@@ -88,7 +89,10 @@ public class QuestionRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		int formID = info.formID;
 		String type = info.type;
 		//String text = info.text;
@@ -258,7 +262,10 @@ public class QuestionRequest extends HttpServlet {
 			} catch (MoodlysisInternalServerError e){
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 				return;
-			} 
+			} catch (MoodlysisNotFound e) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+				return;
+			}
 		}
 		else /*if type not null e.g.*/ {
 			try {
@@ -267,7 +274,10 @@ public class QuestionRequest extends HttpServlet {
 			} catch (MoodlysisInternalServerError e){
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 				return;
-			} 
+			} catch (MoodlysisNotFound e) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+				return;
+			}
 		}
 	}
 
@@ -293,7 +303,10 @@ public class QuestionRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 	}
 
 }

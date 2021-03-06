@@ -13,6 +13,7 @@ import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Host;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 
 /**
@@ -76,7 +77,10 @@ public class HostRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		String email = info.email;
 		String pass = info.pass;
 		//String account = info.account;
@@ -208,7 +212,10 @@ public class HostRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 	}
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -231,7 +238,10 @@ public class HostRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 	}
 
 }

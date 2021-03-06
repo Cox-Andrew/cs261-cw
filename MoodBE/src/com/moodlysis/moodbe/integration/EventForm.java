@@ -10,6 +10,7 @@ import java.sql.Statement;
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.EventFormInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public class EventForm implements EventFormInterface {
 
@@ -23,7 +24,7 @@ public class EventForm implements EventFormInterface {
 	}
 	
 	@Override
-	public eventFormInfo getEventForm(int eventFormID) throws MoodlysisInternalServerError {
+	public eventFormInfo getEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		eventFormInfo info = new eventFormInfo();
 		info.eventFormID = eventFormID;
 		PreparedStatement eventFormGet  = null;
@@ -38,7 +39,9 @@ public class EventForm implements EventFormInterface {
     		eventFormGet = conn.prepareStatement(query);
     		eventFormGet.setInt(1, eventFormID);
 			table = eventFormGet.executeQuery();
-			table.next();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("EventForm not found. EventForm may have expired or been deleted.");
+			}
 			eventID = table.getInt("EventID");
 			formID = table.getInt("FormID");
 			numInEvent = table.getInt("NumInEvent");
@@ -141,15 +144,24 @@ public class EventForm implements EventFormInterface {
 	}
 
 	@Override
-	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) throws MoodlysisInternalServerError {
+	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO fix so if error occurs return false but still execute finally statement
 		// previousID -2 to continue without changing the position
 		PreparedStatement eventFormEdit  = null;
 		PreparedStatement getNumInEvent = null;
 		ResultSet table = null;
+		PreparedStatement existCheck = null;
+		ResultSet table2 = null;
 		int numInEvent = -1;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM EVENTFORMS WHERE EventFormID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, eventFormID);
+			table2 = existCheck.executeQuery();
+			if (!table2.next()) {
+				throw new MoodlysisNotFound("EventForm not found. EventForm may have expired or been deleted.");
+			}
 			if (previousID > 0) {
 				//Query makes sure forms of previous id and given question id are the same
 				//e.g. SELECT EVENTFORMS.EventFormID, EVENTFORMS.NumInEvent FROM (SELECT * FROM EVENTFORMS WHERE EventFormID = 4) AS EVENTFORM INNER JOIN EVENTFORMS ON (EVENTFORM.EventID = EVENTFORMS.EventID) WHERE EVENTFORMS.EventFormID = 5 OR EVENTFORMS.EventFormID = 4 ORDER BY EVENTFORMS.NumInEvent DESC;
@@ -219,6 +231,12 @@ public class EventForm implements EventFormInterface {
 				if (table != null) {
 					table.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table2 != null) {
+					table2.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
 				throw new MoodlysisInternalServerError(e.toString());
@@ -228,11 +246,20 @@ public class EventForm implements EventFormInterface {
 	}
 
 	@Override
-	public boolean deleteEventForm(int eventFormID) throws MoodlysisInternalServerError {
+	public boolean deleteEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		PreparedStatement eventFormDelete  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM EVENTFORMS WHERE EventFormID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, eventFormID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("EventForm not found. EventForm may have expired or been deleted.");
+			}
     		String query = "DELETE FROM EVENTFORMS WHERE EventFormID = ?";
     		eventFormDelete = conn.prepareStatement(query);
     		eventFormDelete.setInt(1, eventFormID);
@@ -252,6 +279,12 @@ public class EventForm implements EventFormInterface {
 			try {
 				if (eventFormDelete != null) {
 					eventFormDelete.close();
+				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);

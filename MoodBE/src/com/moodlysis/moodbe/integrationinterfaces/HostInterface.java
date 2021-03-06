@@ -1,6 +1,7 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public interface HostInterface {
 	
@@ -12,15 +13,15 @@ public interface HostInterface {
 	}
 	
 	//  GET /v0/hosts/{hostID}
-	public hostInfo getHost(int hostID) throws MoodlysisInternalServerError;
+	public hostInfo getHost(int hostID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	//  POST /v0/hosts	
 	public int newHost(String name, String pass, String email) throws MoodlysisInternalServerError;
 	
 	//  PUT /v0/hosts/{hostID}
-	public boolean editHost(int hostID, String name, String pass, String email) throws MoodlysisInternalServerError;
+	public boolean editHost(int hostID, String name, String pass, String email) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	//  DELETE /v0/hosts/{hostID}
-	public boolean deleteHost(int hostID) throws MoodlysisInternalServerError;
+	public boolean deleteHost(int hostID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 }

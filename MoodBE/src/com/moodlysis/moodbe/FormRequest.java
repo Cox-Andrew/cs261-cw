@@ -14,6 +14,7 @@ import org.json.simple.JSONArray;
 
 import com.moodlysis.moodbe.integration.Form;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 /**
  * Servlet implementation class FormRequest
@@ -101,7 +102,10 @@ public class FormRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		
 		int hostID = info.hostID;
 		String title = info.title;
@@ -262,7 +266,10 @@ public class FormRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 	}
 
 
@@ -288,7 +295,10 @@ public class FormRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 	}
 
 }

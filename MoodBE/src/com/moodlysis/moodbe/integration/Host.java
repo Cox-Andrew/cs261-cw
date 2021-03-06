@@ -10,6 +10,7 @@ import java.sql.Statement;
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.HostInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public class Host implements HostInterface {
 	
@@ -22,7 +23,7 @@ public class Host implements HostInterface {
 	}
 	
 	@Override
-	public hostInfo getHost(int hostID) throws MoodlysisInternalServerError {
+	public hostInfo getHost(int hostID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		hostInfo info = new hostInfo();
 		info.hostID = hostID;
 		PreparedStatement hostGet  = null;
@@ -36,7 +37,9 @@ public class Host implements HostInterface {
     		hostGet = conn.prepareStatement(query);
     		hostGet.setInt(1, hostID);
 			table = hostGet.executeQuery();
-			table.next();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Host not found. Host account may have expired or been deleted.");
+			}
 			email = table.getString("Email");
 			pass = table.getString("Pass");
 			account = table.getString("AccountName");
@@ -115,11 +118,20 @@ public class Host implements HostInterface {
 	}
 
 	@Override
-	public boolean editHost(int hostID, String email, String pass, String account) throws MoodlysisInternalServerError {
+	public boolean editHost(int hostID, String email, String pass, String account) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		PreparedStatement hostEdit  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM HOST WHERE HostID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, hostID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Host not found. Host account may have expired or been deleted.");
+			}
     		String query = "UPDATE HOST SET Email = ?, Pass = ?, AccountName = ? WHERE HostID = ?";
     		hostEdit = conn.prepareStatement(query);
     		hostEdit.setString(1, email);
@@ -143,6 +155,12 @@ public class Host implements HostInterface {
 				if (hostEdit != null) {
 					hostEdit.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
 				throw new MoodlysisInternalServerError(e.toString());
@@ -152,10 +170,19 @@ public class Host implements HostInterface {
 	}
 	
 	@Override
-	public boolean deleteHost(int hostID) throws MoodlysisInternalServerError {
+	public boolean deleteHost(int hostID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		PreparedStatement hostDelete  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM HOST WHERE HostID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, hostID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Host not found. Host account may have expired or been deleted.");
+			}
     		String query = "DELETE FROM HOST WHERE HostID = ?";
     		hostDelete = conn.prepareStatement(query);
     		hostDelete.setInt(1, hostID);
@@ -175,6 +202,12 @@ public class Host implements HostInterface {
 			try {
 				if (hostDelete != null) {
 					hostDelete.close();
+				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);

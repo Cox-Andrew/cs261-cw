@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Series;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 
 /**
@@ -77,7 +78,10 @@ public class SeriesRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		int hostID = info.hostID;
 		String title = info.title;
 		//String description = info.description;
@@ -207,7 +211,10 @@ public class SeriesRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 	}
 	
 	
@@ -231,7 +238,10 @@ public class SeriesRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 	}
 
 }

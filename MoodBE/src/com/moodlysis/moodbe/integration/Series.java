@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 
 import com.moodlysis.moodbe.integrationinterfaces.SeriesInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 import com.moodlysis.moodbe.DatabaseConnection;
 
 public class Series implements SeriesInterface {
@@ -22,7 +23,7 @@ public class Series implements SeriesInterface {
 	}
 	
 	@Override
-	public seriesInfo getSeries(int seriesID) throws MoodlysisInternalServerError {
+	public seriesInfo getSeries(int seriesID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		seriesInfo info = new seriesInfo();
 		info.seriesID = seriesID;
 		PreparedStatement seriesGet  = null;
@@ -36,7 +37,9 @@ public class Series implements SeriesInterface {
     		seriesGet = conn.prepareStatement(query);
     		seriesGet.setInt(1, seriesID);
 			table = seriesGet.executeQuery();
-			table.next();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Series not found. Series may have expired or been deleted.");
+			}
 			hostID = table.getInt("hostID");
 			title = table.getString("Title");
 			desc = table.getString("Description");
@@ -120,11 +123,20 @@ public class Series implements SeriesInterface {
 	}
 
 	@Override
-	public boolean editSeries(int seriesID, String newTitle, String newDesc) throws MoodlysisInternalServerError {
+	public boolean editSeries(int seriesID, String newTitle, String newDesc) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO fix so if error occurs return false but still execute finally statement
 		PreparedStatement seriesEdit  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM SERIES WHERE SeriesID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, seriesID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Series not found. Series may have expired or been deleted.");
+			}
     		String query = "UPDATE SERIES SET Title = ?, Description = ? WHERE SeriesID = ?";
     		seriesEdit = conn.prepareStatement(query);
     		seriesEdit.setString(1, newTitle);
@@ -148,6 +160,12 @@ public class Series implements SeriesInterface {
 				if (seriesEdit != null) {
 					seriesEdit.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
 				throw new MoodlysisInternalServerError(e.toString());
@@ -157,11 +175,20 @@ public class Series implements SeriesInterface {
 	}
 
 	@Override
-	public boolean deleteSeries(int seriesID) throws MoodlysisInternalServerError {
+	public boolean deleteSeries(int seriesID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		PreparedStatement seriesDelete  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM SERIES WHERE SeriesID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, seriesID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Series not found. Series may have expired or been deleted.");
+			}
     		String query = "DELETE FROM SERIES WHERE SeriesID = ?";
     		seriesDelete = conn.prepareStatement(query);
     		seriesDelete.setInt(1, seriesID);
@@ -181,6 +208,12 @@ public class Series implements SeriesInterface {
 			try {
 				if (seriesDelete != null) {
 					seriesDelete.close();
+				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);

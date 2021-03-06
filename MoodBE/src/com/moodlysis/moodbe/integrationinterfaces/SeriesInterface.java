@@ -1,6 +1,7 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public interface SeriesInterface {
 	
@@ -17,7 +18,7 @@ public interface SeriesInterface {
 	}
 	
 	// GET /v0/series/{seriesID}
-	public seriesInfo getSeries(int seriesID) throws MoodlysisInternalServerError;
+	public seriesInfo getSeries(int seriesID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	
 	
@@ -26,10 +27,10 @@ public interface SeriesInterface {
 	public int newSeries(String title, String desc, int hostID) throws MoodlysisInternalServerError;
 	
 	// PUT /v0/series/{seriesID}
-	public boolean editSeries(int seriesID, String newTitle, String newDesc) throws MoodlysisInternalServerError;
+	public boolean editSeries(int seriesID, String newTitle, String newDesc) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// DELETE /v0/series/{seriesID}
-	public boolean deleteSeries(int seriesID) throws MoodlysisInternalServerError;
+	public boolean deleteSeries(int seriesID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	
 	// there are other methods in the class diagram but I'm not sure if we need all of them, we can add them later if we do
