@@ -313,14 +313,14 @@ Response:
 ```
 
 Create a question.\
-```POST /v0/questions``` Working, but returns the question options before the questionID? It returns `["Option 1","Option 2","Option 3"]{"questionID":18}`. Also seems to ignore preceding-questionID\
+```POST /v0/questions``` Working, but seems to ignore preceding-questionID\
 Request:
 ```
 {
 	"formID": 234212,
 	"preceding-questionID": 2432432, /* may be null to denote the first question */
 	"data": {
-		"type": "multichoice",
+		"type": "multi",
 		"text": "Choose one of the options",
 		"options": [
 			"Option 1",
