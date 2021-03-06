@@ -164,7 +164,7 @@ Response:
 ```
 
 Create an event\
-```POST /v0/events``` 400 java.lang.ClassCastException: class java.lang.Long cannot be cast to class java.lang.Integer\
+```POST /v0/events``` Working\
 Request:
 ```
 {
@@ -391,7 +391,7 @@ Response:
 ```
 {
 	"eventID": 34414312,
-	"time-updated-since": "2020-01-22T19:33:02Z",
+	"time-updated-since": "2020-01-22T19:33:02",
 	"contains": 2,
 	"list": [
 		{

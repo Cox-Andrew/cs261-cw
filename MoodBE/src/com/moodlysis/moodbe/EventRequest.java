@@ -50,7 +50,7 @@ public class EventRequest extends HttpServlet {
     	
     	/*{
 			"eventID": 1243214,
-			"seriesID" : 2342341,
+			"seriesID" : 2341,
 			"formIDs": [12423142,4324324,5462354],
 			"eventFormIDs": [312312,312312,2352234], 
 			"data": {
@@ -205,18 +205,24 @@ public class EventRequest extends HttpServlet {
 		LocalDateTime timeStart;
 		LocalDateTime timeEnd;
 		
+		System.out.println("1");
+		
 		try {
-			seriesID = (Integer) postObject.get("seriesID");
+			seriesID = (Integer) Integer.parseInt(postObject.get("seriesID").toString());
 			JSONObject data = (JSONObject) postObject.get("data");
 			title = (String) data.get("title");
 			description = (String) data.get("description");
-			timeStart = LocalDateTime.parse((String) data.get("timeStart"));
-			timeEnd = LocalDateTime.parse((String) data.get("timeEnd"));
+			timeStart = LocalDateTime.parse((String) data.get("time-start"));
+			timeEnd = LocalDateTime.parse((String) data.get("time-end"));
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
+		
+		System.out.println("2");
+
 		
 		
 		// TODO - uncomment when getHostIDFromAuthToken is implemented
@@ -242,6 +248,8 @@ public class EventRequest extends HttpServlet {
 			return;
 		}
 		
+		System.out.println("3");
+
 		
 		JSONObject js = new JSONObject();
 		js.put("eventID", eventID);

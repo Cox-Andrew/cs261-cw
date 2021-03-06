@@ -29,7 +29,6 @@ public class Event implements EventInterface {
 		ResultSet rs;
 		
 		try {
-			conn.setAutoCommit(false);
 			strStmt = "SELECT * FROM Events WHERE EventID = ?";
 			stmt = conn.prepareStatement(strStmt);
 			stmt.setInt(1, eventID);
@@ -110,24 +109,25 @@ public class Event implements EventInterface {
 		try {
 			conn.setAutoCommit(false);
 			
-			// check that the host has permission
-			strStmt = ""
-			+ "SELECT FROM Series \n"
-			+ "WHERE seriesID = ? \n"
-			+ "AND hostID = ?;";
-			stmt = conn.prepareStatement(strStmt);
-			stmt.setInt(1, seriesID);
-			stmt.setInt(2, verificationHostID);
-			rs = stmt.executeQuery();
-			if (!rs.next()) {
-				// no results, therefore host does not have permission
-				throw new MoodlysisForbidden("Not signed in as a host with ownership of this series");
-			}
+			// TODO uncomment when authentication works
+//			// check that the host has permission
+//			strStmt = ""
+//			+ "SELECT FROM Series \n"
+//			+ "WHERE seriesID = ? \n"
+//			+ "AND hostID = ?;";
+//			stmt = conn.prepareStatement(strStmt);
+//			stmt.setInt(1, seriesID);
+//			stmt.setInt(2, verificationHostID);
+//			rs = stmt.executeQuery();
+//			if (!rs.next()) {
+//				// no results, therefore host does not have permission
+//				throw new MoodlysisForbidden("Not signed in as a host with ownership of this series");
+//			}
 			
 			// otherwise insert the new values
 			strStmt = ""
 			+ "INSERT INTO Events \n"
-			+ "VALUES (nextval('SeriesSeriesID'),?,?,?,?,?);";   
+			+ "VALUES (nextval('eventseventid'),?,?,?,?,?);";   
 			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
 			
 			stmt.setInt(1, seriesID);
