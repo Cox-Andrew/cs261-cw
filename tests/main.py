@@ -1,5 +1,3 @@
-import requests
-import unittest
 
 import cr1test
 
