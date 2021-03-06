@@ -505,7 +505,7 @@ Response:
 ```
 
 ### 12. Get all eventIDs in a series
-`GET /v0/events?seriesID={seriesID}` java.lang.NullPointerException: Cannot invoke "String.split(String)" because the return value of "javax.servlet.http.HttpServletRequest.getPathInfo()" is null \
+`GET /v0/events?seriesID={seriesID}` Working \
 Response:
 ```
 {

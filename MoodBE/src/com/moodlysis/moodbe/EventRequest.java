@@ -92,12 +92,8 @@ public class EventRequest extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		
-		int l = request.getPathInfo().split("/").length;
-		
-
-		
 		System.out.println(request.getPathInfo());
-		if (request.getPathInfo().length() == 1/*slash only*/) {
+		if (request.getPathInfo() == null || request.getPathInfo().length() == 1/*slash only*/) {
 			doGetEventsWithSeriesID(request, response);
 			return;
 		} else if (!request.getRequestURI().matches("/v0/events/([1-9])([0-9]*)")) {
