@@ -51,6 +51,7 @@ CREATE TABLE EVENTS (
   Description VARCHAR(140),
   TimeStart TIMESTAMP NOT NULL,
   TimeEnd TIMESTAMP NOT NULL,
+  InviteCode VARCHAR(10) UNIQUE NOT NULL,
   CONSTRAINT fk_SeriesID
     FOREIGN KEY(SeriesID)
       REFERENCES SERIES(SeriesID) ON DELETE CASCADE
@@ -126,6 +127,17 @@ CREATE TABLE ANSWERS (
   CONSTRAINT fk_MoodID
     FOREIGN KEY(MoodID)
       REFERENCES MOOD(MoodID) ON DELETE CASCADE
+);
+
+CREATE TABLE REGISTEREVENTS (
+  AttendeeID INTEGER NOT NULL,
+  EventID INTEGER NOT NULL,
+  CONSTRAINT fk_AttendeeID
+    FOREIGN KEY(AttendeeID)
+      REFERENCES ATTENDEE(AttendeeID) ON DELETE CASCADE,
+  CONSTRAINT fk_EventID
+    FOREIGN KEY(EventID)
+      REFERENCES EVENTS(EventID) ON DELETE CASCADE
 );
 
 -- define a sequence to generate attendee ids
@@ -287,7 +299,9 @@ CREATE TRIGGER ShiftEventForms
   FOR EACH ROW WHEN (pg_trigger_depth() = 0)
   EXECUTE FUNCTION ShiftEventForms();
 
-
+--CREATE FUNCTION GenerateInviteCode() RETURNS TRIGGER AS $GenerateInviteCode$
+  --string_agg (substr('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', ceil (random() * 62)::integer, 1), '')
+--$GenerateInviteCode$;
 
 INSERT INTO HOST(HostID, Email, Pass, AccountName)
 VALUES(0,'default@mail.com','password','generalhost');
