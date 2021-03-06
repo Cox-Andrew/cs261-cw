@@ -198,7 +198,7 @@ Request:
 }
 ```
 Delete an event\
-```DELETE /v0/events/{eventID}``` 403 Forbidden
+```DELETE /v0/events/{eventID}``` Working
 
 Add a form to an event\
 ```POST /v0/event-forms``` Working, but always inserts at the end of an event regardless of preceding-eventFormID\
