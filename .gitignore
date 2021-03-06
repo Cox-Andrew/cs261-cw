@@ -13,3 +13,7 @@
 
 # pythonapp
 supervisord.pid
+
+#emacs
+*~
+\#*\#
