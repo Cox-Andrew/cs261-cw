@@ -110,7 +110,7 @@ class CR1 (unittest.TestCase):
 		seriesid = 1
 		title = randomString()
 		description = randomString()
-]
+
 		
 		# # send request
 		# rqdata = f"""{{
