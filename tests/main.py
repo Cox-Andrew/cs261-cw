@@ -1,6 +1,8 @@
 
 import cr1test
 
+# this needs python 3.6 or higher
+
 
 """
 CR1: The host can set up an event for a particular session, series of workshops or project.
