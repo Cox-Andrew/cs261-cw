@@ -31,7 +31,7 @@ public interface FeedbackInterface {
 	// All the following return JSON
 	
 	// GET /v0/feedback?eventID={eventID}
-	public FeedbackInfo getAllFeedback(int eventID, int verificationIDHost);
+	public FeedbackInfo getAllFeedback(int eventID, int verificationIDHost) throws MoodlysisInternalServerError;
 	
 	// GET /v0/feedback?eventID={eventID}&attendeeID={attendeeID}
 	public FeedbackInfo getAllAttendeeFeedback(int eventID, int attendeeID, int verificationAttendeeID);

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -33,9 +34,44 @@ public class Feedback implements FeedbackInterface {
 
 
 	@Override
-	public FeedbackInfo getAllFeedback(int eventID, int verificationIDHost) {
-		// TODO Auto-generated method stub
-		return null;
+	public FeedbackInfo getAllFeedback(int eventID, int verificationIDHost) throws MoodlysisInternalServerError {
+		
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+			// find the oldest date in the database for this event
+			strStmt = ""
+			+ "SELECT timeSubmitted \n"
+			+ "FROM Answers \n"
+			+ "JOIN EventForms ON Answers.EventFormID = EventForms.EventFormID \n"
+			+ "WHERE EventForms.EventID = ? \n"
+			+ "ORDER BY Answers.timeSubmitted ASC \n"
+			+ "LIMIT 1;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, eventID);
+			rs = stmt.executeQuery();
+			if (!rs.next()) {
+				// no feedback for this event yet
+				// create a blank output
+				FeedbackInfo feedbackInfo = new FeedbackInfo();
+				feedbackInfo.eventID = eventID;
+				feedbackInfo.timeUpdatedSince = null;
+				feedbackInfo.list = new LinkedList<SubmissionInfo>();
+				return feedbackInfo;
+			}
+			LocalDateTime oldestEntry = rs.getTimestamp(1).toLocalDateTime();
+			// round down second
+			oldestEntry = oldestEntry.truncatedTo(ChronoUnit.SECONDS);
+			return getFeedbackSince(eventID, oldestEntry, verificationIDHost);
+			
+		} catch (SQLException e) {
+			e.printStackTrace(writer);
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
+		}	
+		
 	}
 
 	@Override
@@ -54,12 +90,27 @@ public class Feedback implements FeedbackInterface {
 		try {
 			// TODO verification
 			
+			// find out what the eventFormId of the general feedback form is
+			// needed to separate general feedback responses that may or may not be general feedback
 			strStmt = ""
-			+ "SELECT answerid, questionID, attendeeid, eventformid, answers.moodid, isedited, answers.timesubmitted, response, formID, numInForm, mood.value \n"
+			+ "SELECT eventFormID \n"
+			+ "FROM EventForms \n"
+			+ "WHERE formID = 0 \n"
+			+ "AND eventID = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, eventID);
+			rs = stmt.executeQuery();
+			rs.next();
+			int genFeedEventFormID = rs.getInt(1);
+			
+			
+			strStmt = ""
+			+ "SELECT answerid, questionID, attendee.attendeeid, eventformid, answers.moodid, isedited, answers.timesubmitted, response, formID, numInForm, mood.value, accountName, answers.IsAnonymous \n"
 			+ "FROM answers \n"
 			+ "NATURAL JOIN Questions  \n"
-			+ "JOIN Mood on mood.moodID = answers.moodID \n"
-			+ "WHERE answers.timeSubmitted > ? \n"
+			+ "JOIN Mood ON mood.moodID = answers.moodID \n"
+			+ "JOIN Attendee ON attendee.attendeeID = answers.attendeeID \n"
+			+ "WHERE answers.timeSubmitted >= ? \n"
 			+ "AND EXISTS ( \n"
 			+ "	SELECT FROM EventForms \n"
 			+ "	WHERE eventID = ? \n"
@@ -91,17 +142,21 @@ public class Feedback implements FeedbackInterface {
 			submissionInfo = new SubmissionInfo();
 			submissionInfo.formID = rs.getInt("formID");
 			submissionInfo.eventFormID = rs.getInt("eventFormID");
-			//TODO------
+			// accountname is filled in if an answer is encountered with isAnonymo
 			submissionInfo.accountName = null;
 			submissionInfo.attendeeID = rs.getInt("attendeeID");
 			submissionInfo.timeUpdated = rs.getTimestamp("timesubmitted").toLocalDateTime();
 			submissionInfo.isEdited = rs.getBoolean("isEdited");
 			submissionInfo.answers = new LinkedList<Answer.AnswerInfo>();
 			
+			// so we don't create a new black submission on the case of a general feedback response
+			// where rs.getInt("eventFormID") == genFeedEventFormID
+			boolean firstItt = true;
+			
 			do {
 				// different submission - add the previous and create a new one
-				if (rs.getInt("eventFormID") != submissionInfo.eventFormID
-				|| rs.getInt("attendeeID") != submissionInfo.attendeeID) {
+				if ( !firstItt && (rs.getInt("eventFormID") != submissionInfo.eventFormID
+				|| rs.getInt("attendeeID") != submissionInfo.attendeeID || rs.getInt("eventFormID") == genFeedEventFormID)) {
 					
 					feedbackInfo.list.add(submissionInfo);
 					
@@ -115,6 +170,8 @@ public class Feedback implements FeedbackInterface {
 					submissionInfo.isEdited = rs.getBoolean("isEdited");
 					submissionInfo.answers = new LinkedList<Answer.AnswerInfo>();
 				}
+				
+				firstItt = false;
 				
 				Answer.AnswerInfo answerInfo = new Answer.AnswerInfo();
 				answerInfo.questionID = rs.getInt("questionID");
@@ -130,6 +187,8 @@ public class Feedback implements FeedbackInterface {
 				if (answerInfo.timeSubmitted.isAfter(submissionInfo.timeUpdated))
 					submissionInfo.timeUpdated = answerInfo.timeSubmitted;
 				submissionInfo.answers.add(answerInfo);
+				if (!rs.getBoolean("isAnonymous"))
+					submissionInfo.accountName = rs.getString("accountname");
 				
 			} while (rs.next());
 			

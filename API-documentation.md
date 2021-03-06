@@ -384,7 +384,7 @@ Note: the format of the invite codes is not yet defined
 
 ### 6.	Get all feedback (hosted event). 
 
-```GET /v0/feedback?eventID={eventID}``` 501 Not Implemented\
+```GET /v0/feedback?eventID={eventID}``` Working\
 ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
 Note: Answers can be edited, so the client may already have received responses to these forms.\
 Response:
@@ -454,7 +454,7 @@ Response:
 ```
 
 ### 7.	Get live feedback since specified time (hosted event).
- ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}``` java.lang.NullPointerException: Cannot read field "eventID" because "info" is null\
+ ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}``` Working \
  ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ``` 501 Not Implemented\
 Time-updated-since is of the form "2020-01-22T19:33:05".\
 Response is of the same kind as getting all feedback.

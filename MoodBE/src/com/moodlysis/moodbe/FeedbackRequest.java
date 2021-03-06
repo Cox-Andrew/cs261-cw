@@ -58,6 +58,15 @@ public class FeedbackRequest extends HttpServlet {
 			return;
 		}
 		
+		// TODO - uncomment when getHostIDFromAuthToken is implemented
+		int hostIDAuth = 0;
+//		int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
+		
+		if (hostIDAuth == -1) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not signed in as a host");
+			return;
+		}
+		
 		
 		
 		Feedback feedback = new Feedback(response.getWriter());
@@ -75,18 +84,18 @@ public class FeedbackRequest extends HttpServlet {
 				return;
 			}
 			
-			// TODO - uncomment when getHostIDFromAuthToken is implemented
-			int hostIDAuth = 0;
-//			int hostIDAuth = GeneralRequest.getHostIDFromAuthToken(request);
-			
-			if (hostIDAuth == -1) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not signed in as a host");
-				return;
-			}
-			
 			
 			try {
 				feedbackInfo = feedback.getFeedbackSince(eventID, timeUpdatedSince, hostIDAuth);
+			} catch (MoodlysisInternalServerError e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "database error: " + e.toString());
+				e.printStackTrace();
+				return;
+			}	
+		
+		} else if (attendeeIDString == null && timeUpdatedSinceString == null) {
+			try {
+				feedbackInfo = feedback.getAllFeedback(eventID, hostIDAuth);
 			} catch (MoodlysisInternalServerError e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "database error: " + e.toString());
 				e.printStackTrace();
@@ -132,7 +141,8 @@ public class FeedbackRequest extends HttpServlet {
 				JSONObject ansObj = new JSONObject();
 				ansObj.put("questionID", ansInfo.questionID);
 				ansObj.put("answerID", ansInfo.answerID);
-				ansObj.put("mood-value", ansInfo.moodValue);
+				if (ansInfo.moodValue != null)
+					ansObj.put("mood-value", ansInfo.moodValue);
 				ansObj.put("is-edited", ansInfo.isEdited);
 				ansObj.put("time-updated", ansInfo.timeSubmitted);
 				JSONObject data = new JSONObject();
