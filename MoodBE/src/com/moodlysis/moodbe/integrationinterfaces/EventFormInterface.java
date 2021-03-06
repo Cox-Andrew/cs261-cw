@@ -1,14 +1,30 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
+
 public interface EventFormInterface {
 	
+	public static class eventFormInfo {
+		public int eventFormID;
+		public int eventID;
+		public int formID;
+		public int numInEvent;
+		public Boolean isActive;
+	}
+	
+	
+	
+	// GET /v0/event-forms/{eventFormID}
+	public eventFormInfo getEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound;
+	
 	// POST /v0/event-forms
-	public int newEventForm(int eventID, int formID, Boolean isActive);
+	public int newEventForm(int eventID, int formID, Boolean isActive) throws MoodlysisInternalServerError;
 	
 	// PUT /v0/event-forms/{eventFormID}
-	public boolean editEventForm(int eventFormID, int preceedingEventFormID ,Boolean isActive);
+	public boolean editEventForm(int eventFormID, int preceedingEventFormID ,Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// DELETE /v0/event-forms/{eventFormD}
-	public boolean deleteEventForm(int eventFormID);
+	public boolean deleteEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 
 }

@@ -10,6 +10,8 @@ import java.sql.Statement;
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.GeneralRequest;
 import com.moodlysis.moodbe.integrationinterfaces.FormInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public class Form implements FormInterface {
 	
@@ -20,20 +22,9 @@ public class Form implements FormInterface {
 		this.conn = DatabaseConnection.getConnection();
 		this.writer = writer;
 	}
-	
-	public static class formInfo {
-		public int formID;
-		public int hostID;
-		public String title;
-		public String description;
-		public int[] questionIDs;
-	}
-	
-	
-	
 
 	@Override
-	public int[] getFormIDsForHost(int hostID) {
+	public int[] getFormIDsForHost(int hostID) throws MoodlysisInternalServerError {
 		PreparedStatement formsGet  = null;
 		ResultSet table = null;
 		int maxForms = 100;
@@ -63,6 +54,7 @@ public class Form implements FormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formsGet != null) {
@@ -73,6 +65,7 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		int[] returnIDs = new int[i];
@@ -82,7 +75,7 @@ public class Form implements FormInterface {
 		return returnIDs;
 	}
 
-	public formInfo getForm(int formID) {
+	public formInfo getForm(int formID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		formInfo info = new formInfo();
 		info.formID = formID;
 		PreparedStatement formGet  = null;
@@ -102,10 +95,15 @@ public class Form implements FormInterface {
     		formGet = conn.prepareStatement(query);
     		formGet.setInt(1, formID);
 			table = formGet.executeQuery();
-			table.next();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Form not found. Form may have expired or been deleted.");
+			}
 			hostID = table.getInt("HostID");
 			title = table.getString("Title");
 			desc = table.getString("Description");
+			if (table.wasNull()) {
+				desc = "";
+			}
 			String query2 = "SELECT * FROM QUESTIONS WHERE FormID = ?";
 			questionsGet = conn.prepareStatement(query2);
 			questionsGet.setInt(1, formID);
@@ -128,6 +126,7 @@ public class Form implements FormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formGet != null) {
@@ -144,6 +143,7 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		int[] returnIDs = new int[i];
@@ -158,7 +158,7 @@ public class Form implements FormInterface {
 	}
 
 	@Override
-	public int newForm(int hostID, String title, String desc) {
+	public int newForm(int hostID, String title, String desc) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		PreparedStatement formInsert  = null;
 		ResultSet formKey = null;
@@ -184,6 +184,7 @@ public class Form implements FormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formInsert != null) {
@@ -194,17 +195,27 @@ public class Form implements FormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return formID;
 	}
 
 	@Override
-	public boolean editForm(int formID, String newTitle, String newDesc) {
+	public boolean editForm(int formID, String newTitle, String newDesc) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		PreparedStatement formEdit  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM FORMS WHERE FormID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, formID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Form not found. Form may have expired or been deleted.");
+			}
     		String query = "UPDATE FORMS SET Title = ?, Description = ? WHERE FormID = ?";
     		formEdit = conn.prepareStatement(query);
     		formEdit.setString(1, newTitle);
@@ -218,30 +229,44 @@ public class Form implements FormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formEdit != null) {
 					formEdit.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteForm(int formID) {
+	public boolean deleteForm(int formID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		PreparedStatement formDelete  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM FORMS WHERE FormID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, formID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Form not found. Form may have expired or been deleted.");
+			}
     		String query = "DELETE FROM FORMS WHERE FormID = ?";
     		formDelete = conn.prepareStatement(query);
     		formDelete.setInt(1, formID);
@@ -253,19 +278,24 @@ public class Form implements FormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (formDelete != null) {
 					formDelete.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

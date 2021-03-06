@@ -13,7 +13,8 @@ import org.json.simple.parser.ParseException;
 import org.json.simple.JSONArray;
 
 import com.moodlysis.moodbe.integration.Form;
-import com.moodlysis.moodbe.integration.Series;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 /**
  * Servlet implementation class FormRequest
@@ -30,6 +31,7 @@ public class FormRequest extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
+    @SuppressWarnings("unchecked")
     public String getJSON(int formID) {
 		// TODO Auto-generated method stub
 		/*
@@ -42,6 +44,7 @@ public class FormRequest extends HttpServlet {
 		return output.toJSONString();
 	}
     
+    @SuppressWarnings("unchecked")
     public String getJSON(Form.formInfo info) {
 		JSONObject output = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -60,6 +63,7 @@ public class FormRequest extends HttpServlet {
 		return output.toJSONString();
 	}
     
+    @SuppressWarnings("unchecked")
     public String getJSON(int[] formIDs) {
     	JSONObject output = new JSONObject();
     	JSONArray forms = new JSONArray();
@@ -92,11 +96,20 @@ public class FormRequest extends HttpServlet {
 		//TODO get the question ids for the form
 		Form form = new Form(response.getWriter());
 		int formID = GeneralRequest.getIDFromPath(request, response);
+		Form.formInfo info;
+		try {
+			info = form.getForm(formID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		
-		Form.formInfo info = form.getForm(formID);
 		int hostID = info.hostID;
 		String title = info.title;
-		String description = info.description;
+		//String description = info.description;
 		
 		// tell the caller that this is JSON content (move to front)
 		// make a proper check for description which isnt just empty string
@@ -117,8 +130,13 @@ public class FormRequest extends HttpServlet {
 		Form form = new Form(response.getWriter());
 		int hostID = GeneralRequest.getIDFromQuery(request, response, "hostID");
 		
-		int[] formIDs = form.getFormIDsForHost(hostID);
-		
+		int[] formIDs;
+		try {
+			formIDs = form.getFormIDsForHost(hostID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} 
 		
 		// tell the caller that this is JSON content (move to front)
 		if (formIDs == null) {
@@ -153,7 +171,6 @@ public class FormRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int hostID = -1;
-		String data = "";
 		String title = "";
 		String description = "";
 		try {
@@ -172,16 +189,21 @@ public class FormRequest extends HttpServlet {
 			 * JSON looks like the above
 			 */
 			hostID = Integer.valueOf(postObject.get("hostID").toString());
-			data = postObject.get("data").toString();
 			title = ((JSONObject) postObject.get("data")).get("title").toString();
 			description = ((JSONObject) postObject.get("data")).get("description").toString();
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
 		//CALL JDBC
-		int formID = form.newForm(hostID, title, description);
+		int formID;
+		try {
+			formID = form.newForm(hostID, title, description);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} 
 		
 		// tell the caller that this is JSON content (move to front)
 		if (formID != -1) {
@@ -215,7 +237,6 @@ public class FormRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int formID = GeneralRequest.getIDFromPath(request, response);
-		String data = "";
 		String title = "";
 		String description = "";
 		try {
@@ -232,23 +253,22 @@ public class FormRequest extends HttpServlet {
 			 * 
 			 * JSON looks like the above
 			 */
-			data = putObject.get("data").toString();
 			title = ((JSONObject) putObject.get("data")).get("title").toString();
 			description = ((JSONObject) putObject.get("data")).get("description").toString();
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			//return;
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
-		if (form.editForm(formID, title, description)) {
+		try {
+			form.editForm(formID, title, description);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
-			//put into response body what was wrong (can be handled in jdbc)
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
 		}
 	}
 
@@ -269,13 +289,15 @@ public class FormRequest extends HttpServlet {
 	protected void doDeleteForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Form form = new Form(response.getWriter());
 		int formID = GeneralRequest.getIDFromPath(request, response);
-		
-		if (form.deleteForm(formID)) {
+		try {
+			form.deleteForm(formID);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
 		}
 	}
 

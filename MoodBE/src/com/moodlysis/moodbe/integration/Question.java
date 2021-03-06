@@ -9,6 +9,8 @@ import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.QuestionInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public class Question implements QuestionInterface {
 
@@ -20,16 +22,8 @@ public class Question implements QuestionInterface {
 		this.writer = writer;
 	}
 	
-	public static class questionInfo {
-		public int questionID;
-		public int formID;
-		public String type;
-		public String text;
-		public String options;
-		public int numInForm;
-	}
-	
-	public questionInfo getQuestion(int questionID) {
+	@Override
+	public questionInfo getQuestion(int questionID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		questionInfo info = new questionInfo();
 		info.questionID = questionID;
 		PreparedStatement questionGet  = null;
@@ -45,12 +39,20 @@ public class Question implements QuestionInterface {
     		questionGet = conn.prepareStatement(query);
     		questionGet.setInt(1, questionID);
 			table = questionGet.executeQuery();
-			table.next();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Question not found. Question may have expired or been deleted.");
+			}
 			formID = table.getInt("FormID");
 			numInForm = table.getInt("NumInForm");
 			type = table.getString("Type");
 			text = table.getString("Content");
+			if (table.wasNull()) {
+				text = "";
+			}
 			options = table.getString("Options");
+			if (table.wasNull()) {
+				options = "";
+			}
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {
@@ -61,6 +63,7 @@ public class Question implements QuestionInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionGet != null) {
@@ -71,6 +74,7 @@ public class Question implements QuestionInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		info.formID = formID;
@@ -82,7 +86,7 @@ public class Question implements QuestionInterface {
 	}
 
 	@Override
-	public int newQuestion(int formID, String questionType, String text, String options) {
+	public int newQuestion(int formID, String questionType, String text, String options) throws MoodlysisInternalServerError {
 		PreparedStatement numInFormGet  = null;
 		ResultSet table = null;
 		PreparedStatement questionInsert  = null;
@@ -122,6 +126,7 @@ public class Question implements QuestionInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionInsert != null) {
@@ -138,17 +143,26 @@ public class Question implements QuestionInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return questionID;
 	}
 
 	@Override
-	public boolean editQuestionDetails(int questionID, String questionType, String text, String options) {
+	public boolean editQuestionDetails(int questionID, String questionType, String text, String options) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO fix so if error occurs return false but still execute finally statement
-		PreparedStatement questionEdit  = null;
+		PreparedStatement questionEdit  = null;PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM QUESTIONS WHERE QuestionID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, questionID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Question not found. Question may have expired or been deleted.");
+			}
     		String query = "UPDATE QUESTIONS SET Type = ?, Content = ?, Options = ? WHERE QuestionID = ?";
     		questionEdit = conn.prepareStatement(query);
     		questionEdit.setString(1, questionType);
@@ -163,31 +177,46 @@ public class Question implements QuestionInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionEdit != null) {
 					questionEdit.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 	
-	public boolean editQuestionPosition(int questionID, int previousID) {
+	@Override
+	public boolean editQuestionPosition(int questionID, int previousID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		PreparedStatement questionEdit  = null;
 		PreparedStatement getNumInForm = null;
 		ResultSet table = null;
+		PreparedStatement existCheck = null;
+		ResultSet table2 = null;
 		int numInForm = -1;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM QUESTIONS WHERE QuestionID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, questionID);
+			table2 = existCheck.executeQuery();
+			if (!table2.next()) {
+				throw new MoodlysisNotFound("Question not found. Question may have expired or been deleted.");
+			}
 			if (previousID > 0) {
 				//Query makes sure forms of previous id and given question id are the same
 				//e.g. SELECT QUESTIONS.QuestionID, QUESTIONS.NumInForm FROM (SELECT * FROM QUESTIONS WHERE QuestionID = 4) AS QUESTION INNER JOIN QUESTIONS ON (QUESTION.FormID = QUESTIONS.FormID) WHERE QUESTIONS.QuestionID = 5 OR QUESTIONS.QuestionID = 4 ORDER BY QUESTIONS.NumInForm DESC;
@@ -231,11 +260,10 @@ public class Question implements QuestionInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionEdit != null) {
@@ -247,19 +275,34 @@ public class Question implements QuestionInterface {
 				if (table != null) {
 					table.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table2 != null) {
+					table2.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteQuestion(int questionID) {
+	public boolean deleteQuestion(int questionID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		PreparedStatement questionDelete  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM QUESTIONS WHERE QuestionID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, questionID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Question not found. Question may have expired or been deleted.");
+			}
     		String query = "DELETE FROM QUESTIONS WHERE QuestionID = ?";
     		questionDelete = conn.prepareStatement(query);
     		questionDelete.setInt(1, questionID);
@@ -271,19 +314,24 @@ public class Question implements QuestionInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (questionDelete != null) {
 					questionDelete.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

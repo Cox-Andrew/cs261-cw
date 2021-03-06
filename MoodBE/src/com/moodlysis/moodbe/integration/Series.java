@@ -1,16 +1,15 @@
 package com.moodlysis.moodbe.integration;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.io.PrintWriter;
 
-import org.json.simple.JSONObject;
-
 import com.moodlysis.moodbe.integrationinterfaces.SeriesInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 import com.moodlysis.moodbe.DatabaseConnection;
 
 public class Series implements SeriesInterface {
@@ -23,17 +22,8 @@ public class Series implements SeriesInterface {
 		this.writer = writer;
 	}
 	
-	
-	public static class seriesInfo {
-		public int seriesID;
-		public int hostID;
-		public String title;
-		public String description;
-	}
-	
-	
-	
-	public seriesInfo getSeries(int seriesID) {
+	@Override
+	public seriesInfo getSeries(int seriesID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		seriesInfo info = new seriesInfo();
 		info.seriesID = seriesID;
 		PreparedStatement seriesGet  = null;
@@ -47,10 +37,15 @@ public class Series implements SeriesInterface {
     		seriesGet = conn.prepareStatement(query);
     		seriesGet.setInt(1, seriesID);
 			table = seriesGet.executeQuery();
-			table.next();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Series not found. Series may have expired or been deleted.");
+			}
 			hostID = table.getInt("hostID");
 			title = table.getString("Title");
 			desc = table.getString("Description");
+			if (table.wasNull()) {
+				desc = "";
+			}
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {
@@ -61,6 +56,7 @@ public class Series implements SeriesInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesGet != null) {
@@ -71,6 +67,7 @@ public class Series implements SeriesInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		info.hostID = hostID;
@@ -80,7 +77,7 @@ public class Series implements SeriesInterface {
 	}
 
 	@Override
-	public int newSeries(String title, String desc, int hostID) {
+	public int newSeries(String title, String desc, int hostID) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		//JDBC
 
@@ -108,6 +105,7 @@ public class Series implements SeriesInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesInsert != null) {
@@ -118,17 +116,27 @@ public class Series implements SeriesInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return seriesID;
 	}
 
 	@Override
-	public boolean editSeries(int seriesID, String newTitle, String newDesc) {
+	public boolean editSeries(int seriesID, String newTitle, String newDesc) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO fix so if error occurs return false but still execute finally statement
 		PreparedStatement seriesEdit  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM SERIES WHERE SeriesID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, seriesID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Series not found. Series may have expired or been deleted.");
+			}
     		String query = "UPDATE SERIES SET Title = ?, Description = ? WHERE SeriesID = ?";
     		seriesEdit = conn.prepareStatement(query);
     		seriesEdit.setString(1, newTitle);
@@ -145,27 +153,42 @@ public class Series implements SeriesInterface {
 				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesEdit != null) {
 					seriesEdit.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteSeries(int seriesID) {
+	public boolean deleteSeries(int seriesID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		PreparedStatement seriesDelete  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM SERIES WHERE SeriesID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, seriesID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("Series not found. Series may have expired or been deleted.");
+			}
     		String query = "DELETE FROM SERIES WHERE SeriesID = ?";
     		seriesDelete = conn.prepareStatement(query);
     		seriesDelete.setInt(1, seriesID);
@@ -177,19 +200,24 @@ public class Series implements SeriesInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (seriesDelete != null) {
 					seriesDelete.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

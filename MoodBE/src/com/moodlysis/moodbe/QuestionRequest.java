@@ -13,7 +13,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Question;
-import com.moodlysis.moodbe.integration.Series;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 
 /**
@@ -31,6 +32,7 @@ public class QuestionRequest extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
+    @SuppressWarnings("unchecked")
     public String getJSON(int questionID) {
 		// TODO Auto-generated method stub
 		/*
@@ -43,6 +45,7 @@ public class QuestionRequest extends HttpServlet {
 		return output.toJSONString();
 	}
 	
+    @SuppressWarnings("unchecked")
 	public String getJSON(Question.questionInfo info) {
 		JSONObject output = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -80,11 +83,20 @@ public class QuestionRequest extends HttpServlet {
 		Question question = new Question(response.getWriter());
 		int questionID = GeneralRequest.getIDFromPath(request, response);
 		
-		Question.questionInfo info = question.getQuestion(questionID);
+		Question.questionInfo info;
+		try {
+			info = question.getQuestion(questionID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		int formID = info.formID;
 		String type = info.type;
-		String text = info.text;
-		String options = info.options;
+		//String text = info.text;
+		//String options = info.options;
 		
 		// tell the caller that this is JSON content (move to front)
 		// make a proper check for text/options which isnt just empty string
@@ -119,7 +131,6 @@ public class QuestionRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int formID = -1;
-		String data = "";
 		String type = null;
 		String text = null;
 		String options = null;
@@ -145,18 +156,22 @@ public class QuestionRequest extends HttpServlet {
 			 * JSON looks like the above
 			 */
 			formID = Integer.valueOf(postObject.get("formID").toString());
-			data = postObject.get("data").toString();
 			type = ((JSONObject) postObject.get("data")).get("type").toString();
 			text = ((JSONObject) postObject.get("data")).get("text").toString();
 			options = ((JSONObject) postObject.get("data")).get("options").toString();
-			response.getWriter().append(options);
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
 		//CALL JDBC
-		int questionID = question.newQuestion(formID, type, text, options);
+		int questionID;
+		try {
+			questionID = question.newQuestion(formID, type, text, options);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} 
 		
 		// tell the caller that this is JSON content (move to front)
 		if (questionID != -1) {
@@ -190,7 +205,6 @@ public class QuestionRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int questionID = GeneralRequest.getIDFromPath(request, response);
-		String data = "";
 		String type = null;
 		String text = null;
 		String options = null;
@@ -219,7 +233,6 @@ public class QuestionRequest extends HttpServlet {
 			 * JSON looks like either of the above
 			 */
 			if (putObject.get("data") != null) {
-				data = putObject.get("data").toString();
 				type = "";
 				text = "";
 				options = "";
@@ -238,30 +251,32 @@ public class QuestionRequest extends HttpServlet {
 			}
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			//return;
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
 		//TODO check if edit question content or edit position
 		if (previousID != -1) {
-			if (question.editQuestionPosition(questionID, previousID)) {
+			try {
+				question.editQuestionPosition(questionID, previousID);
 				response.setStatus(HttpServletResponse.SC_OK);
-			}
-			else {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-				//assumes id not found
-				//put into response body what was wrong (can be handled in jdbc)
+			} catch (MoodlysisInternalServerError e){
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+				return;
+			} catch (MoodlysisNotFound e) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+				return;
 			}
 		}
 		else /*if type not null e.g.*/ {
-			if (question.editQuestionDetails(questionID, type, text, options)) {
+			try {
+				question.editQuestionDetails(questionID, type, text, options);
 				response.setStatus(HttpServletResponse.SC_OK);
-			}
-			else {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-				//assumes id not found
-				//put into response body what was wrong (can be handled in jdbc)
+			} catch (MoodlysisInternalServerError e){
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+				return;
+			} catch (MoodlysisNotFound e) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+				return;
 			}
 		}
 	}
@@ -282,12 +297,15 @@ public class QuestionRequest extends HttpServlet {
 		Question question = new Question(response.getWriter());
 		int questionID = GeneralRequest.getIDFromPath(request, response);
 		
-		if (question.deleteQuestion(questionID)) {
+		try {
+			question.deleteQuestion(questionID);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
 		}
 	}
 

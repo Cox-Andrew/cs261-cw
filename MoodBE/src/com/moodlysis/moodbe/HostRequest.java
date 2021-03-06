@@ -1,7 +1,6 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
-import java.io.BufferedReader;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,7 +12,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Host;
-import com.moodlysis.moodbe.integration.Series;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 
 /**
@@ -31,6 +31,7 @@ public class HostRequest extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
+    @SuppressWarnings("unchecked")
     public String getJSON(int hostID) {
 		// TODO Auto-generated method stub
 		/*
@@ -43,6 +44,7 @@ public class HostRequest extends HttpServlet {
 		return output.toJSONString();
 	}
     
+    @SuppressWarnings("unchecked")
     public String getJSON(Host.hostInfo info) {
 		JSONObject output = new JSONObject();
 		output.put("hostID", info.hostID);
@@ -69,10 +71,19 @@ public class HostRequest extends HttpServlet {
 		Host host = new Host(response.getWriter());
 		int hostID = GeneralRequest.getIDFromPath(request, response);
 		
-		Host.hostInfo info = host.getHost(hostID);
+		Host.hostInfo info;
+		try {
+			info = host.getHost(hostID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		String email = info.email;
 		String pass = info.pass;
-		String account = info.account;
+		//String account = info.account;
 		
 		// tell the caller that this is JSON content (move to front)
 		// make a proper check for account-name which isnt just empty string
@@ -106,7 +117,6 @@ public class HostRequest extends HttpServlet {
 		Host host = new Host(response.getWriter());
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
-		BufferedReader reader = request.getReader();
 		String email = "";
 		String pass = "";
 		String account = "";
@@ -128,11 +138,17 @@ public class HostRequest extends HttpServlet {
 			account = postObject.get("account-name").toString();
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
 		//CALL JDBC
-		int hostID = host.newHost(email, pass, account);
+		int hostID;
+		try {
+			hostID = host.newHost(email, pass, account);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} 
 		
 		// tell the caller that this is JSON content (move to front)
 		if (hostID != -1) {
@@ -187,18 +203,18 @@ public class HostRequest extends HttpServlet {
 			account = putObject.get("account-name").toString();
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			//return;
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
-		if (host.editHost(hostID, email, pass, account)) {
+		try {
+			host.editHost(hostID, email, pass, account);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
-			//put into response body what was wrong (can be handled in jdbc)
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
 		}
 	}
 	
@@ -216,12 +232,15 @@ public class HostRequest extends HttpServlet {
 		Host host = new Host(response.getWriter());
 		int hostID = GeneralRequest.getIDFromPath(request, response);
 		
-		if (host.deleteHost(hostID)) {
+		try {
+			host.deleteHost(hostID);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
 		}
 	}
 

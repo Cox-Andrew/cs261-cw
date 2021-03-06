@@ -50,7 +50,7 @@ public class EventRequest extends HttpServlet {
     	
     	/*{
 			"eventID": 1243214,
-			"seriesID" : 2342341,
+			"seriesID" : 2341,
 			"formIDs": [12423142,4324324,5462354],
 			"eventFormIDs": [312312,312312,2352234], 
 			"data": {
@@ -205,18 +205,24 @@ public class EventRequest extends HttpServlet {
 		LocalDateTime timeStart;
 		LocalDateTime timeEnd;
 		
+		System.out.println("1");
+		
 		try {
-			seriesID = (Integer) postObject.get("seriesID");
+			seriesID = (Integer) Integer.parseInt(postObject.get("seriesID").toString());
 			JSONObject data = (JSONObject) postObject.get("data");
 			title = (String) data.get("title");
 			description = (String) data.get("description");
-			timeStart = LocalDateTime.parse((String) data.get("timeStart"));
-			timeEnd = LocalDateTime.parse((String) data.get("timeEnd"));
+			timeStart = LocalDateTime.parse((String) data.get("time-start"));
+			timeEnd = LocalDateTime.parse((String) data.get("time-end"));
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
+		
+		System.out.println("2");
+
 		
 		
 		// TODO - uncomment when getHostIDFromAuthToken is implemented
@@ -242,6 +248,8 @@ public class EventRequest extends HttpServlet {
 			return;
 		}
 		
+		System.out.println("3");
+
 		
 		JSONObject js = new JSONObject();
 		js.put("eventID", eventID);
@@ -256,9 +264,9 @@ public class EventRequest extends HttpServlet {
 	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String pathInfo = request.getPathInfo();
-		if (pathInfo == null || pathInfo.split("/").length != 2) {
-		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "must be of form /v0/events/{eventID}");
+		if (!request.getRequestURI().matches("/v0/events/([1-9])([0-9]*)")) {
+		    response.sendError(HttpServletResponse.SC_NOT_FOUND, "must be like /v0/events/{eventID}");
+		    System.out.println("must be like /v0/events/{eventID}");
 		    return;
 		}
 		
@@ -271,6 +279,7 @@ public class EventRequest extends HttpServlet {
 		try {
 			postObject = (JSONObject) postParser.parse(jsonData); 
 		} catch(ParseException e) {
+			System.out.println("Unable to parse. " + e.toString());
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unable to parse. " + e.toString());
 			return;
 		}
@@ -284,9 +293,10 @@ public class EventRequest extends HttpServlet {
 			JSONObject data = (JSONObject) postObject.get("data");
 			title = (String) data.get("title");
 			description = (String) data.get("description");
-			timeStart = LocalDateTime.parse((String) data.get("timeStart"));
-			timeEnd = LocalDateTime.parse((String) data.get("timeEnd"));
+			timeStart = LocalDateTime.parse((String) data.get("time-start"));
+			timeEnd = LocalDateTime.parse((String) data.get("time-end"));
 		} catch (Exception e) {
+			System.out.println(e.toString());
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}

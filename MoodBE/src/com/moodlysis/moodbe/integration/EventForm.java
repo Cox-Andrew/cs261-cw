@@ -9,6 +9,8 @@ import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.EventFormInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 public class EventForm implements EventFormInterface {
 
@@ -21,18 +23,8 @@ public class EventForm implements EventFormInterface {
 		this.writer = writer;
 	}
 	
-	
-	public static class eventFormInfo {
-		public int eventFormID;
-		public int eventID;
-		public int formID;
-		public int numInEvent;
-		public Boolean isActive;
-	}
-	
-	
-	
-	public eventFormInfo getEventForm(int eventFormID) {
+	@Override
+	public eventFormInfo getEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		eventFormInfo info = new eventFormInfo();
 		info.eventFormID = eventFormID;
 		PreparedStatement eventFormGet  = null;
@@ -47,7 +39,9 @@ public class EventForm implements EventFormInterface {
     		eventFormGet = conn.prepareStatement(query);
     		eventFormGet.setInt(1, eventFormID);
 			table = eventFormGet.executeQuery();
-			table.next();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("EventForm not found. EventForm may have expired or been deleted.");
+			}
 			eventID = table.getInt("EventID");
 			formID = table.getInt("FormID");
 			numInEvent = table.getInt("NumInEvent");
@@ -62,6 +56,7 @@ public class EventForm implements EventFormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormGet != null) {
@@ -72,6 +67,7 @@ public class EventForm implements EventFormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		info.eventID = eventID;
@@ -82,7 +78,7 @@ public class EventForm implements EventFormInterface {
 	}
 
 	@Override
-	public int newEventForm(int eventID, int formID, Boolean isActive) {
+	public int newEventForm(int eventID, int formID, Boolean isActive) throws MoodlysisInternalServerError {
 		// TODO Auto-generated method stub
 		//JDBC
 
@@ -124,6 +120,7 @@ public class EventForm implements EventFormInterface {
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormInsert != null) {
@@ -140,21 +137,31 @@ public class EventForm implements EventFormInterface {
 				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return eventFormID;
 	}
 
 	@Override
-	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) {
+	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO fix so if error occurs return false but still execute finally statement
 		// previousID -2 to continue without changing the position
 		PreparedStatement eventFormEdit  = null;
 		PreparedStatement getNumInEvent = null;
 		ResultSet table = null;
+		PreparedStatement existCheck = null;
+		ResultSet table2 = null;
 		int numInEvent = -1;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM EVENTFORMS WHERE EventFormID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, eventFormID);
+			table2 = existCheck.executeQuery();
+			if (!table2.next()) {
+				throw new MoodlysisNotFound("EventForm not found. EventForm may have expired or been deleted.");
+			}
 			if (previousID > 0) {
 				//Query makes sure forms of previous id and given question id are the same
 				//e.g. SELECT EVENTFORMS.EventFormID, EVENTFORMS.NumInEvent FROM (SELECT * FROM EVENTFORMS WHERE EventFormID = 4) AS EVENTFORM INNER JOIN EVENTFORMS ON (EVENTFORM.EventID = EVENTFORMS.EventID) WHERE EVENTFORMS.EventFormID = 5 OR EVENTFORMS.EventFormID = 4 ORDER BY EVENTFORMS.NumInEvent DESC;
@@ -209,11 +216,10 @@ public class EventForm implements EventFormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormEdit != null) {
@@ -225,20 +231,35 @@ public class EventForm implements EventFormInterface {
 				if (table != null) {
 					table.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table2 != null) {
+					table2.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean deleteEventForm(int eventFormID) {
+	public boolean deleteEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		PreparedStatement eventFormDelete  = null;
+		PreparedStatement existCheck = null;
+		ResultSet table = null;
 		try {
 			conn.setAutoCommit(false);
+			String selectQuery = "SELECT * FROM EVENTFORMS WHERE EventFormID = ?";
+			existCheck = conn.prepareStatement(selectQuery);
+			existCheck.setInt(1, eventFormID);
+			table = existCheck.executeQuery();
+			if (!table.next()) {
+				throw new MoodlysisNotFound("EventForm not found. EventForm may have expired or been deleted.");
+			}
     		String query = "DELETE FROM EVENTFORMS WHERE EventFormID = ?";
     		eventFormDelete = conn.prepareStatement(query);
     		eventFormDelete.setInt(1, eventFormID);
@@ -250,19 +271,24 @@ public class EventForm implements EventFormInterface {
 			e.printStackTrace(this.writer);
 			try {
 				conn.rollback();
-				return false;
 			} catch(SQLException er) {
 				er.printStackTrace(this.writer);
-				return false;
 			}
+			throw new MoodlysisInternalServerError(e.toString());
 		} finally {
 			try {
 				if (eventFormDelete != null) {
 					eventFormDelete.close();
 				}
+				if (existCheck != null) {
+					existCheck.close();
+				}
+				if (table != null) {
+					table.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace(this.writer);
-				return false;
+				throw new MoodlysisInternalServerError(e.toString());
 			}
 		}
 		return true;

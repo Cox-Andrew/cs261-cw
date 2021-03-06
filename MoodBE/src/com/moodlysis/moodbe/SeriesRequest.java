@@ -1,18 +1,18 @@
 package com.moodlysis.moodbe;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.*;
-import java.sql.*;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Series;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 
 /**
@@ -30,6 +30,7 @@ public class SeriesRequest extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
+    @SuppressWarnings("unchecked")
     public String getJSON(int seriesID) {
 		// TODO Auto-generated method stub
 		/*
@@ -42,6 +43,7 @@ public class SeriesRequest extends HttpServlet {
 		return output.toJSONString();
 	}
 	
+    @SuppressWarnings("unchecked")
 	public String getJSON(Series.seriesInfo info) {
 		JSONObject output = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -70,10 +72,19 @@ public class SeriesRequest extends HttpServlet {
 		Series series = new Series(response.getWriter());
 		int seriesID = GeneralRequest.getIDFromPath(request, response);
 		
-		Series.seriesInfo info = series.getSeries(seriesID);
+		Series.seriesInfo info;
+		try {
+			info = series.getSeries(seriesID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		int hostID = info.hostID;
 		String title = info.title;
-		String description = info.description;
+		//String description = info.description;
 		
 		// tell the caller that this is JSON content (move to front)
 		// make a proper check for description which isnt just empty string
@@ -108,7 +119,6 @@ public class SeriesRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int hostID = -1;
-		String data = "";
 		String title = "";
 		String description = "";
 		try {
@@ -127,18 +137,21 @@ public class SeriesRequest extends HttpServlet {
 			 * JSON looks like the above
 			 */
 			hostID = Integer.valueOf(postObject.get("hostID").toString());
-			data = postObject.get("data").toString();
 			title = ((JSONObject) postObject.get("data")).get("title").toString();
 			description = ((JSONObject) postObject.get("data")).get("description").toString();
-			response.getWriter().append("\nhostID: " + hostID + "\ndata: " + data + "\n");
-			response.getWriter().append("title: " + title + "\n" + "description: " + description + "\n");
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
 		//CALL JDBC
-		int seriesID = series.newSeries(title, description, hostID);
+		int seriesID;
+		try {
+			seriesID = series.newSeries(title, description, hostID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} 
 		
 		// tell the caller that this is JSON content (move to front)
 		if (seriesID != -1) {
@@ -169,7 +182,6 @@ public class SeriesRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int seriesID = GeneralRequest.getIDFromPath(request, response);
-		String data = "";
 		String title = "";
 		String description = "";
 		try {
@@ -186,25 +198,22 @@ public class SeriesRequest extends HttpServlet {
 			 * 
 			 * JSON looks like the above
 			 */
-			data = putObject.get("data").toString();
 			title = ((JSONObject) putObject.get("data")).get("title").toString();
 			description = ((JSONObject) putObject.get("data")).get("description").toString();
-			response.getWriter().append("\ndata: " + data + "\n");
-			response.getWriter().append("title: " + title + "\n" + "description: " + description + "\n");
 		} catch(ParseException e) {
 			//TODO
-			response.getWriter().append(jsonData + "\n\n\n");
-			e.printStackTrace(response.getWriter());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			//return;
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		}
-		if (series.editSeries(seriesID, title, description)) {
+		try {
+			series.editSeries(seriesID, title, description);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
-			//put into response body what was wrong (can be handled in jdbc)
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
 		}
 	}
 	
@@ -223,12 +232,15 @@ public class SeriesRequest extends HttpServlet {
 		Series series = new Series(response.getWriter());
 		int seriesID = GeneralRequest.getIDFromPath(request, response);
 		
-		if (series.deleteSeries(seriesID)) {
+		try {
+			series.deleteSeries(seriesID);
 			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			//assumes id not found
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
 		}
 	}
 

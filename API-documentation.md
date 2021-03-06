@@ -157,14 +157,14 @@ Response:
 	"data": {
 		"title": "Event Title",
 		"description": "Description of Event.",
-		"time-start": "2020-01-22T19:33:05Z",
-		"time-end": "2020-01-22T19:33:05Z",
+		"time-start": "2020-01-22T19:33:05",
+		"time-end": "2020-01-22T19:33:05",
 	}
 }
 ```
 
 Create an event\
-```POST /v0/events``` 400 java.lang.ClassCastException: class java.lang.Long cannot be cast to class java.lang.Integer\
+```POST /v0/events``` Working\
 Request:
 ```
 {
@@ -172,8 +172,8 @@ Request:
 	"data": {
 		"title": "Event Title",
 		"description": "Description of Event.",
-		"time-start": "2020-01-22T19:33:05Z",
-		"time-end":"2020-01-22T19:33:05Z",
+		"time-start": "2020-01-22T19:33:05",
+		"time-end":"2020-01-22T19:33:05",
 	}
 }
 ```
@@ -184,7 +184,7 @@ Response:
 }
 ```
 Edit an event\
-```PUT /v0/events/{eventID}``` 400 Bad Request\
+```PUT /v0/events/{eventID}``` Working\
 Only items in the "data" section may be updated.\
 Request:
 ```
@@ -192,13 +192,13 @@ Request:
 	"data": {
 		"title": "Event Title",
 		"description": "Description of Event.",
-		"time-start": "2020-01-22T19:33:05Z",
-		"time-end": "2020-01-22T19:33:05Z",
+		"time-start": "2020-01-22T19:33:05",
+		"time-end": "2020-01-22T19:33:05",
 	}
 }
 ```
 Delete an event\
-```DELETE /v0/events/{eventID}``` 403 Forbidden
+```DELETE /v0/events/{eventID}``` Working
 
 Add a form to an event\
 ```POST /v0/event-forms``` Working, but always inserts at the end of an event regardless of preceding-eventFormID\
@@ -298,7 +298,7 @@ Delete a form.\
 ```DELETE /v0/forms/{formID}``` Working
 
 Get a question.\
-```GET /v0/questions/{questionID}``` java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null \
+```GET /v0/questions/{questionID}``` Working \
 Response:
 ```
 {
@@ -313,14 +313,14 @@ Response:
 ```
 
 Create a question.\
-```POST /v0/questions``` Working, but returns the question options before the questionID? It returns `["Option 1","Option 2","Option 3"]{"questionID":18}`. Also seems to ignore preceding-questionID\
+```POST /v0/questions``` Working, but seems to ignore preceding-questionID\
 Request:
 ```
 {
 	"formID": 234212,
 	"preceding-questionID": 2432432, /* may be null to denote the first question */
 	"data": {
-		"type": "multichoice",
+		"type": "multi",
 		"text": "Choose one of the options",
 		"options": [
 			"Option 1",
@@ -391,7 +391,7 @@ Response:
 ```
 {
 	"eventID": 34414312,
-	"time-updated-since": "2020-01-22T19:33:02Z",
+	"time-updated-since": "2020-01-22T19:33:02",
 	"contains": 2,
 	"list": [
 		{
@@ -401,8 +401,8 @@ Response:
 			// submission ID will no longer included, but still packaged like this to make it easier for the front end
 			"account-name": "John Smith", /* may be null for anonymous responses */
 			"attendeeID": 3424234 /* always included so users may be blocked. */
-			// "time-submitted": "2020-01-22T19:33:05Z",
-			"time-updated": "2020-01-22T19:33:05Z",
+			// "time-submitted": "2020-01-22T19:33:05",
+			"time-updated": "2020-01-22T19:33:05",
 			// time-updated specified the latest of the time-updated of the answers
 			"is-edited": false,
 			"answers": [
@@ -411,7 +411,7 @@ Response:
 					"answerID": 524753,
 					"mood-value": 0.432423523, /* may be null. Mood may be accessed in other ways. */
 					"is-edited": false,
-					"time-updated": "2020-01-22T19:33:05Z",
+					"time-updated": "2020-01-22T19:33:05",
 					"data": {
 						"response": "Response to question 1"
 					}
@@ -421,7 +421,7 @@ Response:
 					"answerID": 524753,
 					"mood-value": null,
 					"is-edited": false,
-					"time-updated": "2020-01-22T19:33:05Z",
+					"time-updated": "2020-01-22T19:33:05",
 					"data": {
 						"response": "3", /* checkbox answer 3 selected */
 					}
@@ -433,7 +433,7 @@ Response:
 			"eventFormID": 4243424
 			// "submissionID": 4238492,
 			"account-name": "John Smith", /* may be null for anonymous responses */
-			// "time-submitted": "2020-01-22T19:33:05Z",
+			// "time-submitted": "2020-01-22T19:33:05",
 			"time-updated": "2020-01-22T19:33:05Z",
 			"is-edited": false,
 			"answers": [
@@ -442,7 +442,7 @@ Response:
 					"answerID": 524753,
 					"mood-value": 0.432423523,
 					"is-edited": false,
-					"time-updated": "2020-01-22T19:33:05Z",
+					"time-updated": "2020-01-22T19:33:05",
 					"data": {
 						"response": "This is a general feedback response."
 					}
@@ -456,7 +456,7 @@ Response:
 ### 7.	Get live feedback since specified time (hosted event).
  ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}``` java.lang.NullPointerException: Cannot read field "eventID" because "info" is null\
  ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ``` 501 Not Implemented\
-Time-updated-since is of the form "2020-01-22T19:33:05Z".\
+Time-updated-since is of the form "2020-01-22T19:33:05".\
 Response is of the same kind as getting all feedback.
 
 ### 8.	Get live mood since specified time (hosted event). 
@@ -466,16 +466,16 @@ Response:
 ```
 {
 	"eventID": 34414312,
-	"time-submitted-since": "2020-01-22T19:33:02Z",
+	"time-submitted-since": "2020-01-22T19:33:02",
 	"contains": 2,
 	"list": [
 		{
-			"time-submitted": "2020-01-22T19:33:05Z",
+			"time-submitted": "2020-01-22T19:33:05",
 			"mood-value": 0.432423523,
 			"answerID": 4324322 /* may be null if it was explicit feedback */
 		},
 		{
-			"time-submitted": "2020-01-22T19:33:05Z",
+			"time-submitted": "2020-01-22T19:33:05",
 			"mood-value": 0.842384,
 			"answerID": null,
 			"attendeeID": 3432423 /* only included if it is an explicit mood, for the purpose of kicking attendees */
