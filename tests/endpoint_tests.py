@@ -1,6 +1,8 @@
 import requests
 import unittest
 
+import cr1test
+
 
 """
 CR1: The host can set up an event for a particular session, series of workshops or project.
@@ -249,6 +251,6 @@ R21: Components of the system can be reused (reusability, utility).
 { R21.1(C): A RESTful API allows for mood analysis in other projects.
 """
 
-class EventTest(unittest.TestCase):
-	pass
-	
+
+if __name__ == "__main__":
+	cr1test.runTests()
