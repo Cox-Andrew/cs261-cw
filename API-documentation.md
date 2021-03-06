@@ -460,7 +460,7 @@ Time-updated-since is of the form "2020-01-22T19:33:05".\
 Response is of the same kind as getting all feedback.
 
 ### 8.	Get live mood since specified time (hosted event). 
-```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}``` 501 Not Implemented\
+```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}``` Working \
 ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ``` 501 Not Implemented\
 Response:
 ```
@@ -478,7 +478,6 @@ Response:
 			"time-submitted": "2020-01-22T19:33:05",
 			"mood-value": 0.842384,
 			"answerID": null,
-			"attendeeID": 3432423 /* only included if it is an explicit mood, for the purpose of kicking attendees */
 		}
 	]
 }

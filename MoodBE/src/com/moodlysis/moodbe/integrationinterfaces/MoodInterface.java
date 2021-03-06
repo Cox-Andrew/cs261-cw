@@ -36,6 +36,6 @@ public interface MoodInterface {
 	public String getAttendeeMoodSince(Connection conn, int eventID, int attendeeID, Date since) throws SQLException;
 	
 	// POST /v0/moods (explicit mood)
-	public boolean newMood(Connection conn, int eventID, Date timeSubmitted, float value) throws SQLException;
+	public int newMood(int eventID, LocalDateTime timeSubmitted, double value) throws MoodlysisInternalServerError;
 
 }

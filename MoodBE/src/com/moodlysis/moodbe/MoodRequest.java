@@ -1,6 +1,7 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -12,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Answer;
 import com.moodlysis.moodbe.integration.Feedback;
@@ -93,13 +96,63 @@ public class MoodRequest extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().print(responseJSON);
 			
-		}
+		} else {
 		
-		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	
+			response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+		}
 	}
 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		if (!request.getRequestURI().equals("/v0/moods")) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "url not of form /v0/moods");
+			return;
+		}
+		
+		String jsonData = GeneralRequest.readJSON(request, response);
+		JSONParser postParser = new JSONParser();
+		JSONObject postObject;
+		
+		try {
+			postObject = (JSONObject) postParser.parse(jsonData); 
+		} catch(ParseException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parse data: " + e.toString());
+			return;
+		}
+		
+		int eventID;
+		double moodValue;
+		
+		try {
+			
+			eventID = (int) Integer.parseInt(postObject.get("eventID").toString());
+			moodValue = (double) postObject.get("mood-value");
+			
+		} catch (Exception e) {
+			response.getWriter().print(e.toString());
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "error on parsing json" + e.toString());
+			return;
+		}
+		
+		// get the current time
+		Instant now = Instant.now();
+		LocalDateTime timeSubmitted = LocalDateTime.now();
+		
+		Mood mood = new Mood(response.getWriter());
+		
+		try {
+			mood.newMood(eventID, timeSubmitted, moodValue);
+		} catch (MoodlysisInternalServerError e) {
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+		}
 
+		
+	}
+		
+	
+	
+	
 	@SuppressWarnings("unchecked")
 	private String getMoodListJSON(MoodListInfo info) {
 		JSONObject output = new JSONObject();

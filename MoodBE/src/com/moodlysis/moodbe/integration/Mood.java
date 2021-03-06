@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedList;
@@ -95,9 +96,40 @@ public class Mood implements MoodInterface {
 	}
 
 	@Override
-	public boolean newMood(Connection conn, int eventID, Date timeSubmitted, float value) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public int newMood(int eventID, LocalDateTime timeSubmitted, double value) throws MoodlysisInternalServerError {
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		try {
+			conn.setAutoCommit(false);
+			strStmt = ""
+			+ "INSERT INTO mood (moodID, eventID, timeSubmitted, value) \n"
+			+ "VALUES (nextval('moodsmoodid'), ?, ?, ?);";
+			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
+			stmt.setInt(1, eventID);
+			stmt.setTimestamp(2, java.sql.Timestamp.valueOf(timeSubmitted));
+			stmt.setDouble(3, value);
+			stmt.execute();
+			rs = stmt.getGeneratedKeys();
+			rs.next();
+			int moodID = rs.getInt(1);
+			conn.commit();
+			conn.setAutoCommit(true);
+			return moodID;
+			
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			e.printStackTrace(writer);
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
+		}
 	}
+
+
 
 }
