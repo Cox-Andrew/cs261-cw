@@ -298,7 +298,7 @@ Delete a form.\
 ```DELETE /v0/forms/{formID}``` Working
 
 Get a question.\
-```GET /v0/questions/{questionID}``` java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null \
+```GET /v0/questions/{questionID}``` Working \
 Response:
 ```
 {
