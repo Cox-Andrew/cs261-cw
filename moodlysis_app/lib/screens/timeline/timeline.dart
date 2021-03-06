@@ -46,31 +46,7 @@ class _TimelineState extends State<Timeline> {
                   Event event = _testEvents[i];
                   return SizedBox(
                     width: 250,
-                    child: Card(
-                      child: InkWell(
-                        onTap: () {
-                          Scaffold.of(context).removeCurrentSnackBar();
-                          Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text("Attending ${event.title}")));
-                          Future.delayed(Duration(milliseconds: 500), () {
-                            // 5s over, navigate to a new page
-                            Navigator.pushNamed(context, "/event",
-                                arguments: EventScreenArgs(event));
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Text(event.title, style: Theme.of(context).textTheme.headline6,),
-                              Text(event.description),
-                              Text("Start: ${event.schedule.start}"),
-                              Text("End: ${event.schedule.end}")
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: _EventCard(event)
                   );
                 }),
           ),
@@ -97,26 +73,7 @@ class _TimelineState extends State<Timeline> {
                   Event event = _testEvents[i];
                   return SizedBox(
                     height: 200,
-                    child: Card(
-                      child: InkWell(
-                        onTap: () {
-                          Scaffold.of(context).removeCurrentSnackBar();
-                          Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text("attending event " + event.toString())));
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Text(event.title, style: Theme.of(context).textTheme.headline6,),
-                              Text(event.description),
-                              Text("Start: ${event.schedule.start}"),
-                              Text("End: ${event.schedule.end}")
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: _EventCard(event)
                   );
                 }),
           ),
@@ -124,4 +81,41 @@ class _TimelineState extends State<Timeline> {
       ),
     );
   }
+}
+
+class _EventCard extends StatelessWidget {
+  Event event;
+  _EventCard(this.event);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: () {
+          if (DateTime.now().isAfter(event.schedule.start)) {
+            Scaffold.of(context).removeCurrentSnackBar();
+            Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text("Attending ${event.title}")));
+            Future.delayed(Duration(milliseconds: 500), () {
+              // 5s over, navigate to a new page
+              Navigator.pushNamed(context, "/event",
+                  arguments: EventScreenArgs(event));
+            });
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Text(event.title, style: Theme.of(context).textTheme.headline6,),
+              Text(event.description),
+              Text("Start: ${event.schedule.start}"),
+              Text("End: ${event.schedule.end}")
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }
