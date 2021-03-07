@@ -40,9 +40,13 @@
       <div class="create-meeting">
         <h1>Create a meeting</h1>
         <form name="myForm" action="" onsubmit="return submitForm()" method="POST">
-          <label>Meeting Name: </label>      
+          <label>Meeting Name: </label>
           <div class="txtb">
             <input type="text" name="name" id="name" placeholder="Name" required>
+            <label><br>Meeting Date: </label>
+            <input type="date" class = "DateTime" id = "date" required>
+            <label><br>Meeting Time: </label>
+            <input type="time" class = "DateTime" id="time" required>
           </div>
           <br>
           <input type="submit" class = "submit" value="Create">

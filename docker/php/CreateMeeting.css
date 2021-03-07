@@ -192,7 +192,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* text-align: center; */
   }
 
   .create-meeting{
@@ -237,6 +236,10 @@
   }
   .txtb textarea{
     background-color: rgb(212, 212, 212);
+    font-family: "poppins", sans-serif;
+  }
+
+  .DateTime{
     font-family: "poppins", sans-serif;
   }
   
