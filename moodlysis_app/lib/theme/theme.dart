@@ -12,7 +12,8 @@ ThemeData appTheme() {
         fontSize: 80,
         fontWeight: FontWeight.bold,
         color: Colors.black
-      )
+      ),
     ),
+    // fontFamily: "Poppins"
   );
 }
