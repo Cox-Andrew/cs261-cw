@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="ManageMeeting.css" />
+    <title>Home</title>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="HostHomepage.html"><h4>MOODLYSIS</h4></a>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Aboutus.html">About us</a>
+        </li>
+        <li>
+          <a href="faq.html">FAQs</a>
+        </li>
+        <li>
+        <form method = "POST" action = "">
+            <button name = "logout" class = "logout">Log out</button>
+        </form>
+        </li>
+      </ul>
+      <div class="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
+    
+    <div class="content">
+      <div class = "heading">
+        <button onclick="template1()">Template 1</button>
+        <div class = "hidden"><br></div>
+        <button onclick="template2()">Template 2</button>
+      </div>
+
+      <div class  = "template1" id  = "template1">
+        <div class = "form">
+          <h3>Template 1</h3>
+          <form id = "temp1" onsubmit="return submitTemplate1();">
+            <label>Question 1<br></label>
+            <textarea class = "textarea" id = "q1" rows="2" cols="15" placeholder=" "></textarea>
+            <label>Question 2<br></label>
+            <textarea class = "textarea" id = "q2" rows="2" cols="15" placeholder=" "></textarea>
+            <label>Question 3<br></label>
+            <textarea class = "textarea" id = "q3" rows="2" cols="15" placeholder=" "></textarea>
+            <input type = "submit" class = "submitTemp1" value="Save">
+          </form>
+        </div>
+      </div>
+
+      <div class = "template2" id  = "template2">
+        <div class = "form">
+          <h3>Template 2</h3>
+          <form id="temp2" onsubmit="return submitTemplate2();">
+            <label>Question 1<br></label> 
+            <textarea class = "textarea" id = "ques1" rows="2" cols="15" placeholder=" "></textarea>
+            <label>Question 2<br></label> 
+            <textarea class = "textarea" id = "ques2" rows="2" cols="15" placeholder=" "></textarea>
+            <label>Question 3<br></label> 
+            <textarea class = "textarea" id = "ques3" rows="2" cols="15" placeholder=" "></textarea>
+            <br>
+            <input type = "submit" class = "submitTemp2" value="Save">
+          </form>        
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+      Moodlysis-Mood Analysis Application
+      </div>
+    </footer>
+    <script src="app.js"></script>
+    <script src="ManageMeeting.js"></script>
+  </body>
+</html>

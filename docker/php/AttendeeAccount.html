@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="AttendeeAccount.css" />
+    <title>Home</title>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="AttendeeHomepage.html"><h4>MOODLYSIS</h4></a>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Aboutus.html">About us</a>
+        </li>
+        <li>
+          <a href="faq.html">FAQs</a>
+        </li>
+        <li>
+        <form method = "POST" action = "">
+            <button name = "EndSession" class = "EndSession">End Session</button>
+        </form>
+        </li>
+      </ul>
+      <div class="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
+    
+    <div class="content">
+        <div class = "account">
+            <label>
+                Account type: Attendee
+            </label>
+            <br>
+            <label>
+                Full Name: <div class = "fullname" id = "fullname">name</div>
+            </label>
+            <br>
+            <label>
+                Email id: <div class = "email" id = "email">email</div>
+            </label>
+            <br>
+            <label>
+                <div class = "DeleteAcc">
+                    <form method = "POST" action = "">
+                        <button name = "delete" class = "delete" onclick="">Delete Account</button>
+                    </form>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+      Moodlysis-Mood Analysis Application
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

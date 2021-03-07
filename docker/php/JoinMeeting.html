@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="JoinMeeting.css" />
+    <title>Join Meeting</title>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="index.html"><h4>MOODLYSIS</h4></a>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Aboutus.html">About us</a>
+        </li>
+        <li>
+          <a href="faq.html">FAQs</a>
+        </li>
+        <li>
+          <a href="AttendeeAccount.html">Manage Account</a>
+        </li>
+        <form method = "POST" action = "">
+          <button name = "EndSession" class = "EndSession">End Session</button>
+      </form>
+      </ul>
+      <div class="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
+
+    <div class="content">
+      <div class="join-meeting">
+        <h1>Join a meeting</h1>
+        <form name="myForm" action="" onsubmit="return submitForm()" method="POST">
+          <label>Meeting Id: </label>
+          <div class="txtb">
+            <input type="text" name="mname" id="mname" placeholder="Meeting Id" required>
+          </div>
+
+          <label>Name: </label>      
+          <div class="txtb">
+            <input type="text" name="name" id="name" placeholder="Name">
+          </div>
+          <br>
+          <div class="checkbox">
+            <input type="checkbox" name="anonymous" id="anonymous" placeholder="Anonymous">
+            Anonymous
+          </div>
+          <br>
+
+          <input type="submit" class = "submit" value="Join">
+        </form>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+        Moodlysis-Mood Analysis Application
+      </div>
+    </footer>
+    <script src="app.js"></script>
+    <script src="JoinMeeting.js"></script>
+  </body>
+</html>
