@@ -3,6 +3,10 @@ import cr1test
 
 # this needs python 3.6 or higher
 
+#current known bugs:
+# hosts POST cannot be used to change username only
+# hosts GET does not have a "data" section
+# moods GET does not return time as a string
 
 """
 CR1: The host can set up an event for a particular session, series of workshops or project.
