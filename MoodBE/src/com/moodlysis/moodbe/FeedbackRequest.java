@@ -123,7 +123,7 @@ public class FeedbackRequest extends HttpServlet {
 		
 		JSONObject output = new JSONObject();
 		output.put("eventID", info.eventID);
-		output.put("time-updated-since", info.timeUpdatedSince);
+		output.put("time-updated-since", info.timeUpdatedSince.toString());
 		output.put("contains", info.list.size());
 		
 		JSONArray list = new JSONArray();
@@ -133,7 +133,7 @@ public class FeedbackRequest extends HttpServlet {
 			subObj.put("eventFormID", subInfo.eventFormID);
 			subObj.put("account-name", subInfo.accountName);
 			subObj.put("attendeeID", subInfo.attendeeID);
-			subObj.put("time-updated", subInfo.timeUpdated);
+			subObj.put("time-updated", subInfo.timeUpdated.toString());
 			subObj.put("is-edited", subInfo.isEdited);
 			
 			JSONArray answers = new JSONArray();
@@ -144,7 +144,7 @@ public class FeedbackRequest extends HttpServlet {
 				if (ansInfo.moodValue != null)
 					ansObj.put("mood-value", ansInfo.moodValue);
 				ansObj.put("is-edited", ansInfo.isEdited);
-				ansObj.put("time-updated", ansInfo.timeSubmitted);
+				ansObj.put("time-updated", ansInfo.timeSubmitted.toString());
 				JSONObject data = new JSONObject();
 				data.put("response", ansInfo.response);
 				ansObj.put("data", data);
