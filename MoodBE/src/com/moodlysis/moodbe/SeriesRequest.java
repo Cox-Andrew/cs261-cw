@@ -136,6 +136,9 @@ public class SeriesRequest extends HttpServlet {
 		if (seriesIDs == null) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
+		else if (seriesIDs.length == 0) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 		else {
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
