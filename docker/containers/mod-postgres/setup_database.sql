@@ -321,7 +321,7 @@ CREATE TRIGGER GetInviteCode
   AFTER INSERT ON EVENTS
   FOR EACH ROW
   EXECUTE FUNCTION GetInviteCode();
-
+--uses md5 which is unsecure but should be good for this purpose
 
 INSERT INTO HOST(HostID, Email, Pass, AccountName)
 VALUES(0,'default@mail.com','password','generalhost');

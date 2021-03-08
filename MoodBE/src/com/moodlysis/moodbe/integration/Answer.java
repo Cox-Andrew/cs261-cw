@@ -45,8 +45,7 @@ public class Answer implements AnswerInterface {
 	
 	public Double getSentiment(String text) throws IOException, MalformedURLException {
 		JSONParser parser = new JSONParser();
-		Double neg = 0.0;
-		Double pos = 0.0;
+		Double com = 0.0;
 		URL url = new URL("http://pythonapp.mood-net/v0/analyse?text=" + text);
 		HttpURLConnection con = (HttpURLConnection)url.openConnection();
 		con.setRequestMethod("GET");
@@ -60,13 +59,12 @@ public class Answer implements AnswerInterface {
 		}
 		try {
 			JSONObject mood = (JSONObject) parser.parse(response.toString());
-			neg = Double.valueOf(mood.get("neg").toString());
-			pos = Double.valueOf(mood.get("pos").toString());
+			com = Double.valueOf(mood.get("compound").toString());
 		} catch (ParseException e) {
 			e.printStackTrace(this.writer);
 		}
 		
-		Double value = pos - neg;
+		Double value = com;
 		return value;
 	}
 
