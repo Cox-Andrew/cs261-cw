@@ -11,6 +11,7 @@ import com.moodlysis.moodbe.integrationinterfaces.SeriesInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 import com.moodlysis.moodbe.DatabaseConnection;
+import com.moodlysis.moodbe.GeneralRequest;
 
 public class Series implements SeriesInterface {
 	
@@ -74,6 +75,57 @@ public class Series implements SeriesInterface {
 		info.title = title;
 		info.description = desc;
 		return info;
+	}
+	
+	public int[] getSeriesIDsForHost(int hostID) throws MoodlysisInternalServerError {
+		PreparedStatement seriesGet  = null;
+		ResultSet table = null;
+		int maxSeries = 100;
+		int[] seriesIDs = new int[maxSeries];
+		int i = 0;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "SELECT * FROM SERIES WHERE HostID = ?";
+    		seriesGet = conn.prepareStatement(query);
+    		seriesGet.setInt(1, hostID);
+			table = seriesGet.executeQuery();
+			while(table.next()) {
+				seriesIDs[i] = table.getInt("SeriesID");
+				i++;
+				if (i == maxSeries) {
+					maxSeries = maxSeries * 2;
+					seriesIDs = GeneralRequest.extendArray(seriesIDs,maxSeries);
+				}
+			}
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			throw new MoodlysisInternalServerError(e.toString());
+		} finally {
+			try {
+				if (seriesGet != null) {
+					seriesGet.close();
+				}
+				if (table != null) {
+					table.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
+			}
+		}
+		int[] returnIDs = new int[i];
+		for (int j = 0; j < i; j++) {
+			returnIDs[j] = seriesIDs[j];
+		}
+		return returnIDs;
 	}
 
 	@Override

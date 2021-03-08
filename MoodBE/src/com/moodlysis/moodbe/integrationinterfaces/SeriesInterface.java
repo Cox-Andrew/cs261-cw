@@ -20,6 +20,9 @@ public interface SeriesInterface {
 	// GET /v0/series/{seriesID}
 	public seriesInfo getSeries(int seriesID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
+	// GET /v0/forms?hostID={hostID}
+	// return a list of all seriesIDs for a host
+	public int[] getSeriesIDsForHost(int hostID) throws MoodlysisInternalServerError;
 	
 	
 	// POST /v0/series

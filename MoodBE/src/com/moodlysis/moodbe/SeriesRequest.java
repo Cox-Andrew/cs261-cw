@@ -6,6 +6,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -54,6 +56,19 @@ public class SeriesRequest extends HttpServlet {
 		output.put("data", data);
 		return output.toJSONString();
 	}
+    
+    @SuppressWarnings("unchecked")
+    public String getJSON(int[] seriesIDs) {
+    	JSONObject output = new JSONObject();
+    	JSONArray forms = new JSONArray();
+    	if (seriesIDs != null) {
+	    	for (int i = 0; i < seriesIDs.length; i++) {
+	    		forms.add(seriesIDs[i]);
+	    	}
+    	}
+    	output.put("seriesID", forms);
+    	return output.toJSONString();
+    }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -62,6 +77,9 @@ public class SeriesRequest extends HttpServlet {
 		// TODO Auto-generated method stub
 		if (request.getRequestURI().matches("/v0/series/([1-9])([0-9]*)")) {
 			doGetSeries(request, response);
+		}
+		else if (request.getRequestURI().equals("/v0/series")) {
+			doGetHostSeries(request, response);
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -100,6 +118,32 @@ public class SeriesRequest extends HttpServlet {
 			response.getWriter().append(output + "\n");
 		}
 		
+	}
+	
+	protected void doGetHostSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Series series = new Series(response.getWriter());
+		int hostID = GeneralRequest.getIDFromQuery(request, response, "hostID");
+		
+		int[] seriesIDs;
+		try {
+			seriesIDs = series.getSeriesIDsForHost(hostID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} 
+		
+		// tell the caller that this is JSON content (move to front)
+		if (seriesIDs == null) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		else {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			
+			//Write JSON
+			String output = getJSON(seriesIDs);
+			response.getWriter().append(output + "\n");
+		}
 	}
 
 	/**
