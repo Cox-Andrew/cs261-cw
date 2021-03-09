@@ -1,5 +1,5 @@
 
-<!-- Problems 
+<!-- Problems
 
 Editing forms will cause chaos if attendees have already answered questions. If the form is changed then the Question entry can still remain, but the original ordering of the form will be lost. Maybe copy every form/question when it is used in an event?
 
@@ -17,8 +17,8 @@ Editing forms will cause chaos if attendees have already answered questions. If 
 
 For all endpoints where data is restricted, the user must have the appropriate tokens/etc I don't really know atm how this will work (TODO)
 
-## Available to all: 
-### 1.	Register for account. 
+## Available to all:
+### 1.	Register for account.
 ```POST /v0/attendees``` Working\
 ```POST /v0/hosts``` Working\
 Request
@@ -45,7 +45,7 @@ Response:
 Use OAuth2.0/OpenID?\
 Returns a token/something, TODO.
 
-### 3.	Change name. 
+### 3.	Change name.
 ```PUT /v0/attendees/{attendeeID}``` Working\
 ```PUT /v0/hosts/{hostID}```Working\
 Request:
@@ -64,7 +64,7 @@ Request:
 }
 ```
 
-### 4.	Change anonymity. 
+### 4.	Change anonymity.
 <!-- For anonymous submissions, the request should leave attendeeID blank/null.\
 TODO: problem - the current system would not be able to authenticate attendees' requests for the mood of this feedback, as the attendeeID is not stored alongside anonymous requests. -->
 If a user is creating an anonymous response, the line "isAnonymous": true should be included in the answer post request.
@@ -88,8 +88,8 @@ Response:
 ```DELETE /v0/hosts/{hostID}``` Working
 
 
-## Host functionality (available to authenticated users): 
-### 1.	Create/Read/Update/Delete hosted series. 
+## Host functionality (available to authenticated users):
+### 1.	Create/Read/Update/Delete hosted series.
 
 Get a series\
 ```GET /v0/series/{seriesID}``` Working\
@@ -141,7 +141,7 @@ Delete a series\
 ```DELETE /v0/series/{seriesID}``` Working
 
 
-### 2.	Create/Read/Update/Delete hosted events. 
+### 2.	Create/Read/Update/Delete hosted events.
 
 Get an event\
 ```GET /v0/events/{eventID}``` Working\
@@ -153,7 +153,7 @@ Response:
 	"eventID": 1243214,
 	"seriesID" : 2342341,
 	"formIDs": [12423142,4324324,5462354],
-	"eventFormIDs": [312312,312312,2352234], 
+	"eventFormIDs": [312312,312312,2352234],
 	"data": {
 		"title": "Event Title",
 		"description": "Description of Event.",
@@ -238,7 +238,7 @@ Delete a form from an event
 
 
 
-### 3.	Create/Read/Update/Delete form templates (hosted series/event). 
+### 3.	Create/Read/Update/Delete form templates (hosted series/event).
 
 Get a list of a user's forms. Users may only access their own templates.\
 ```GET /v0/forms?hostID={hostID}``` Working\
@@ -367,7 +367,7 @@ Delete a question.\
 
 Get the forms of host with hostID `0`.
 
-### 5.	Get invite code (hosted event). 
+### 5.	Get invite code (hosted event).
 
 <!-- OLD VERSION: ```GET /v0/events/{eventID}/invite-code```\ -->
 ```GET /v0/invite-code?eventID={eventID} ```404 Not Found\
@@ -382,7 +382,7 @@ Note: the format of the invite codes is not yet defined
 
 
 
-### 6.	Get all feedback (hosted event). 
+### 6.	Get all feedback (hosted event).
 
 ```GET /v0/feedback?eventID={eventID}``` Working\
 ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ```\
@@ -459,7 +459,7 @@ Response:
 Time-updated-since is of the form "2020-01-22T19:33:05".\
 Response is of the same kind as getting all feedback.
 
-### 8.	Get live mood since specified time (hosted event). 
+### 8.	Get live mood since specified time (hosted event).
 ```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}``` Working \
 ```attendees may also get their own feedback in this way by adding "&attendeeID={attendeeID}" ``` 501 Not Implemented\
 Response:
@@ -512,13 +512,23 @@ Response:
 }
 ```
 
-## Attendee request (available to authenticated users): 
-### 1.	Register for event (with invite code). 
+### 13. Get all attendees registered to an event
+`GET /v0/register-event?eventID={eventID}` not implemented yet \
+Response:
+```
+{
+	"attendeeIDs": [5452454, 14525, 23451]
+}
+```
+
+## Attendee request (available to authenticated users):
+### 1.	Register for event (with invite code).
 ```POST /v0/register-event``` Invite codes are not implemented yet\
 Request:
 ```
 {
-	"invite-code": "123-123-123"
+	"invite-code": "123-123-123",
+	"attendeeID": 5452454
 }
 ```
 Response:
@@ -527,9 +537,9 @@ Response:
 	"eventID": 342432
 }
 ```
-### 2.	Get metadata of registered series/event. 
+### 2.	Get metadata of registered series/event.
 Use the ```GET``` methods defined in the host session.
-### 3.	Get all forms for registered event. 
+### 3.	Get all forms for registered event.
 Use the ```GET``` methods defined in the host session.
 ### 4.	Submit completed feedback form (registered event).
 
@@ -563,10 +573,10 @@ Request:
 	"isAnonymous": false
 }
 ```
-### 5.	Submit general feedback (registered event). 
+### 5.	Submit general feedback (registered event).
 ```POST /v0/answers``` \
 Use the questionID corersponding to question in the general feedback form, which has formID ```0```.
-### 6.	Submit explicit mood (registered event). 
+### 6.	Submit explicit mood (registered event).
 ```POST /v0/moods``` 405 Method Not Allowed\
 Request:
 ```
@@ -575,16 +585,7 @@ Request:
 	"mood-value": 0.432423523
 }
 ```
-### 7. Register to an event using an invite code
-```GET /v0/invite-code/{invite-code}``` invite codes are not implemented\
-Response:
-```
-{
-	"eventID": 2847823
-}
-```
-Also returns a cookie that is needed to access event-related endpoints, eg 
-```GET /v0/questions/{questionID}``` is only allowed if the user has registered to an event that contains that question.
+
 
 ### 8. Other
 ```GET /v0/series/{seriesID}```\
@@ -594,5 +595,3 @@ Also returns a cookie that is needed to access event-related endpoints, eg
 ```GET /v0/feedback?eventID={eventID}&attendeeID={attendeeID}```\
  ```GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}&attendeeID={attendeeID}```\
  ```GET /v0/moods?eventID={eventID}&time-updated-since={time-updated-since}&attendeeID={attendeeID}```\
-
-
