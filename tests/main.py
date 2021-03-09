@@ -1,5 +1,6 @@
 
-import cr1test
+import dr1_1
+import dr1_2
 
 # this needs python 3.6 or higher
 

@@ -19,7 +19,7 @@ def cursor():
 
 def getObjectFromDB(table, id):
 	depluralized = table
-	if table[-1] == "s" and table != "events":
+	if table[-1] == "s" and table not in ["series"]:
 		depluralized = table[:-1]
 
 	with cursor() as cur:
@@ -29,7 +29,7 @@ def getObjectFromDB(table, id):
 
 def deleteObjectFromDB(table, id):
 	depluralized = table
-	if table[-1] == "s" and table != "events":
+	if table[-1] == "s" and table not in ["series"]:
 		depluralized = table[:-1]
 
 	with cursor() as cur:
@@ -38,7 +38,7 @@ def deleteObjectFromDB(table, id):
 
 def existsInDB(table, id):
 	depluralized = table
-	if table[-1] == "s" and table != "events":
+	if table[-1] == "s" and table not in ["series"]:
 		depluralized = table[:-1]
 
 	with cursor() as cur:
@@ -49,3 +49,23 @@ def existsInDB(table, id):
 
 def randomString():
 	return "".join([random.choice("qwertyuioplkjhgfdsazxcvbnm") for i in range(0, 20)])
+
+
+def randomValidTimestamp():
+
+	year = str(random.randint(1995, 2021))
+	month = str(random.randint(1, 12))
+	if len(month) == 1: month = "0" + month
+	day = str(random.randint(1, 28))
+	if len(day) == 1: day = "0" + day
+
+	hour = str(random.randint(0, 23))
+	if len(hour) == 1: hour = "0" + hour
+	minute = str(random.choice([0, 30]))
+	if len(minute) == 1: minute = "0" + minute
+	second = str(random.randint(0, 59))
+	if len(second) == 1: second = "0" + second
+
+	return f"{year}-{month}-{day}T{hour}:{minute}:{second}"
+
+
