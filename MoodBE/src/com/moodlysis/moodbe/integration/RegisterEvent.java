@@ -135,7 +135,7 @@ public class RegisterEvent implements RegisterEventInterface {
 				throw new MoodlysisNotFound("Event not found. Event may have expired or been deleted.");
 			}
 			eventID = table.getInt("eventID");
-			String queryAttendee = "SELECT * FROM ATTENDEES WHERE AttendeeID = ?";
+			String queryAttendee = "SELECT * FROM ATTENDEE WHERE AttendeeID = ?";
 			existCheck = conn.prepareStatement(queryAttendee);
 			existCheck.setInt(1, attendeeID);
 			table2 = existCheck.executeQuery();
