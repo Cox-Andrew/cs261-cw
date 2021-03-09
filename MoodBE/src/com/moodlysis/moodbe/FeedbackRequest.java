@@ -123,7 +123,10 @@ public class FeedbackRequest extends HttpServlet {
 		
 		JSONObject output = new JSONObject();
 		output.put("eventID", info.eventID);
-		output.put("time-updated-since", info.timeUpdatedSince.toString());
+		if (info.timeUpdatedSince != null)
+			output.put("time-updated-since", info.timeUpdatedSince.toString());
+		else
+			output.put("time-updated-since", null);
 		output.put("contains", info.list.size());
 		
 		JSONArray list = new JSONArray();
