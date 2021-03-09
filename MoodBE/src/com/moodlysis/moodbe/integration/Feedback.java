@@ -105,17 +105,17 @@ public class Feedback implements FeedbackInterface {
 			
 			
 			strStmt = ""
-			+ "SELECT answerid, questionID, attendee.attendeeid, eventformid, answers.moodid, isedited, answers.timesubmitted, response, formID, numInForm, mood.value, accountName, answers.IsAnonymous \n"
-			+ "FROM answers \n"
-			+ "NATURAL JOIN Questions  \n"
-			+ "JOIN Mood ON mood.moodID = answers.moodID \n"
-			+ "JOIN Attendee ON attendee.attendeeID = answers.attendeeID \n"
-			+ "WHERE answers.timeSubmitted > ? \n"
-			+ "AND EXISTS ( \n"
-			+ "	SELECT FROM EventForms \n"
-			+ "	WHERE eventID = ? \n"
-			+ "	AND EventForms.eventFormID = answers.eventFormID \n"
-			+ ") \n"
+			+ "SELECT answerid, questionID, attendee.attendeeid, eventformid, answers.moodid, isedited, answers.timesubmitted, response, formID, numInForm, mood.value, accountName, answers.IsAnonymous , questions.type \n"
+			+ "FROM answers  \n"
+			+ "NATURAL JOIN Questions   \n"
+			+ "JOIN Mood ON mood.moodID = answers.moodID  \n"
+			+ "JOIN Attendee ON attendee.attendeeID = answers.attendeeID  \n"
+			+ "WHERE answers.timeSubmitted > ?  \n"
+			+ "AND EXISTS (  \n"
+			+ "	SELECT FROM EventForms  \n"
+			+ "	WHERE eventID = ?  \n"
+			+ "	AND EventForms.eventFormID = answers.eventFormID  \n"
+			+ ")  \n"
 			+ "ORDER BY formID, eventFormID, attendeeID, numInForm;";
 			stmt = conn.prepareStatement(strStmt);
 			stmt.setTimestamp(1, java.sql.Timestamp.valueOf(since));
@@ -178,6 +178,8 @@ public class Feedback implements FeedbackInterface {
 				answerInfo.answerID = rs.getInt("answerID");
 				answerInfo.moodValue = rs.getFloat("value");
 				if (rs.wasNull())
+					answerInfo.moodValue = null;
+				if (rs.getString("type").equals("multi") || rs.getString("type").equals("rating"))
 					answerInfo.moodValue = null;
 				answerInfo.isEdited = rs.getBoolean("isEdited");
 				answerInfo.timeSubmitted = rs.getTimestamp("timeSubmitted").toLocalDateTime();
