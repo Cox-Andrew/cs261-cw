@@ -131,6 +131,7 @@ public class QuestionRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int formID = -1;
+		int precedingID = -1;
 		String type = null;
 		String text = null;
 		String options = null;
@@ -139,6 +140,7 @@ public class QuestionRequest extends HttpServlet {
 			/*
 			 * {
 			 *		"formID": 1,
+			 *		"preceding-questionID": 2432432,
 			 *		"data": {
 			 *			"type": "multi",
 			 *			"text": "Choose one of the options",
@@ -151,10 +153,11 @@ public class QuestionRequest extends HttpServlet {
 			 *	}
  			 *
 			 *
-			 * {"formID": 1, "data": {"type": "multi","text": "Choose one of the options","options": ["Option 1","Option 2","Option 3"]}}
+			 * {"formID": 1, "preceding-questionID": 2432432, "data": {"type": "multi","text": "Choose one of the options","options": ["Option 1","Option 2","Option 3"]}}
 			 * 
 			 * JSON looks like the above
 			 */
+			precedingID = Integer.valueOf(postObject.get("preceding-questionID").toString());
 			formID = Integer.valueOf(postObject.get("formID").toString());
 			type = ((JSONObject) postObject.get("data")).get("type").toString();
 			text = ((JSONObject) postObject.get("data")).get("text").toString();
@@ -167,11 +170,14 @@ public class QuestionRequest extends HttpServlet {
 		//CALL JDBC
 		int questionID;
 		try {
-			questionID = question.newQuestion(formID, type, text, options);
+			questionID = question.newQuestion(formID, precedingID, type, text, options);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		}
 		
 		// tell the caller that this is JSON content (move to front)
 		if (questionID != -1) {

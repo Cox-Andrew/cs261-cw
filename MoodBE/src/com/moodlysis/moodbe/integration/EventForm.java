@@ -78,7 +78,7 @@ public class EventForm implements EventFormInterface {
 	}
 
 	@Override
-	public int newEventForm(int eventID, int formID, Boolean isActive) throws MoodlysisInternalServerError {
+	public int newEventForm(int eventID, int formID, int previousID, Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		//JDBC
 
@@ -90,15 +90,21 @@ public class EventForm implements EventFormInterface {
 		int numInEvent = -1;
 		try {
 			conn.setAutoCommit(false);
-			String queryGetNumInEvent = "SELECT * FROM EVENTFORMS WHERE EventID = ? ORDER BY NumInEvent DESC";
-			numInEventGet = conn.prepareStatement(queryGetNumInEvent);
-			numInEventGet.setInt(1, eventID);
-			table = numInEventGet.executeQuery();
-			if (table.next()) {
-				numInEvent = table.getInt("NumInEvent") + 1;
+			if (previousID == 0) {
+				numInEvent = 1;
 			}
 			else {
-				numInEvent = 1;
+				String queryGetNumInEvent = "SELECT * FROM EVENTFORMS WHERE EventID = ? AND EventFormID = ? ORDER BY NumInEvent DESC";
+				numInEventGet = conn.prepareStatement(queryGetNumInEvent);
+				numInEventGet.setInt(1, eventID);
+				numInEventGet.setInt(2, previousID);
+				table = numInEventGet.executeQuery();
+				if (table.next()) {
+					numInEvent = table.getInt("NumInEvent") + 1;
+				}
+				else {
+					throw new MoodlysisNotFound("Previous EventForm not found. EventForm may have expired, been deleted or is part of another event.");
+				}
 			}
     		String query = "INSERT INTO EVENTFORMS VALUES (nextval('EventFormsEventFormID'),?,?,?,?)";
     		eventFormInsert = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);

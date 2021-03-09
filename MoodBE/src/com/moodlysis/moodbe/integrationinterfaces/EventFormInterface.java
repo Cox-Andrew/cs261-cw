@@ -19,7 +19,7 @@ public interface EventFormInterface {
 	public eventFormInfo getEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// POST /v0/event-forms
-	public int newEventForm(int eventID, int formID, Boolean isActive) throws MoodlysisInternalServerError;
+	public int newEventForm(int eventID, int formID, int previousID, Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// PUT /v0/event-forms/{eventFormID}
 	public boolean editEventForm(int eventFormID, int preceedingEventFormID ,Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound;

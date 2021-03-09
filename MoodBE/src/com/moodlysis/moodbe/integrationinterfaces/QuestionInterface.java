@@ -19,7 +19,7 @@ public interface QuestionInterface {
 	
 	// POST /v0/questions
 	// NOTE: the numInForm of other questions may need to be considered when inserting
-	public int newQuestion(int formID, String questionType, String text, String options) throws MoodlysisInternalServerError;
+	public int newQuestion(int formID, int previousID, String questionType, String text, String options) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// PUT /v0/questions/{questionID}
 	// NOTE: again, the numInForm of other questions may need to be considered when editing

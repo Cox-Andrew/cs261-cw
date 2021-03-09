@@ -86,7 +86,7 @@ public class Question implements QuestionInterface {
 	}
 
 	@Override
-	public int newQuestion(int formID, String questionType, String text, String options) throws MoodlysisInternalServerError {
+	public int newQuestion(int formID, int previousID, String questionType, String text, String options) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		PreparedStatement numInFormGet  = null;
 		ResultSet table = null;
 		PreparedStatement questionInsert  = null;
@@ -95,15 +95,21 @@ public class Question implements QuestionInterface {
 		int numInForm = -1;
 		try {
 			conn.setAutoCommit(false);
-			String queryGetNumInForm = "SELECT * FROM QUESTIONS WHERE FormID = ? ORDER BY NumInForm DESC";
-			numInFormGet = conn.prepareStatement(queryGetNumInForm);
-			numInFormGet.setInt(1, formID);
-			table = numInFormGet.executeQuery();
-			if (table.next()) {
-				numInForm = table.getInt("NumInForm") + 1;
+			if (previousID == 0) {
+				numInForm = 1;
 			}
 			else {
-				numInForm = 1;
+				String queryGetNumInForm = "SELECT * FROM QUESTIONS WHERE QuestionID = ? AND FormID = ? ORDER BY NumInForm DESC";
+				numInFormGet = conn.prepareStatement(queryGetNumInForm);
+				numInFormGet.setInt(1, previousID);
+				numInFormGet.setInt(2, formID);
+				table = numInFormGet.executeQuery();
+				if (table.next()) {
+					numInForm = table.getInt("NumInForm") + 1;
+				}
+				else {
+					throw new MoodlysisNotFound("Previous question not found. Question may have expired, been deleted or is part of a different form");
+				}
 			}
 			String queryInsert = "INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'),?,?,?,?,?)";
     		questionInsert = conn.prepareStatement(queryInsert, Statement.RETURN_GENERATED_KEYS);

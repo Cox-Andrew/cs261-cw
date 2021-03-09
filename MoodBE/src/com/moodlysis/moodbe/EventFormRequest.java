@@ -120,20 +120,22 @@ public class EventFormRequest extends HttpServlet {
 		JSONParser postParser = new JSONParser();
 		int eventID = -1;
 		int formID = -1;
+		int precedingID = -1;
 		try {
 			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
 			/*
 			 *  {
-			 *  	"eventID": 2,
+			 *  	"eventID": 1,
 			 *		"formID": 1,
-			 *		"preceding-eventFormID": 2 -- not implemented at the moment
+			 *		"preceding-eventFormID": 13 
 			 *	}
 			 *
-			 * {"eventID": 2,"formID": 1,"preceding-eventFormID": 2 }
-			 * {"eventID": 2,"formID": 1}
+			 * {"eventID": 1,"formID": 1,"preceding-eventFormID": 13 }
+			 * 
 			 * 
 			 * JSON looks like the above
 			 */
+			precedingID = Integer.valueOf(postObject.get("preceding-eventFormID").toString());
 			eventID = Integer.valueOf(postObject.get("eventID").toString());
 			formID = Integer.valueOf(postObject.get("formID").toString());
 
@@ -145,9 +147,12 @@ public class EventFormRequest extends HttpServlet {
 		//CALL JDBC
 		int eventFormID;
 		try {
-			eventFormID = eventForm.newEventForm(eventID, formID, false);
+			eventFormID = eventForm.newEventForm(eventID, formID, precedingID, false);
 		} catch (MoodlysisInternalServerError e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
 		}
 		
