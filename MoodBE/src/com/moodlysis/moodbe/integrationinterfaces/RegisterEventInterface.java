@@ -10,9 +10,13 @@ public interface RegisterEventInterface {
 		//public String cookie;
 	}
 	
+	//GET /v0/invite-code?eventID={eventID}
 	public String getInviteCode(int eventID) throws MoodlysisNotFound, MoodlysisInternalServerError;
 	
+	//GET /v0/register-event?eventID={eventID}
+	public int[] getAttendees(int eventID) throws MoodlysisNotFound, MoodlysisInternalServerError;
+	
 	// POST /v0/register-event
-	public registerInfo register(String inviteCode) throws MoodlysisNotFound, MoodlysisInternalServerError;
+	public registerInfo register(String inviteCode, int attendeeID) throws MoodlysisNotFound, MoodlysisInternalServerError;
 
 }

@@ -72,7 +72,7 @@ public class FormRequest extends HttpServlet {
 	    		forms.add(formIDs[i]);
 	    	}
     	}
-    	output.put("formID", forms);
+    	output.put("formIDs", forms);
     	return output.toJSONString();
     }
 

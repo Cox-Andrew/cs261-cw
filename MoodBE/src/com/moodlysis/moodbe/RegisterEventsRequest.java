@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,7 +19,7 @@ import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 /**
  * Servlet implementation class registerevents
  */
-@WebServlet(urlPatterns = {"/v0/invite-code", "/v0/invite-code/*", "/v0/register-event"})
+@WebServlet(urlPatterns = {"/v0/invite-code", "/v0/register-event"})
 public class RegisterEventsRequest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -50,15 +51,28 @@ public class RegisterEventsRequest extends HttpServlet {
 		//output.put("cookie", info.cookie);
 		return output.toJSONString();
 	}
+    
+    @SuppressWarnings("unchecked")
+    public String getJSON(int[] attendeeIDs) {
+    	JSONObject output = new JSONObject();
+    	JSONArray attendees = new JSONArray();
+    	if (attendeeIDs != null) {
+	    	for (int i = 0; i < attendeeIDs.length; i++) {
+	    		attendees.add(attendeeIDs[i]);
+	    	}
+    	}
+    	output.put("attendeeIDs", attendees);
+    	return output.toJSONString();
+    }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//GET /v0/invite-code/{invite-code}
-		if (request.getRequestURI().matches("/v0/invite-code/(.*)")) {
-			doGetRegisterEvents(request, response);
+		//GET /v0/register-event?eventID={eventID}
+		if (request.getRequestURI().equals("/v0/register-event")) {
+			doGetAttendees(request, response);
 		}
 		//GET /v0/invite-code?eventID={eventID}
 		else if (request.getRequestURI().equals("/v0/invite-code")) {
@@ -69,13 +83,13 @@ public class RegisterEventsRequest extends HttpServlet {
 		}
 	}
 	
-	protected void doGetRegisterEvents(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGetAttendees(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		RegisterEvent registerEvent = new RegisterEvent(response.getWriter());
-		String[] path = request.getRequestURI().split("/");
-		String inviteCode = path[path.length - 1];
-		RegisterEvent.registerInfo info;
+		int eventID = GeneralRequest.getIDFromQuery(request, response, "eventID");
+		
+		int[] attendeeIDs;
 		try {
-			info = registerEvent.register(inviteCode);
+			attendeeIDs = registerEvent.getAttendees(eventID);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
@@ -84,28 +98,26 @@ public class RegisterEventsRequest extends HttpServlet {
 			return;
 		}
 		
-		
-		//int eventID = info.eventID;
-		//String cookie = info.cookie;
-		
 		// tell the caller that this is JSON content (move to front)
-		// make a proper check for cookie which isnt just empty string
-		if (info.eventID == -1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		if (attendeeIDs == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
+		if (attendeeIDs.length == 0) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 		else {
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
 			
 			//Write JSON
-			String output = getJSON(info);
+			String output = getJSON(attendeeIDs);
 			response.getWriter().append(output + "\n");
 		}
 	}
 	
 	protected void doGetInviteCode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		RegisterEvent registerEvent = new RegisterEvent(response.getWriter());
-		int eventID = GeneralRequest.getIDFromQuery(request, response, "hostID");
+		int eventID = GeneralRequest.getIDFromQuery(request, response, "eventID");
 		
 		String inviteCode;
 		try {
@@ -149,20 +161,23 @@ public class RegisterEventsRequest extends HttpServlet {
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		String inviteCode = null;
+		int attendeeID = -1;
 		RegisterEvent.registerInfo info;
 		
 		try {
 			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
 			/*
 			 *  {
-			 *		"invite-code": "xcedag55a"
+			 *		"invite-code": "xcedag55a",
+			 *		"attendeeID": 5452454
 			 *	}
 			 *
-			 * {"invite-code": "xcedag55a"}
+			 * {"invite-code": "xcedag55a", "attendeeID": 5452454}
 			 * 
 			 * JSON looks like the above
 			 */
 			inviteCode = postObject.get("invite-code").toString();
+			attendeeID = Integer.valueOf(postObject.get("attendeeID").toString());
 		} catch(ParseException e) {
 			//TODO
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
@@ -171,7 +186,7 @@ public class RegisterEventsRequest extends HttpServlet {
 		
 		
 		try {
-			info = registerEvent.register(inviteCode);
+			info = registerEvent.register(inviteCode, attendeeID);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;

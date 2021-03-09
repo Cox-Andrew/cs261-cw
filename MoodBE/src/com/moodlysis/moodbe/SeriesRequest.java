@@ -66,7 +66,7 @@ public class SeriesRequest extends HttpServlet {
 	    		forms.add(seriesIDs[i]);
 	    	}
     	}
-    	output.put("seriesID", forms);
+    	output.put("seriesIDs", forms);
     	return output.toJSONString();
     }
 
