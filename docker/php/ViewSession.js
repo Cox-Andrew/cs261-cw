@@ -74,42 +74,58 @@ function getGeneralFeedbackSubmission(id) {
 return document.getElementById(base + id);
 }
 
+function setInnerHTMLSanitized(element, unsanitized) {
+  element.innerHTML = DOMPurify.sanitize(unsanitized);
+}
+
 
 var base = "http://localhost:8001/v0";
-var timeOfLastUpdate = "2020-01-22T19:33:02";
+var timeOfLastUpdateUnparsed = "2001-01-22T19:33:02";
+var timeOfLastUpdate = Date.parse(timeOfLastUpdateUnparsed);
 var eventID = 1; // TODO retrieve this from somewhere
-var generalFeedbackIDBase = "generalFeedbackAnswer"
+var generalFeedbackIDBase = "generalFeedbackAnswer";
 
 function updateFeedback() {
   console.log("updating feedback");
-  $.getJSON(base + "/feedback?eventID=" + eventID + "&time-updated-since=" + timeOfLastUpdate, function(data) {
+  $.getJSON(base + "/feedback?eventID=" + eventID + "&time-updated-since=" + timeOfLastUpdateUnparsed, function(data) {
 
     console.log(data);
-    data.list.forEach(submission => {
+    for (var i = 0; i < data.list.length; i++) {
+      submission = data.list[i];
       
+      // need to store the newest time-submitted sent by the server so that we are working on the server's clock, not the client's.
+      // store the parsed and unparsed versions so that the unparsed can be sent next time - easier than converting back to string
+      var thisTime = Date.parse(submission["time-updated"]);
+      if (thisTime > timeOfLastUpdate) {
+        timeOfLastUpdate = thisTime;
+        timeOfLastUpdateUnparsed = submission["time-updated"];
+      }
+
 
       if (submission.formID == 1 /* general feedback form */) {
 
         // create a new submission element in the document to place the data.
-        var node = generalFeedbackSubmissionDisplayFactory(eventID);
+        var node = generalFeedbackSubmissionDisplayFactory(submission.answers[0].answerID);
 
         // populate
-        node.getElementsByClassName("time-updated")[0].innerHTML = submission.answers[0]["time-updated"];
+        setInnerHTMLSanitized(node.getElementsByClassName("time-updated")[0], submission.answers[0]["time-updated"]);
+
         if (submission["account_name"] == null){
-          node.getElementsByClassName("account-name")[0].innerHTML = "<Anonymous user>";
+          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], "(Anonymous user)")
         } else {
-          node.getElementsByClassName("account-name")[0].innerHTML = submission["account_name"];
+          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], submission["account_name"])
         }
-        node.getElementsByClassName("response")[0].innerHTML = submission.answers[0].data.response;
-        node.getElementsByClassName("is-edited")[0].innerHTML = submission["is-edited"];
-        node.getElementsByClassName("mood-value")[0].innerHTML = submission.answers[0]["mood-value"];
+        setInnerHTMLSanitized(node.getElementsByClassName("response")[0], submission.answers[0].data.response)
+        setInnerHTMLSanitized(node.getElementsByClassName("is-edited")[0], submission["is-edited"])
+        setInnerHTMLSanitized(node.getElementsByClassName("mood-value")[0], submission.answers[0]["mood-value"])
 
 
       }
 
-    });
+    }
   });
 
 }
 
 updateFeedback();
+setInterval(updateFeedback, 5000); // update every 5 secs

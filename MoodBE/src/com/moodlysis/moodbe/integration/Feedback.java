@@ -110,7 +110,7 @@ public class Feedback implements FeedbackInterface {
 			+ "NATURAL JOIN Questions  \n"
 			+ "JOIN Mood ON mood.moodID = answers.moodID \n"
 			+ "JOIN Attendee ON attendee.attendeeID = answers.attendeeID \n"
-			+ "WHERE answers.timeSubmitted >= ? \n"
+			+ "WHERE answers.timeSubmitted > ? \n"
 			+ "AND EXISTS ( \n"
 			+ "	SELECT FROM EventForms \n"
 			+ "	WHERE eventID = ? \n"
@@ -135,7 +135,7 @@ public class Feedback implements FeedbackInterface {
 			
 			if (!rs.next()) {
 				// no results
-				return null;
+				return feedbackInfo;
 			}
 
 			// json response is organised into submissions - create the first one
