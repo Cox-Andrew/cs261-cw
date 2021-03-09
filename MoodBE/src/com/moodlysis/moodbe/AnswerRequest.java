@@ -18,6 +18,7 @@ import com.moodlysis.moodbe.integration.Answer;
 import com.moodlysis.moodbe.integration.Event;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisForbidden;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
 @WebServlet({"/v0/answers", "/v0/answers/*"})
 public class AnswerRequest extends HttpServlet{
@@ -90,6 +91,9 @@ public class AnswerRequest extends HttpServlet{
 			answerID = answer.newAnswer(attendeeID, questionID, eventFormID, now, questionResponse, isAnonymous);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e){
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
 		}
 		

@@ -49,8 +49,8 @@ CREATE TABLE EVENTS (
   SeriesID INTEGER NOT NULL,
   Title VARCHAR(30) NOT NULL CHECK (CHAR_LENGTH(Title) > 0),
   Description VARCHAR(140),
-  TimeStart TIMESTAMP NOT NULL,
-  TimeEnd TIMESTAMP NOT NULL,
+  TimeStart TIMESTAMP,
+  TimeEnd TIMESTAMP,
   InviteCode VARCHAR(10) UNIQUE,
   CONSTRAINT fk_SeriesID
     FOREIGN KEY(SeriesID)
@@ -382,3 +382,12 @@ VALUES(nextval('QuestionsQuestionID'),'long',6,1,'Is there anything you do not u
 
 INSERT INTO QUESTIONS
 VALUES(nextval('QuestionsQuestionID'),'long',6,2,'How do you feel about the project?');
+
+INSERT INTO SERIES
+VALUES(0,0,'Moodless');
+
+INSERT INTO EVENTS
+VALUES(0,0,'Moodless');
+
+INSERT INTO MOOD
+VALUES(0,0,0.0);

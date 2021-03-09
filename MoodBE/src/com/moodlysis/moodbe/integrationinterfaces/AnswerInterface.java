@@ -25,7 +25,7 @@ public interface AnswerInterface {
 
 	// POST /v0/answers
 	// NOTE: when an answer is submitted, the database should also insert an entry into Mood
-	public int newAnswer(int attendeeID, int questionID, int eventFormID, Instant timeSubmitted, String response, boolean isAnonymous) throws MoodlysisInternalServerError;
+	public int newAnswer(int attendeeID, int questionID, int eventFormID, Instant timeSubmitted, String response, boolean isAnonymous) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// PUT /v0/answers/{answerID}
 	public boolean editAnswer(int answerID, Date timeSubmitted, String response) throws SQLException;

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -70,7 +71,7 @@ public class Answer implements AnswerInterface {
 
 
 	@Override
-	public int newAnswer(int attendeeID, int questionID, int eventFormID, Instant now, String response, boolean isAnonymous) throws MoodlysisInternalServerError {
+	public int newAnswer(int attendeeID, int questionID, int eventFormID, Instant now, String response, boolean isAnonymous) throws MoodlysisInternalServerError, MoodlysisNotFound {
 	
 		// TODO this function also need to signal to the sentiment analysis module that an answer has been submitted
 		
@@ -101,34 +102,49 @@ public class Answer implements AnswerInterface {
 			stmt = conn.prepareStatement(strStmt);
 			stmt.setInt(1, eventFormID);
 			rs = stmt.executeQuery();
-			rs.next();
+			if (!rs.next()) {
+				throw new MoodlysisNotFound("EventForm not found. EventForm may have expired or been deleted.");
+			}
 			int eventID = rs.getInt("eventID");
 			
 			
 			// create an entry in Mood for the sentiment analysis
 			// want to do analysis before insertion here 
 			// value = getSentiment(response);
-			Double value = 0.0;
-			try {
-				value = getSentiment(response);
-			} catch (MalformedURLException e) {
-				e.printStackTrace(this.writer);
-				throw new MoodlysisInternalServerError(e.toString());
-			} catch (IOException er) {
-				er.printStackTrace();
-				throw new MoodlysisInternalServerError(er.toString());
-			}
+			// only done if question is long or short answer
+			int moodID = 0;
 			strStmt = ""
-			+ "INSERT INTO Mood(moodid, eventID, value, timeSubmitted) \n"
-			+ "VALUES (nextval('moodsmoodid'), ?, ?, ?);";
-			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
-			stmt.setInt(1, eventID);
-			stmt.setDouble(2, value);
-			stmt.setTimestamp(3, java.sql.Timestamp.from(now));
-			stmt.execute();
-			keys = stmt.getGeneratedKeys();
-			keys.next();
-			int moodID = keys.getInt(1);
+			+ "SELECT * FROM QUESTIONS "
+			+ "WHERE QuestionID = ?";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, questionID);
+			rs = stmt.executeQuery();
+			if (!rs.next()) {
+				throw new MoodlysisNotFound("Question not found. Question may have expired or been deleted.");
+			}
+			if (rs.getString("Type").equals("long") || rs.getString("Type").equals("short")) {
+				Double value = 0.0;
+				try {
+					value = getSentiment(response);
+				} catch (MalformedURLException e) {
+					e.printStackTrace(this.writer);
+					throw new MoodlysisInternalServerError(e.toString());
+				} catch (IOException er) {
+					er.printStackTrace();
+					throw new MoodlysisInternalServerError(er.toString());
+				}
+				strStmt = ""
+				+ "INSERT INTO Mood(moodid, eventID, value, timeSubmitted) \n"
+				+ "VALUES (nextval('moodsmoodid'), ?, ?, ?);";
+				stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
+				stmt.setInt(1, eventID);
+				stmt.setDouble(2, value);
+				stmt.setTimestamp(3, java.sql.Timestamp.from(now));
+				stmt.execute();
+				keys = stmt.getGeneratedKeys();
+				keys.next();
+				moodID = keys.getInt(1);
+			}
 			
 			strStmt = ""
 			+ "INSERT INTO Answers(AnswerID, QuestionID, AttendeeID, EventFormID, MoodID, IsEdited, TimeSubmitted, Response, IsAnonymous) \n"
