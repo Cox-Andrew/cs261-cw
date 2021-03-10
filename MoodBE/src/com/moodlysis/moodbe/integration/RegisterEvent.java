@@ -75,6 +75,58 @@ public class RegisterEvent implements RegisterEventInterface {
 	}
 	
 	@Override
+	public int[] getEvents(int attendeeID) throws MoodlysisNotFound, MoodlysisInternalServerError{
+		PreparedStatement eventsGet  = null;
+		ResultSet table = null;
+		int maxEvents = 100;
+		int[] eventIDs = new int[maxEvents];
+		int i = 0;
+		try {
+			conn.setAutoCommit(false);
+    		String query = "SELECT * FROM REGISTEREVENTS WHERE AttendeeID = ?";
+    		eventsGet = conn.prepareStatement(query);
+    		eventsGet.setInt(1, attendeeID);
+			table = eventsGet.executeQuery();
+			while(table.next()) {
+				eventIDs[i] = table.getInt("EventID");
+				i++;
+				if (i == maxEvents) {
+					maxEvents = maxEvents * 2;
+					eventIDs = GeneralRequest.extendArray(eventIDs,maxEvents);
+				}
+			}
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch(SQLException e) {
+			//TODO
+			e.printStackTrace(this.writer);
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			throw new MoodlysisInternalServerError(e.toString());
+		} finally {
+			try {
+				if (eventsGet != null) {
+					eventsGet.close();
+				}
+				if (table != null) {
+					table.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace(this.writer);
+				throw new MoodlysisInternalServerError(e.toString());
+			}
+		}
+		int[] returnIDs = new int[i];
+		for (int j = 0; j < i; j++) {
+			returnIDs[j] = eventIDs[j];
+		}
+		return returnIDs;
+	}
+	
+	@Override
 	public String getInviteCode(int eventID) throws MoodlysisNotFound, MoodlysisInternalServerError{
 		String inviteCode = null;
 		PreparedStatement inviteCodeGet  = null;

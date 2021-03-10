@@ -56,15 +56,15 @@ public class RegisterEventsRequest extends HttpServlet {
 	}
     
     @SuppressWarnings("unchecked")
-    public String getJSON(int[] attendeeIDs) {
+    public String getJSON(int[] returnIDs, String outName) {
     	JSONObject output = new JSONObject();
-    	JSONArray attendees = new JSONArray();
-    	if (attendeeIDs != null) {
-	    	for (int i = 0; i < attendeeIDs.length; i++) {
-	    		attendees.add(attendeeIDs[i]);
+    	JSONArray list = new JSONArray();
+    	if (returnIDs != null) {
+	    	for (int i = 0; i < returnIDs.length; i++) {
+	    		list.add(returnIDs[i]);
 	    	}
     	}
-    	output.put("attendeeIDs", attendees);
+    	output.put(outName, list);
     	return output.toJSONString();
     }
 
@@ -74,8 +74,12 @@ public class RegisterEventsRequest extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//GET /v0/register-event?eventID={eventID}
-		if (request.getRequestURI().equals("/v0/register-event")) {
+		if (request.getRequestURI().equals("/v0/register-event") && request.getParameter("eventID") != null) {
 			doGetAttendees(request, response);
+		}
+		//GET /v0/register-event?attendeeID={attendeeID}
+		else if (request.getRequestURI().equals("/v0/register-event") && request.getParameter("attendeeID") != null) {
+			doGetEvents(request, response);
 		}
 		//GET /v0/invite-code?eventID={eventID}
 		else if (request.getRequestURI().equals("/v0/invite-code")) {
@@ -121,7 +125,47 @@ public class RegisterEventsRequest extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			
 			//Write JSON
-			String output = getJSON(attendeeIDs);
+			String output = getJSON(attendeeIDs, "attendeeIDs");
+			response.getWriter().append(output + "\n");
+		}
+	}
+	
+	protected void doGetEvents(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		int attendeeID = GeneralRequest.getIDFromQuery(request, response, "attendeeID");
+		Connection conn = DatabaseConnection.getConnection();
+		RegisterEvent registerEvent = new RegisterEvent(response.getWriter(), conn);
+
+		int[] eventIDs;
+		try {
+			eventIDs = registerEvent.getEvents(attendeeID);
+		} catch (MoodlysisInternalServerError e){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisNotFound e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
+			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		// tell the caller that this is JSON content (move to front)
+		if (eventIDs == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
+		if (eventIDs.length == 0) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
+		else {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			
+			//Write JSON
+			String output = getJSON(eventIDs, "eventIDs");
 			response.getWriter().append(output + "\n");
 		}
 	}
