@@ -1,6 +1,9 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -84,9 +87,10 @@ public class RegisterEventsRequest extends HttpServlet {
 	}
 	
 	protected void doGetAttendees(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		RegisterEvent registerEvent = new RegisterEvent(response.getWriter());
 		int eventID = GeneralRequest.getIDFromQuery(request, response, "eventID");
-		
+		Connection conn = DatabaseConnection.getConnection();
+		RegisterEvent registerEvent = new RegisterEvent(response.getWriter(), conn);
+
 		int[] attendeeIDs;
 		try {
 			attendeeIDs = registerEvent.getAttendees(eventID);
@@ -96,6 +100,13 @@ public class RegisterEventsRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		// tell the caller that this is JSON content (move to front)
@@ -116,9 +127,11 @@ public class RegisterEventsRequest extends HttpServlet {
 	}
 	
 	protected void doGetInviteCode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		RegisterEvent registerEvent = new RegisterEvent(response.getWriter());
 		int eventID = GeneralRequest.getIDFromQuery(request, response, "eventID");
 		
+		Connection conn = DatabaseConnection.getConnection();
+		RegisterEvent registerEvent = new RegisterEvent(response.getWriter(), conn);
+
 		String inviteCode;
 		try {
 			inviteCode = registerEvent.getInviteCode(eventID);
@@ -128,6 +141,13 @@ public class RegisterEventsRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		// tell the caller that this is JSON content (move to front)
@@ -157,7 +177,6 @@ public class RegisterEventsRequest extends HttpServlet {
 	}
 	
 	protected void doPostRegisterEvents(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		RegisterEvent registerEvent = new RegisterEvent(response.getWriter());
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		String inviteCode = null;
@@ -184,7 +203,9 @@ public class RegisterEventsRequest extends HttpServlet {
 			return;
 		}
 		
-		
+		Connection conn = DatabaseConnection.getConnection();
+		RegisterEvent registerEvent = new RegisterEvent(response.getWriter(), conn);
+
 		try {
 			info = registerEvent.register(inviteCode, attendeeID);
 		} catch (MoodlysisInternalServerError e){
@@ -193,6 +214,13 @@ public class RegisterEventsRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		//int eventID = info.eventID;

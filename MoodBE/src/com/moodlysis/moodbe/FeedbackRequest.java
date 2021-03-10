@@ -1,6 +1,8 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -68,8 +70,7 @@ public class FeedbackRequest extends HttpServlet {
 		}
 		
 		
-		
-		Feedback feedback = new Feedback(response.getWriter());
+
 		Feedback.FeedbackInfo feedbackInfo = null;
 		
 		// GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}
@@ -84,23 +85,41 @@ public class FeedbackRequest extends HttpServlet {
 				return;
 			}
 			
-			
+			Connection conn = DatabaseConnection.getConnection();
+			Feedback feedback = new Feedback(response.getWriter(), conn);
 			try {
 				feedbackInfo = feedback.getFeedbackSince(eventID, timeUpdatedSince, hostIDAuth);
 			} catch (MoodlysisInternalServerError e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "database error: " + e.toString());
 				e.printStackTrace();
 				return;
-			}	
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		
 		} else if (attendeeIDString == null && timeUpdatedSinceString == null) {
+			Connection conn = DatabaseConnection.getConnection();
+			Feedback feedback = new Feedback(response.getWriter(), conn);
+			
 			try {
 				feedbackInfo = feedback.getAllFeedback(eventID, hostIDAuth);
 			} catch (MoodlysisInternalServerError e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "database error: " + e.toString());
 				e.printStackTrace();
 				return;
-			}	
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 		} else {
 			// TODO add other situations of attendeeIDString and timeUpdatedSinceString

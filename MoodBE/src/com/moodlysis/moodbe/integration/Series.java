@@ -18,8 +18,8 @@ public class Series implements SeriesInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public Series(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Series(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 	

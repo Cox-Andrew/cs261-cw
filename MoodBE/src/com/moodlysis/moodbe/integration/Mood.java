@@ -21,8 +21,8 @@ public class Mood implements MoodInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public Mood(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Mood(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 

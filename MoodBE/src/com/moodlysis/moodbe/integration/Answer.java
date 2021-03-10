@@ -39,8 +39,8 @@ public class Answer implements AnswerInterface {
 	private Connection conn;
 	private PrintWriter writer;
 
-	public Answer(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Answer(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 	

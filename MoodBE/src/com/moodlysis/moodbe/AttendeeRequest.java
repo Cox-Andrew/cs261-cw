@@ -1,6 +1,8 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import javax.servlet.ServletException;
@@ -82,7 +84,8 @@ public class AttendeeRequest extends HttpServlet {
 		
 		int attendeeID = GeneralRequest.getIDFromPath(request, response);
 		
-		Attendee attendee = new Attendee(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Attendee attendee = new Attendee(response.getWriter(), conn);
 		Attendee.AttendeeInfo attendeeInfo;
 		
 		// extract attendeeID from cookie TODO
@@ -104,7 +107,16 @@ public class AttendeeRequest extends HttpServlet {
 		} catch (MoodlysisForbidden e) {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		
+		
 		
 		String responseJSON = getJSON(attendeeInfo);
 		
@@ -150,8 +162,8 @@ public class AttendeeRequest extends HttpServlet {
 			return;
 		}
 		
-		
-		Attendee attendee = new Attendee(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Attendee attendee = new Attendee(response.getWriter(), conn);
 		int attendeeID;
 		
 		try {
@@ -159,6 +171,13 @@ public class AttendeeRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		
@@ -185,7 +204,6 @@ public class AttendeeRequest extends HttpServlet {
 
 		int attendeeID = GeneralRequest.getIDFromPath(request, response);
 		
-		Attendee attendee = new Attendee(response.getWriter());
 
 		// extract attendeeID from cookie TODO
 		int verificationAttendeeID = 0;
@@ -224,6 +242,9 @@ public class AttendeeRequest extends HttpServlet {
 			return;
 		}
 		
+		
+		Connection conn = DatabaseConnection.getConnection();
+		Attendee attendee = new Attendee(response.getWriter(), conn);
 
 		
 		try {
@@ -245,6 +266,14 @@ public class AttendeeRequest extends HttpServlet {
 		} catch (MoodlysisForbidden e) {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		
 		
@@ -265,7 +294,7 @@ public class AttendeeRequest extends HttpServlet {
 
 		int attendeeID = GeneralRequest.getIDFromPath(request, response);
 		
-		Attendee attendee = new Attendee(response.getWriter());
+
 
 		// extract attendeeID from cookie TODO
 		int verificationAttendeeID = 0;
@@ -275,6 +304,8 @@ public class AttendeeRequest extends HttpServlet {
 			return;
 		}
 		
+		Connection conn = DatabaseConnection.getConnection();
+		Attendee attendee = new Attendee(response.getWriter(), conn);
 		
 		try {
 			// can either change account name only, or change everything
@@ -288,6 +319,13 @@ public class AttendeeRequest extends HttpServlet {
 		} catch (MoodlysisForbidden e) {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		

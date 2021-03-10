@@ -1,6 +1,8 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 
@@ -105,7 +107,8 @@ public class EventRequest extends HttpServlet {
 		// GET /v0/series/{seriesID}
 		int eventID = GeneralRequest.getIDFromPath(request, response);
 		
-		Event event = new Event(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Event event = new Event(response.getWriter(), conn);
 		Event.EventInfo eventInfo;
 		
 		try {
@@ -116,6 +119,13 @@ public class EventRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		String responseJSON = getJSON(eventInfo);
@@ -147,7 +157,8 @@ public class EventRequest extends HttpServlet {
 		}
 		
 		LinkedList<Integer> eventIDs;
-		Event event = new Event(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Event event = new Event(response.getWriter(), conn);
 		
 		try {
 			eventIDs = event.getSeriesEvents(seriesID);
@@ -159,6 +170,13 @@ public class EventRequest extends HttpServlet {
 			response.getWriter().print(e.toString());
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		JSONObject output = new JSONObject();
@@ -230,7 +248,8 @@ public class EventRequest extends HttpServlet {
 			return;
 		}
 		
-		Event event = new Event(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Event event = new Event(response.getWriter(), conn);
 		int eventID;
 		
 		try {
@@ -242,6 +261,13 @@ public class EventRequest extends HttpServlet {
 			response.getWriter().print(e.toString());
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		System.out.println("3");
@@ -306,8 +332,9 @@ public class EventRequest extends HttpServlet {
 			return;
 		}
 		
+		Connection conn = DatabaseConnection.getConnection();
+		Event event = new Event(response.getWriter(), conn);
 		
-		Event event = new Event(response.getWriter());
 		try {
 			event.editEvent(eventID, title, description, timeStart, timeEnd, hostIDAuth);
 		} catch (MoodlysisInternalServerError e){
@@ -317,6 +344,13 @@ public class EventRequest extends HttpServlet {
 			response.getWriter().print(e.toString());
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		
@@ -342,7 +376,9 @@ public class EventRequest extends HttpServlet {
 			return;
 		}
 		
-		Event event = new Event(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Event event = new Event(response.getWriter(), conn);
+		
 		try {
 			event.deleteEvent(eventID, hostIDAuth);
 		} catch (MoodlysisInternalServerError e){
@@ -352,6 +388,13 @@ public class EventRequest extends HttpServlet {
 			response.getWriter().print(e.toString());
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		

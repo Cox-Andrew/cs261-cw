@@ -1,6 +1,9 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -87,9 +90,12 @@ public class SeriesRequest extends HttpServlet {
 	}
 	
 	protected void doGetSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Series series = new Series(response.getWriter());
 		int seriesID = GeneralRequest.getIDFromPath(request, response);
 		
+		Connection conn = DatabaseConnection.getConnection();
+		Series series = new Series(response.getWriter(), conn);
+
+	
 		Series.seriesInfo info;
 		try {
 			info = series.getSeries(seriesID);
@@ -99,6 +105,13 @@ public class SeriesRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		int hostID = info.hostID;
 		String title = info.title;
@@ -121,16 +134,24 @@ public class SeriesRequest extends HttpServlet {
 	}
 	
 	protected void doGetHostSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Series series = new Series(response.getWriter());
 		int hostID = GeneralRequest.getIDFromQuery(request, response, "hostID");
-		
+		Connection conn = DatabaseConnection.getConnection();
+		Series series = new Series(response.getWriter(), conn);
+
 		int[] seriesIDs;
 		try {
 			seriesIDs = series.getSeriesIDsForHost(hostID);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		// tell the caller that this is JSON content (move to front)
 		if (seriesIDs == null) {
@@ -162,7 +183,6 @@ public class SeriesRequest extends HttpServlet {
 	}
 	
 	protected void doNewSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Series series = new Series(response.getWriter());
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int hostID = -1;
@@ -191,14 +211,24 @@ public class SeriesRequest extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
-		//CALL JDBC
+		//CALL JDBC		
+		Connection conn = DatabaseConnection.getConnection();
+		Series series = new Series(response.getWriter(), conn);
+
 		int seriesID;
 		try {
 			seriesID = series.newSeries(title, description, hostID);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		// tell the caller that this is JSON content (move to front)
 		if (seriesID != -1) {
@@ -225,7 +255,6 @@ public class SeriesRequest extends HttpServlet {
 	}
 	
 	protected void doEditSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Series series = new Series(response.getWriter());
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int seriesID = GeneralRequest.getIDFromPath(request, response);
@@ -251,7 +280,11 @@ public class SeriesRequest extends HttpServlet {
 			//TODO
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
-		}
+		}		
+		
+		Connection conn = DatabaseConnection.getConnection();
+		Series series = new Series(response.getWriter(), conn);
+
 		try {
 			series.editSeries(seriesID, title, description);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -261,6 +294,13 @@ public class SeriesRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -276,9 +316,11 @@ public class SeriesRequest extends HttpServlet {
 	}
 	
 	protected void doDeleteSeries(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Series series = new Series(response.getWriter());
 		int seriesID = GeneralRequest.getIDFromPath(request, response);
 		
+		Connection conn = DatabaseConnection.getConnection();
+		Series series = new Series(response.getWriter(), conn);
+
 		try {
 			series.deleteSeries(seriesID);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -288,6 +330,13 @@ public class SeriesRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

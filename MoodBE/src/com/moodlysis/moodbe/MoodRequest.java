@@ -1,6 +1,8 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -67,12 +69,13 @@ public class MoodRequest extends HttpServlet {
 		}
 		
 		
-		Mood mood = new Mood(response.getWriter());
+		
 		Mood.MoodListInfo moodListInfo = null;
 		
 		if (attendeeIDString == null && timeUpdatedSinceString != null) {
 			LocalDateTime timeUpdatedSince;
-
+			
+			
 			try {
 				timeUpdatedSince = LocalDateTime.parse(timeUpdatedSinceString);
 			} catch (DateTimeParseException e) {
@@ -81,14 +84,22 @@ public class MoodRequest extends HttpServlet {
 			}
 			
 			// TODO authentication
-			
+			Connection conn = DatabaseConnection.getConnection();
+			Mood mood = new Mood(response.getWriter(), conn);
 			try {
 				moodListInfo = mood.getMoodSince(eventID, timeUpdatedSince);
 			} catch (MoodlysisInternalServerError e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 				e.printStackTrace();
 				return;
-			}	
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 			String responseJSON = getMoodListJSON(moodListInfo);
 			
@@ -138,13 +149,21 @@ public class MoodRequest extends HttpServlet {
 		Instant now = Instant.now();
 		LocalDateTime timeSubmitted = LocalDateTime.now();
 		
-		Mood mood = new Mood(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Mood mood = new Mood(response.getWriter(), conn);
 		
 		try {
 			mood.newMood(eventID, timeSubmitted, moodValue);
 		} catch (MoodlysisInternalServerError e) {
 			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		

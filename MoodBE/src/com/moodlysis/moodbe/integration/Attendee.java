@@ -21,8 +21,8 @@ public class Attendee implements AttendeeInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public Attendee(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Attendee(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 

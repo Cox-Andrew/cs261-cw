@@ -18,8 +18,8 @@ public class EventForm implements EventFormInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public EventForm(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public EventForm(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 	

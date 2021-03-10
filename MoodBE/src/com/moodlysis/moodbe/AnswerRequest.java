@@ -1,6 +1,8 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
@@ -84,7 +86,8 @@ public class AnswerRequest extends HttpServlet{
 		Instant now = Instant.now();
 		LocalDateTime timeSubmitted = LocalDateTime.now();
 		
-		Answer answer = new Answer(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Answer answer = new Answer(response.getWriter(), conn);
 		int answerID;
 		
 		try {
@@ -95,7 +98,15 @@ public class AnswerRequest extends HttpServlet{
 		} catch (MoodlysisNotFound e){
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		
 		
 		
 		JSONObject js = new JSONObject();

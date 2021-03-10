@@ -17,8 +17,8 @@ public class Host implements HostInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public Host(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Host(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 	

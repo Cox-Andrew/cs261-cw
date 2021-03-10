@@ -18,8 +18,8 @@ public class Form implements FormInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public Form(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Form(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 

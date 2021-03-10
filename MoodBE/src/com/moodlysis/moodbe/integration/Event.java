@@ -80,8 +80,8 @@ public class Event implements EventInterface {
 		}
 	}
 	
-	public Event(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Event(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 

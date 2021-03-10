@@ -1,6 +1,9 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.json.simple.JSONArray;
 
+import com.moodlysis.moodbe.integration.Feedback;
 import com.moodlysis.moodbe.integration.Form;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
@@ -94,7 +98,8 @@ public class FormRequest extends HttpServlet {
 	
 	protected void doGetForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//TODO get the question ids for the form
-		Form form = new Form(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		Form form = new Form(response.getWriter(), conn);
 		int formID = GeneralRequest.getIDFromPath(request, response);
 		Form.formInfo info;
 		try {
@@ -105,6 +110,13 @@ public class FormRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		int hostID = info.hostID;
@@ -127,16 +139,25 @@ public class FormRequest extends HttpServlet {
 	}
 	
 	protected void doGetHostForms(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Form form = new Form(response.getWriter());
 		int hostID = GeneralRequest.getIDFromQuery(request, response, "hostID");
 		
+		Connection conn = DatabaseConnection.getConnection();
+		Form form = new Form(response.getWriter(), conn);
+
 		int[] formIDs;
 		try {
 			formIDs = form.getFormIDsForHost(hostID);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		// tell the caller that this is JSON content (move to front)
 		if (formIDs == null) {
@@ -170,7 +191,7 @@ public class FormRequest extends HttpServlet {
 	
 	protected void doNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		Form form = new Form(response.getWriter());
+		
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int hostID = -1;
@@ -200,13 +221,22 @@ public class FormRequest extends HttpServlet {
 			return;
 		}
 		//CALL JDBC
+		Connection conn = DatabaseConnection.getConnection();
+		Form form = new Form(response.getWriter(), conn);
 		int formID;
 		try {
 			formID = form.newForm(hostID, title, description);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		// tell the caller that this is JSON content (move to front)
 		if (formID != -1) {
@@ -236,7 +266,7 @@ public class FormRequest extends HttpServlet {
 	}
 	
 	protected void doEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Form form = new Form(response.getWriter());
+		
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int formID = GeneralRequest.getIDFromPath(request, response);
@@ -263,6 +293,8 @@ public class FormRequest extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
+		Connection conn = DatabaseConnection.getConnection();
+		Form form = new Form(response.getWriter(), conn);
 		try {
 			form.editForm(formID, title, description);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -272,6 +304,13 @@ public class FormRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -290,8 +329,11 @@ public class FormRequest extends HttpServlet {
 	}
 	
 	protected void doDeleteForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Form form = new Form(response.getWriter());
+		
 		int formID = GeneralRequest.getIDFromPath(request, response);
+		
+		Connection conn = DatabaseConnection.getConnection();
+		Form form = new Form(response.getWriter(), conn);
 		try {
 			form.deleteForm(formID);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -301,6 +343,13 @@ public class FormRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

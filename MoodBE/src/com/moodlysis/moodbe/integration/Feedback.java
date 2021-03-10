@@ -20,8 +20,8 @@ public class Feedback implements FeedbackInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public Feedback(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Feedback(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 

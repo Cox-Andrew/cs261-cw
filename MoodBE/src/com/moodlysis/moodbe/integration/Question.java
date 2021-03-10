@@ -17,8 +17,8 @@ public class Question implements QuestionInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public Question(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public Question(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 	

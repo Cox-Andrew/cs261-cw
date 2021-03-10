@@ -1,6 +1,9 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -68,9 +71,10 @@ public class HostRequest extends HttpServlet {
 	}
 	
 	protected void doGetHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Host host = new Host(response.getWriter());
-		int hostID = GeneralRequest.getIDFromPath(request, response);
 		
+		int hostID = GeneralRequest.getIDFromPath(request, response);
+		Connection conn = DatabaseConnection.getConnection();
+		Host host = new Host(response.getWriter(), conn);
 		Host.hostInfo info;
 		try {
 			info = host.getHost(hostID);
@@ -80,6 +84,13 @@ public class HostRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		String email = info.email;
 		String pass = info.pass;
@@ -114,7 +125,7 @@ public class HostRequest extends HttpServlet {
 	}
 	
 	protected void doNewHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Host host = new Host(response.getWriter());
+		
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		String email = "";
@@ -142,13 +153,22 @@ public class HostRequest extends HttpServlet {
 			return;
 		}
 		//CALL JDBC
+		Connection conn = DatabaseConnection.getConnection();
+		Host host = new Host(response.getWriter(), conn);
 		int hostID;
 		try {
 			hostID = host.newHost(email, pass, account);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
-		} 
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		// tell the caller that this is JSON content (move to front)
 		if (hostID != -1) {
@@ -178,7 +198,7 @@ public class HostRequest extends HttpServlet {
 	}
 	
 	protected void doEditHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Host host = new Host(response.getWriter());
+		
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int hostID = GeneralRequest.getIDFromPath(request, response);
@@ -206,6 +226,8 @@ public class HostRequest extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		}
+		Connection conn = DatabaseConnection.getConnection();
+		Host host = new Host(response.getWriter(), conn);
 		try {
 			host.editHost(hostID, email, pass, account);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -215,6 +237,13 @@ public class HostRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -229,9 +258,10 @@ public class HostRequest extends HttpServlet {
 	}
 	
 	protected void doDeleteHost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Host host = new Host(response.getWriter());
-		int hostID = GeneralRequest.getIDFromPath(request, response);
 		
+		int hostID = GeneralRequest.getIDFromPath(request, response);
+		Connection conn = DatabaseConnection.getConnection();
+		Host host = new Host(response.getWriter(), conn);
 		try {
 			host.deleteHost(hostID);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -241,6 +271,13 @@ public class HostRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

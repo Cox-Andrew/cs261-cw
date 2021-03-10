@@ -1,6 +1,9 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -68,8 +71,11 @@ public class EventFormRequest extends HttpServlet {
 	}
 	
 	protected void doGetEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		EventForm eventForm = new EventForm(response.getWriter());
+		
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
+		
+		Connection conn = DatabaseConnection.getConnection();
+		EventForm eventForm = new EventForm(response.getWriter(), conn);
 		
 		EventForm.eventFormInfo info;
 		try {
@@ -80,6 +86,13 @@ public class EventFormRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		int eventID = info.eventID;
 		int formID = info.formID;
@@ -115,7 +128,6 @@ public class EventFormRequest extends HttpServlet {
 	}
 	
 	protected void doNewEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		EventForm eventForm = new EventForm(response.getWriter());
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int eventID = -1;
@@ -145,6 +157,8 @@ public class EventFormRequest extends HttpServlet {
 			return;
 		}
 		//CALL JDBC
+		Connection conn = DatabaseConnection.getConnection();
+		EventForm eventForm = new EventForm(response.getWriter(), conn);
 		int eventFormID;
 		try {
 			eventFormID = eventForm.newEventForm(eventID, formID, precedingID, false);
@@ -154,6 +168,13 @@ public class EventFormRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		// tell the caller that this is JSON content (move to front)
@@ -184,7 +205,7 @@ public class EventFormRequest extends HttpServlet {
 	}
 	
 	protected void doEditEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		EventForm eventForm = new EventForm(response.getWriter());
+		
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
@@ -215,6 +236,8 @@ public class EventFormRequest extends HttpServlet {
 			return;
 		}
 		
+		Connection conn = DatabaseConnection.getConnection();
+		EventForm eventForm = new EventForm(response.getWriter(), conn);
 		try {
 			eventForm.editEventForm(eventFormID, previousID, isActive);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -224,6 +247,13 @@ public class EventFormRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -241,7 +271,8 @@ public class EventFormRequest extends HttpServlet {
 	}
 	
 	protected void doDeleteEventForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		EventForm eventForm = new EventForm(response.getWriter());
+		Connection conn = DatabaseConnection.getConnection();
+		EventForm eventForm = new EventForm(response.getWriter(), conn);
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
 		
 		try {
@@ -253,6 +284,13 @@ public class EventFormRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

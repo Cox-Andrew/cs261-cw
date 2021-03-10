@@ -1,6 +1,9 @@
 package com.moodlysis.moodbe;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -80,9 +83,11 @@ public class QuestionRequest extends HttpServlet {
 	}
 	
 	protected void doGetQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Question question = new Question(response.getWriter());
 		int questionID = GeneralRequest.getIDFromPath(request, response);
 		
+		Connection conn = DatabaseConnection.getConnection();
+		Question question = new Question(response.getWriter(), conn);
+
 		Question.questionInfo info;
 		try {
 			info = question.getQuestion(questionID);
@@ -92,6 +97,13 @@ public class QuestionRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		int formID = info.formID;
 		String type = info.type;
@@ -127,7 +139,7 @@ public class QuestionRequest extends HttpServlet {
 	}
 	
 	protected void doNewQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Question question = new Question(response.getWriter());
+
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser postParser = new JSONParser();
 		int formID = -1;
@@ -166,7 +178,10 @@ public class QuestionRequest extends HttpServlet {
 			//TODO
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
-		}
+		}		
+		
+		Connection conn = DatabaseConnection.getConnection();
+		Question question = new Question(response.getWriter(), conn);
 		//CALL JDBC
 		int questionID;
 		try {
@@ -177,6 +192,13 @@ public class QuestionRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		// tell the caller that this is JSON content (move to front)
@@ -207,7 +229,7 @@ public class QuestionRequest extends HttpServlet {
 	}
 	
 	protected void doEditQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Question question = new Question(response.getWriter());
+		
 		String jsonData = GeneralRequest.readJSON(request, response);
 		JSONParser putParser = new JSONParser();
 		int questionID = GeneralRequest.getIDFromPath(request, response);
@@ -262,6 +284,8 @@ public class QuestionRequest extends HttpServlet {
 		}
 		//TODO check if edit question content or edit position
 		if (previousID != -1) {
+			Connection conn = DatabaseConnection.getConnection();
+			Question question = new Question(response.getWriter(), conn);
 			try {
 				question.editQuestionPosition(questionID, previousID);
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -271,9 +295,18 @@ public class QuestionRequest extends HttpServlet {
 			} catch (MoodlysisNotFound e) {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 				return;
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		else /*if type not null e.g.*/ {
+			Connection conn = DatabaseConnection.getConnection();
+			Question question = new Question(response.getWriter(), conn);
 			try {
 				question.editQuestionDetails(questionID, type, text, options);
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -283,6 +316,13 @@ public class QuestionRequest extends HttpServlet {
 			} catch (MoodlysisNotFound e) {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 				return;
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -300,9 +340,10 @@ public class QuestionRequest extends HttpServlet {
 	}
 	
 	protected void doDeleteQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Question question = new Question(response.getWriter());
 		int questionID = GeneralRequest.getIDFromPath(request, response);
-		
+		Connection conn = DatabaseConnection.getConnection();
+		Question question = new Question(response.getWriter(), conn);
+
 		try {
 			question.deleteQuestion(questionID);
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -312,6 +353,13 @@ public class QuestionRequest extends HttpServlet {
 		} catch (MoodlysisNotFound e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.toString());
 			return;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

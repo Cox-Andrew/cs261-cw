@@ -17,8 +17,8 @@ public class RegisterEvent implements RegisterEventInterface {
 	private Connection conn;
 	private PrintWriter writer;
 	
-	public RegisterEvent(PrintWriter writer) {
-		this.conn = DatabaseConnection.getConnection();
+	public RegisterEvent(PrintWriter writer, Connection conn) {
+		this.conn = conn;
 		this.writer = writer;
 	}
 	
