@@ -31,7 +31,7 @@ public class RegisterEvent implements RegisterEventInterface {
 		int i = 0;
 		try {
 			conn.setAutoCommit(false);
-    		String query = "SELECT * FROM REGISTEREVENTS WHERE EventID = ?";
+    		String query = "SELECT * FROM REGISTEREVENTS WHERE EventID = ? ";
     		attendeesGet = conn.prepareStatement(query);
     		attendeesGet.setInt(1, eventID);
 			table = attendeesGet.executeQuery();
@@ -83,7 +83,10 @@ public class RegisterEvent implements RegisterEventInterface {
 		int i = 0;
 		try {
 			conn.setAutoCommit(false);
-    		String query = "SELECT * FROM REGISTEREVENTS WHERE AttendeeID = ?";
+    		String query = "SELECT * FROM REGISTEREVENTS "
+					 	 + "LEFT JOIN EVENTS ON EVENTS.EventID = REGISTEREVENTS.EventID "
+					 	 + "WHERE AttendeeID = ? "
+					 	 + "ORDER BY TimeStart ASC";
     		eventsGet = conn.prepareStatement(query);
     		eventsGet.setInt(1, attendeeID);
 			table = eventsGet.executeQuery();
