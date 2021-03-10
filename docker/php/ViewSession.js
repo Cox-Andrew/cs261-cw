@@ -56,7 +56,7 @@ moodValue.className = "mood-value";
 
 var submissionNode = document.createElement("div");
 submissionNode.className = "submission";
-submissionNode.id = generalFeedbackIDBase + id;
+submissionNode.id = answerBase + id;
 submissionNode.appendChild(timeUpdated);
 submissionNode.appendChild(accountName);
 submissionNode.appendChild(response);
@@ -83,7 +83,62 @@ var base = "http://localhost:8001/v0";
 var timeOfLastUpdateUnparsed = "2001-01-22T19:33:02";
 var timeOfLastUpdate = Date.parse(timeOfLastUpdateUnparsed);
 var eventID = 1; // TODO retrieve this from somewhere
-var generalFeedbackIDBase = "generalFeedbackAnswer";
+var answerBase = "answer";
+
+var formsCache = []; // stores data like this:
+// {
+//   "formID": 42343
+// 	"hostID": 234212,
+// 	"data": {
+// 		"title": "Form title",
+// 		"description": "Form description"
+// 	},
+// 	"questionIDs": [312321, 4354325]
+//   "questions": [
+//     {
+//       "questionID": 312321,
+//       "formID": 432423,
+//       "data": {
+//         "type": "longanswer",
+//         "text": "How did you find today's presentation?",
+//         "options": null
+//       }
+//     }, 
+//     {
+//       "questionID": 312321,
+//       "formID": 432423,
+//       "data": {
+//         "type": "longanswer",
+//         "text": "How did you find today's presentation?",
+//         "options": null
+//       }
+//     }, 
+//   ]
+// }
+
+var eventData = null;
+
+// download event data
+$.getJSON(base + "/events/" + eventID, function (event) {
+  eventData = event;
+  event["forms"] = [];
+  event.formIDs.forEach(formID => {
+    $.getJSON(base + "/forms/" + formID, function(form) {
+      // need to add this, the form GET doesn't return this, it's only in the request
+      form["formID"] = formID;
+      form["questions"] = [];
+      event["forms"][event.formIDs.indexOf(formID)] = form;
+      form.questionIDs.forEach(questionID => {
+        $.getJSON(base + "/questions/" + questionID, function(question) {
+          // insert into questions
+          form.questions[form.questionIDs.indexOf(questionID)] = question;
+        });
+      });
+    });
+  });
+});
+
+
 
 function updateFeedback() {
   console.log("updating feedback");
@@ -102,23 +157,52 @@ function updateFeedback() {
       }
 
 
-      if (submission.formID == 1 /* general feedback form */) {
 
-        // create a new submission element in the document to place the data.
-        var node = generalFeedbackSubmissionDisplayFactory(submission.answers[0].answerID);
+
+
+      if (submission.formID == 0 /* general feedback form */) {
+
+        var node;
+
+        // check if the answer has already been output to the page before
+        var oldResponse = document.getElementById(answerBase + submission.answers[0].answerID);
+        if (oldResponse != null){
+          node = oldResponse;
+        } else {
+          // create a new submission element in the document to place the data.
+          node = generalFeedbackSubmissionDisplayFactory(submission.answers[0].answerID);
+        }
+
 
         // populate
         setInnerHTMLSanitized(node.getElementsByClassName("time-updated")[0], submission.answers[0]["time-updated"]);
 
-        if (submission["account_name"] == null){
-          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], "(Anonymous user)")
+        if (submission["account-name"] == null){
+          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], "(Anonymous user)");
         } else {
-          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], submission["account_name"])
+          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], submission["account-name"]);
         }
-        setInnerHTMLSanitized(node.getElementsByClassName("response")[0], submission.answers[0].data.response)
-        setInnerHTMLSanitized(node.getElementsByClassName("is-edited")[0], submission["is-edited"])
-        setInnerHTMLSanitized(node.getElementsByClassName("mood-value")[0], submission.answers[0]["mood-value"])
+        setInnerHTMLSanitized(node.getElementsByClassName("response")[0], submission.answers[0].data.response);
+        setInnerHTMLSanitized(node.getElementsByClassName("is-edited")[0], submission["is-edited"]);
+        setInnerHTMLSanitized(node.getElementsByClassName("mood-value")[0], submission.answers[0]["mood-value"]);
 
+
+      }
+
+
+
+      else { // comprepensive feedback
+
+        // check to see if the form has already been downloaded
+        var form;
+        for (i=0; i<formsCache.length;i++) {
+          if (formsCache[i].formID == submission.formID) {
+            form = formsCache[i].formID;
+            break;
+          }
+        }
+        // if not, need to get the form, and all the questions
+        
 
       }
 

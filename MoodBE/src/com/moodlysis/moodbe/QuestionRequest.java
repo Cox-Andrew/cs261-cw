@@ -71,7 +71,7 @@ public class QuestionRequest extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		if (request.getRequestURI().matches("/v0/questions/([1-9])([0-9]*)")) {
+		if (request.getRequestURI().matches("/v0/questions/([0-9]*)")) {
 			doGetQuestion(request, response);
 		}
 		else {
