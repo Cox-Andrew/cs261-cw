@@ -13,6 +13,9 @@ public interface RegisterEventInterface {
 	//GET /v0/invite-code?eventID={eventID}
 	public String getInviteCode(int eventID) throws MoodlysisNotFound, MoodlysisInternalServerError;
 	
+	//GET /v0/register-event?attendeeID={attendeeID}
+	public int[] getEvents(int attendeeID) throws MoodlysisNotFound, MoodlysisInternalServerError;
+	
 	//GET /v0/register-event?eventID={eventID}
 	public int[] getAttendees(int eventID) throws MoodlysisNotFound, MoodlysisInternalServerError;
 	
