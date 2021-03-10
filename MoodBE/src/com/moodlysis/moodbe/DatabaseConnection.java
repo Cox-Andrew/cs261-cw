@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-	private static Connection conn;
+//	private static Connection conn;
 	
 	public static Connection getConnection() {
 //		if (conn == null) {
@@ -29,10 +29,14 @@ public class DatabaseConnection {
 		
 		// now have to create separate connections for each request
 		// because different threads can set conn.setAutocommit
+	
+		Connection conn;
+		
 		try {
 			Class.forName("org.postgresql.Driver");
 			String dburl = "jdbc:postgresql://database.mood-net:5432/mood?user=mooduser&password=password";
 			conn = DriverManager.getConnection(dburl);
+			return conn;
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to find class org.postgresql.Driver");
 			e.printStackTrace();
@@ -43,7 +47,6 @@ public class DatabaseConnection {
 			return null;
 		}
 		
-		return conn;
 		
 	}
 }
