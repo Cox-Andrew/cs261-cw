@@ -1,5 +1,6 @@
 var gen = document.getElementById("general");
 var feed = document.getElementById("feedback");
+var refreshCheckID = 0;
 function general() {
   if (gen.style.display === "none" || gen.style.display === '')
   {
@@ -115,6 +116,8 @@ var noForm = document.createElement("div");
 noForm.setAttribute("id","noForm");
 setInnerHTMLSanitized(noForm, "There is no feedback form right now" );
 
+var intervalID = window.setInterval(getComprehensive, 5000);
+
 function getComprehensive() {
   const currentDiv = document.getElementById("CForm");
   boolform = true;
@@ -143,125 +146,132 @@ function getComprehensive() {
         formID = result["formID"];
         if (timeNow > dateStart && timeNow < dateEnd && formID != 0) {
           boolform = false;
-          var remNoForm = document.getElementById("noForm");
-          if (remNoForm != null) {
-            remNoForm.remove();
-          }
-          setCookie("eventFormID", eventFormID , 1);
-          $.ajax({
-            type: "GET",
-            url: endpointToRealAddress("/forms/" + formID),
-            dataType: "json",
-            async: false,
-            success: function(result, status, xhr){
-              questionIDs = result["questionIDs"];
-              i = 1;
-              Array.from(questionIDs).forEach(questionID => {
-                $.ajax({
-                  type: "GET",
-                  url: endpointToRealAddress("/questions/" + questionID),
-                  dataType: "json",
-                  async: false,
-                  success: function(result, status, xhr){
-                    setCookie("questionID" + i, questionID , 1);
-                    type = result.data["type"];
-                    text = result.data["text"];
-                    options = result.data["options"];
-                    var br = document.createElement("br");
-                    br.setAttribute("id","br");
-                    var questionDiv = document.createElement("div");
-                    questionDiv.className = "question1";
-                    var questionLabel = document.createElement("Label");
-                    questionLabel.setAttribute("id", "formLabel");
-                    setInnerHTMLSanitized(questionLabel, text );
-                    questionDiv.appendChild(questionLabel);
-                    if (type == "long") {
-                      var questionEntry = document.createElement("textarea");
-                      questionEntry.className = "textarea";
-                      questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
-                      questionEntry.setAttribute("id","ques" + i);
-                      questionEntry.setAttribute("rows","2");
-                      questionEntry.setAttribute("cols","15");
-                      questionEntry.setAttribute("placeholder"," ");
-                      currentDiv.appendChild(questionDiv);
-                      currentDiv.appendChild(br);
-                      currentDiv.appendChild(questionEntry);
+          if (removeForm(eventFormID)) {
+            var remNoForm = document.getElementById("noForm");
+            if (remNoForm != null) {
+              remNoForm.remove();
+            }
+            setCookie("eventFormID", eventFormID , 1);
+            $.ajax({
+              type: "GET",
+              url: endpointToRealAddress("/forms/" + formID),
+              dataType: "json",
+              async: false,
+              success: function(result, status, xhr){
+                questionIDs = result["questionIDs"];
+                i = 1;
+                Array.from(questionIDs).forEach(questionID => {
+                  $.ajax({
+                    type: "GET",
+                    url: endpointToRealAddress("/questions/" + questionID),
+                    dataType: "json",
+                    async: false,
+                    success: function(result, status, xhr){
+                      setCookie("questionID" + i, questionID , 1);
+                      type = result.data["type"];
+                      text = result.data["text"];
+                      options = result.data["options"];
                       var br = document.createElement("br");
                       br.setAttribute("id","br");
-                      currentDiv.appendChild(br);
+                      var questionDiv = document.createElement("div");
+                      questionDiv.className = "question1";
+                      var questionLabel = document.createElement("Label");
+                      questionLabel.setAttribute("id", "formLabel");
+                      setInnerHTMLSanitized(questionLabel, text );
+                      questionDiv.appendChild(questionLabel);
+                      if (type == "long") {
+                        var questionEntry = document.createElement("textarea");
+                        questionEntry.className = "textarea";
+                        questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+                        questionEntry.setAttribute("id","ques" + i);
+                        questionEntry.setAttribute("rows","2");
+                        questionEntry.setAttribute("cols","15");
+                        questionEntry.setAttribute("placeholder"," ");
+                        currentDiv.appendChild(questionDiv);
+                        currentDiv.appendChild(br);
+                        currentDiv.appendChild(questionEntry);
+                        var br = document.createElement("br");
+                        br.setAttribute("id","br");
+                        currentDiv.appendChild(br);
+                      }
+                      else if (type == "short") {
+                        //TODO only enter two words + make distinguishable
+                        var questionEntry = document.createElement("textarea");
+                        questionEntry.className = "textarea";
+                        questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+                        questionEntry.setAttribute("id","ques1");
+                        questionEntry.setAttribute("rows","2");
+                        questionEntry.setAttribute("cols","15");
+                        questionEntry.setAttribute("placeholder"," ");
+                        currentDiv.appendChild(questionDiv);
+                        currentDiv.appendChild(br);
+                        currentDiv.appendChild(questionEntry);
+                        var br = document.createElement("br");
+                        currentDiv.appendChild(br);
+                      }
+                      else if (type == "options") {
+                        //TODO
+                      }
+                      else if (type == "rating") {
+                        //TODO
+                      }
                     }
-                    else if (type == "short") {
-                      //TODO only enter two words + make distinguishable
-                      var questionEntry = document.createElement("textarea");
-                      questionEntry.className = "textarea";
-                      questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
-                      questionEntry.setAttribute("id","ques1");
-                      questionEntry.setAttribute("rows","2");
-                      questionEntry.setAttribute("cols","15");
-                      questionEntry.setAttribute("placeholder"," ");
-                      currentDiv.appendChild(questionDiv);
-                      currentDiv.appendChild(br);
-                      currentDiv.appendChild(questionEntry);
-                      var br = document.createElement("br");
-                      currentDiv.appendChild(br);
-                    }
-                    else if (type == "options") {
-                      //TODO
-                    }
-                    else if (type == "rating") {
-                      //TODO
-                    }
-                  }
+                  });
+                  i++;
                 });
-                i++;
-              });
-              var onlySubmitOnce = document.createElement("div");
-              onlySubmitOnce.setAttribute("id","msgFeed");
-              setInnerHTMLSanitized(onlySubmitOnce, "This form can only be submitted once." );
-              currentDiv.appendChild(onlySubmitOnce);
-              var submitButton = document.createElement("input");
-              submitButton.setAttribute("id","btnFeed");
-              submitButton.setAttribute("class","submitFeed");
-              submitButton.setAttribute("type","submit");
-              submitButton.setAttribute("value","Submit");
-              currentDiv.appendChild(submitButton);
-              return;
-            }
-          });
+                var onlySubmitOnce = document.createElement("div");
+                onlySubmitOnce.setAttribute("id","msgFeed");
+                setInnerHTMLSanitized(onlySubmitOnce, "This form can only be submitted once." );
+                currentDiv.appendChild(onlySubmitOnce);
+                var submitButton = document.createElement("input");
+                submitButton.setAttribute("id","btnFeed");
+                submitButton.setAttribute("class","submitFeed");
+                submitButton.setAttribute("type","submit");
+                submitButton.setAttribute("value","Submit");
+                currentDiv.appendChild(submitButton);
+                return;
+              }
+            });
+          }
         }
-
       }
     });
   });
   if (boolform) {
-    removeForm();
+    removeForm(0);
     currentDiv.appendChild(noForm);
   }
   return;
 
 }
 
-function removeForm() {
+function removeForm(eventFormID) {
   i = 1;
-  while(document.getElementById("ques" + i)) {
-    formQ = document.getElementById("ques" + i);
-    formQ.remove();
-    br = document.getElementById("br");
-    br.remove();
-    br = document.getElementById("br");
-    br.remove();
-    labelQ = document.getElementById("formLabel");
-    labelQ.remove();
-    i++;
+  check = false;
+  if (refreshCheckID != eventFormID) {
+    while(document.getElementById("ques" + i)) {
+      formQ = document.getElementById("ques" + i);
+      formQ.remove();
+      br = document.getElementById("br");
+      br.remove();
+      br = document.getElementById("br");
+      br.remove();
+      labelQ = document.getElementById("formLabel");
+      labelQ.remove();
+      i++;
+    }
+    if (document.getElementById("btnFeed")) {
+      submitButton = document.getElementById("btnFeed");
+      submitButton.remove();
+    }
+    if (document.getElementById("msgFeed")) {
+      onlySubmitOnce = document.getElementById("msgFeed");
+      onlySubmitOnce.remove();
+    }
+    check = true;
   }
-  if (document.getElementById("btnFeed")) {
-    submitButton = document.getElementById("btnFeed");
-    submitButton.remove();
-  }
-  if (document.getElementById("msgFeed")) {
-    onlySubmitOnce = document.getElementById("msgFeed");
-    onlySubmitOnce.remove();
-  }
+  refreshCheckID = eventFormID;
+  return check;
 }
 
 function submitComprehensive() {
