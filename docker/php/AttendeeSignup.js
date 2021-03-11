@@ -25,7 +25,20 @@ function validateForm() {
     }
     else
     {
-        return true;
         // Call backend function here
+        $.post(endpointToRealAddress("/attendees"), JSON.stringify({
+            email: email,
+            pass: password,
+            "account-name": fname 
+        }), function(response) {
+            // store attendee in cookie
+            setCookie("attendeeID", response.attendeeID, 1);
+            // redirect to signed in page
+            window.location.href = "/AttendeePage.html";
+        }).fail(function() {
+            alert("An error occurred");
+        });
+
+        return true;
     }  
 }
