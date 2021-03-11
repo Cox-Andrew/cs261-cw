@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
 import java.io.PrintWriter;
 
 import com.moodlysis.moodbe.integrationinterfaces.SeriesInterface;
@@ -32,6 +33,7 @@ public class Series implements SeriesInterface {
 		int hostID = -1;
 		String title = "";
 		String desc = "";
+		LinkedList<Integer> eventIDs = new LinkedList<Integer>();
 		try {
 			conn.setAutoCommit(false);
     		String query = "SELECT * FROM SERIES WHERE SeriesID = ?";
@@ -47,6 +49,21 @@ public class Series implements SeriesInterface {
 			if (table.wasNull()) {
 				desc = "";
 			}
+			table.close();
+			
+			// need to also get the list of eventIDs
+			query = ""
+			+ "SELECT eventID FROM events \n"
+			+ "WHERE seriesID = ? \n"
+			+ "ORDER BY timestart;";
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, seriesID);
+			table = stmt.executeQuery();
+			while(table.next()) {
+				eventIDs.add(table.getInt("eventID"));
+			}
+			
+			
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {
@@ -74,6 +91,7 @@ public class Series implements SeriesInterface {
 		info.hostID = hostID;
 		info.title = title;
 		info.description = desc;
+		info.eventIDs = eventIDs;
 		return info;
 	}
 	

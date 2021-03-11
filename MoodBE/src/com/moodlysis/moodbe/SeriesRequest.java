@@ -56,6 +56,7 @@ public class SeriesRequest extends HttpServlet {
 		output.put("hostID", info.hostID);
 		data.put("title", info.title);
 		data.put("description", info.description);
+		output.put("eventIDs", info.eventIDs);
 		output.put("data", data);
 		return output.toJSONString();
 	}

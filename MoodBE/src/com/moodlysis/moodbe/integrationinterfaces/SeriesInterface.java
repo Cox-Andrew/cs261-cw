@@ -1,5 +1,7 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
+import java.util.LinkedList;
+
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
@@ -15,6 +17,7 @@ public interface SeriesInterface {
 		public int hostID;
 		public String title;
 		public String description;
+		public LinkedList<Integer> eventIDs;
 	}
 	
 	// GET /v0/series/{seriesID}

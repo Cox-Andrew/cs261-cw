@@ -1,15 +1,26 @@
-//call backend function for adding meeting list
-//Add links to the div "links" from this script
-
-var base = "http://backend.mood-net"
-
-// dont know how to get the id
-var hostID = 1;
-
-// ok, it turns out this isn't implemented in the backend, oops.
 
 
-const links = document.getElementById('links');
+var seriesIDString = getCookie("seriesID");
+if (seriesIDString == "") {
+	window.location.href = "/SeriesList.html"
+}
+var seriesID = parseInt(seriesIDString);
 
 
-//add list of meetings using:- links.innerText="      html code comes here    "
+$.getJSON(endpointToRealAddress("/series/" + seriesID), function(data) {
+	data.seriesIDs.forEach(seriesID => {
+		var newLi = document.createElement("li");
+		var newA = document.createElement("a");
+		newA.setAttribute("href", "#");
+		$(newA).click(function() {
+			setCookie("seriesID", ""+seriesID, 1);
+			window.location.href = "/SessionPage.html"
+		});
+		newLi.appendChild(newA);
+		document.getElementById("session-list").appendChild(newLi);
+
+		$.getJSON(endpointToRealAddress("/series/"+seriesID), function(seriesData) {
+			setInnerHTMLSanitized(newA, seriesData.data.title);
+		});
+	});
+});
