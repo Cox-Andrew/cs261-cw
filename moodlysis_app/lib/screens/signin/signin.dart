@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:moodlysis_app/services/authentication.dart';
+import 'package:moodlysis_app/globals.dart' as globals;
 
 class SignInScreen extends StatelessWidget {
   static const route = "/signin";
@@ -111,8 +112,8 @@ class SignInFormState extends State<SignInForm> {
 
       setState(() => _loading = true);
       authenticateUser(_formData["email"], _formData["password"])
-          .then((authToken) {
-        if (authToken == null) {
+          .then((user) {
+        if (user == null) {
           Scaffold.of(context).removeCurrentSnackBar();
           Scaffold.of(context).showSnackBar(SnackBar(
             content: Text("Invalid credentials"),
@@ -121,10 +122,12 @@ class SignInFormState extends State<SignInForm> {
           return;
         }
 
+        globals.currentUser = user;
+
         Scaffold.of(context).removeCurrentSnackBar();
         Scaffold.of(context).showSnackBar(SnackBar(
           content: Text(
-              'Email: ${_formData["email"]}, Passwd: ${_formData["password"]}, Token: $authToken'),
+              'Email: ${_formData["email"]}, Passwd: ${_formData["password"]}, User: $user'),
           backgroundColor: Colors.green,
         ));
 
