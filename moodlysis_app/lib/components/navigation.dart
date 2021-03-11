@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:moodlysis_app/screens/screens.dart';
 
-const List<String> _routes = ["/timeline", "/add-event", "/account"];
+const List<String> _routes = [TimelineScreen.route, RegisterEventScreen.route, AccountScreen.route];
 
 class MoodlysisBottomNavigationBar extends StatelessWidget {
   final int _currentIndex;
