@@ -154,7 +154,16 @@ Request:
 }
 ```
 Delete a series\
-```DELETE /v0/series/{seriesID}``` Working
+```DELETE /v0/series/{seriesID}``` Working\
+
+Get a list of a host's series\
+`GET /v0/series?hostID={hostID}`\
+Response:
+```
+{
+	"seriesIDs": [123,3123,414]
+}
+```
 
 
 ### 2.	Create/Read/Update/Delete hosted events.
