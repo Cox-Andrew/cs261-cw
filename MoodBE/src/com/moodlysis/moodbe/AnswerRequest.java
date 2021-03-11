@@ -73,8 +73,8 @@ public class AnswerRequest extends HttpServlet{
 			eventFormID = (int) Integer.parseInt(postObject.get("eventFormID").toString());
 			questionID = (int) Integer.parseInt(postObject.get("questionID").toString());
 			JSONObject data = (JSONObject) postObject.get("data");
-			questionResponse = (String) data.get("response");
-			isAnonymous = (boolean) data.get("isAnonymous");
+			questionResponse = (String) data.get("response").toString();
+			isAnonymous = (boolean) Boolean.parseBoolean(data.get("isAnonymous").toString());
 			
 		} catch (Exception e) {
 			response.getWriter().print(e.toString());

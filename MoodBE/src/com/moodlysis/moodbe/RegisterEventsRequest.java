@@ -90,6 +90,8 @@ public class RegisterEventsRequest extends HttpServlet {
 		}
 	}
 	
+
+	
 	protected void doGetAttendees(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int eventID = GeneralRequest.getIDFromQuery(request, response, "eventID");
 		Connection conn = DatabaseConnection.getConnection();

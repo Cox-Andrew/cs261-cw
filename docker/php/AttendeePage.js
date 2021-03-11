@@ -18,8 +18,8 @@ function feedback() {
     if(gen.style.display !== "none" || gen.style.display !== '')
     {
       gen.style.display = "none";
-    }    
-    feed.style.display = "block"; 
+    }
+    feed.style.display = "block";
   } else {
     feed.style.display = "none";
   }
@@ -31,17 +31,133 @@ function showDiv() {
 function submitGeneral() {
   var emoji = document.getElementsByName('emoji');
   var emojiValue = null;
-  for(i = 0; i < emoji.length; i++) 
-  { 
-    if(emoji[i].checked) 
+  for(i = 0; i < emoji.length; i++)
+  {
+    if(emoji[i].checked)
       emojiValue = emoji[i].value;
-  } 
+  }
   //emojiValue is the name of selected emoji
-
   var comments = document.getElementById('comments').value;
-  alert('Form submitted successfully');
 
   // Call backend function here
+  moodInsert(emojiValue);
+  generalInsert(comments);
+}
+
+function moodInsert(emojiValue) {
+  mood = {};
+  mood["mood-value"] = emojiValue;
+  mood["eventID"] = getCookie("eventID");
+  $.ajax({
+    type: "POST",
+    url: endpointToRealAddress("/moods"),
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify(mood),
+    async: false,
+    success: function(result, status, xhr){
+      //moodID = result.moodID;
+      //TODO
+    }
+  });
+}
+
+function generalInsert(comments) {
+  answer = {};
+  answer["attendeeID"] = getCookie("attendeeID");
+  eventID = getCookie("eventID");
+  answer["eventID"] = eventID;
+  answer["questionID"] = 0;
+  answer.data = {};
+  answer.data["response"] = comments;
+  answer.data["isAnonymous"] = getCookie("isAnonymous");
+  $.ajax({
+    type: "GET",
+    url: endpointToRealAddress("/events/" + eventID),
+    dataType: "json",
+    async: false,
+    success: function(result, status, xhr){
+      eventFormIDs = result.eventFormIDs
+    }
+  });
+  Array.from(eventFormIDs).forEach(eventFormID => {
+    $.ajax({
+      type: "GET",
+      url: endpointToRealAddress("/event-forms/" + eventFormID),
+      dataType: "json",
+      async: false,
+      success: function(result, status, xhr){
+        if (result.formID == 0) {
+          returnEventFormID = eventFormID;
+          answer["eventFormID"] = returnEventFormID;
+          $.ajax({
+            type: "POST",
+            url: endpointToRealAddress("/answers"),
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(answer),
+            async: false,
+            success: function(result, status, xhr){
+              //answerID = result.answerID;
+              //TODO
+              return;
+            }
+          });
+        }
+      }
+    });
+  });
+
+}
+
+function getComprehensive() {
+  const currentDiv = document.getElementById("form");
+  eventID = getCookie("eventID");
+  $.ajax({
+    type: "GET",
+    url: endpointToRealAddress("/events/" + eventID),
+    dataType: "json",
+    async: false,
+    success: function(result, status, xhr){
+      eventFormIDs = result.eventFormIDs
+    }
+  });
+  Array.from(eventFormIDs).forEach(eventFormID => {
+    $.ajax({
+      type: "GET",
+      url: endpointToRealAddress("/event-forms/" + eventFormID),
+      dataType: "json",
+      async: false,
+      success: function(result, status, xhr){
+        if (result.formID == 0) {
+          returnEventFormID = eventFormID;
+          answer["eventFormID"] = returnEventFormID;
+          $.ajax({
+            type: "POST",
+            url: endpointToRealAddress("/answers"),
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(answer),
+            async: false,
+            success: function(result, status, xhr){
+              //answerID = result.answerID;
+              //TODO
+              return;
+            }
+          });
+        }
+      }
+    });
+  });
+  var dateStart = new Date(timeStart);
+  var dateEnd = new Date(timeEnd);
+  var br = document.createElement("br");
+  var eventName = document.createElement("a");
+  eventName.className = "eventName";
+  eventName.setAttribute("href","AttendeePage.html");
+  setInnerHTMLSanitized(eventName, title);
+  currentDiv.appendChild(eventName);
+  currentDiv.appendChild(br);
 }
 
 function submitComprehensive() {

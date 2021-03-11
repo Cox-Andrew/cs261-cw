@@ -6,8 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.EventFormInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
@@ -46,6 +47,8 @@ public class EventForm implements EventFormInterface {
 			formID = table.getInt("FormID");
 			numInEvent = table.getInt("NumInEvent");
 			isActive = table.getBoolean("IsActive");
+			info.timeStart = table.getTimestamp("TimeStart").toLocalDateTime();
+			info.timeEnd = table.getTimestamp("TimeEnd").toLocalDateTime();
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {
@@ -74,11 +77,12 @@ public class EventForm implements EventFormInterface {
 		info.formID = formID;
 		info.numInEvent = numInEvent;
 		info.isActive = isActive;
+		
 		return info;
 	}
 
 	@Override
-	public int newEventForm(int eventID, int formID, int previousID, Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound {
+	public int newEventForm(int eventID, int formID, int previousID, Boolean isActive, LocalDateTime timeStart, LocalDateTime timeEnd) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
 		//JDBC
 
@@ -106,12 +110,14 @@ public class EventForm implements EventFormInterface {
 					throw new MoodlysisNotFound("Previous EventForm not found. EventForm may have expired, been deleted or is part of another event.");
 				}
 			}
-    		String query = "INSERT INTO EVENTFORMS VALUES (nextval('EventFormsEventFormID'),?,?,?,?)";
+    		String query = "INSERT INTO EVENTFORMS VALUES (nextval('EventFormsEventFormID'),?,?,?,?,?,?)";
     		eventFormInsert = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
     		eventFormInsert.setInt(1, eventID);
     		eventFormInsert.setInt(2, formID);
     		eventFormInsert.setInt(3, numInEvent);
-    		eventFormInsert.setBoolean(4, isActive);
+    		eventFormInsert.setTimestamp(4, Timestamp.valueOf(timeStart));
+    		eventFormInsert.setTimestamp(5, Timestamp.valueOf(timeEnd));
+    		eventFormInsert.setBoolean(6, isActive);
     		eventFormInsert.executeUpdate();
     		eventFormKey = eventFormInsert.getGeneratedKeys();
     		eventFormKey.next();
@@ -150,7 +156,7 @@ public class EventForm implements EventFormInterface {
 	}
 
 	@Override
-	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound {
+	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive, LocalDateTime timeStart, LocalDateTime timeEnd) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO fix so if error occurs return false but still execute finally statement
 		// previousID -2 to continue without changing the position
 		PreparedStatement eventFormEdit  = null;
@@ -201,14 +207,16 @@ public class EventForm implements EventFormInterface {
 			}
 			if (previousID == -2) {
 				//TODO don't change NumInEvent 
-				String queryUpdate = "UPDATE EVENTFORMS SET IsActive = ? WHERE EventFormID = ?";
+				String queryUpdate = "UPDATE EVENTFORMS SET IsActive = ?, TimeStart = ?, TimeEnd = ? WHERE EventFormID = ?";
 				eventFormEdit = conn.prepareStatement(queryUpdate);
 	    		eventFormEdit.setBoolean(1, isActive);
-	    		eventFormEdit.setInt(2, eventFormID);
+	    		eventFormEdit.setTimestamp(2, Timestamp.valueOf(timeStart));
+	    		eventFormEdit.setTimestamp(3, Timestamp.valueOf(timeStart));
+	    		eventFormEdit.setInt(4, eventFormID);
 	    		eventFormEdit.executeUpdate();
 			}
 			else {
-	    		String queryUpdate = "UPDATE EVENTFORMS SET NumInEvent = ?, IsActive = ? WHERE EventFormID = ?";
+	    		String queryUpdate = "UPDATE EVENTFORMS SET NumInEvent = ?, IsActive = ?, TimeStart = ?, TimeEnd = ? WHERE EventFormID = ?";
 	    		eventFormEdit = conn.prepareStatement(queryUpdate);
 	    		eventFormEdit.setInt(1, numInEvent);
 	    		eventFormEdit.setBoolean(2, isActive);

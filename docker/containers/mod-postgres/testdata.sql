@@ -126,6 +126,3 @@ INSERT INTO answers VALUES (nextval('answersanswerid'), 27, 1, 25, (select last_
 -- general feedback event 12
 INSERT INTO Mood VALUES (nextval('moodsmoodid'), 12, 0.9, '2021-01-01 00:40:00');
 INSERT INTO answers VALUES (nextval('answersanswerid'), 0, 1, (select eventFormID from eventForms where eventid = 12 and formid = 0), (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-01 00:40:00', 'I think the event is going well!');
-
-
-

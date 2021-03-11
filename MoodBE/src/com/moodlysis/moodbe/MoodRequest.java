@@ -137,7 +137,7 @@ public class MoodRequest extends HttpServlet {
 		try {
 			
 			eventID = (int) Integer.parseInt(postObject.get("eventID").toString());
-			moodValue = (double) postObject.get("mood-value");
+			moodValue = (double) Double.parseDouble(postObject.get("mood-value").toString());
 			
 		} catch (Exception e) {
 			response.getWriter().print(e.toString());

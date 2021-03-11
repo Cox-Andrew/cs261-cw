@@ -3,6 +3,7 @@ package com.moodlysis.moodbe;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -133,6 +134,8 @@ public class EventFormRequest extends HttpServlet {
 		int eventID = -1;
 		int formID = -1;
 		int precedingID = -1;
+		LocalDateTime timeStart;
+		LocalDateTime timeEnd;
 		try {
 			JSONObject postObject = (JSONObject) postParser.parse(jsonData); //can directly use reader rather than string
 			/*
@@ -150,6 +153,8 @@ public class EventFormRequest extends HttpServlet {
 			precedingID = Integer.valueOf(postObject.get("preceding-eventFormID").toString());
 			eventID = Integer.valueOf(postObject.get("eventID").toString());
 			formID = Integer.valueOf(postObject.get("formID").toString());
+			timeStart = LocalDateTime.parse(postObject.get("time-start").toString());
+			timeEnd = LocalDateTime.parse(postObject.get("time-end").toString());
 
 		} catch(ParseException e) {
 			//TODO
@@ -161,7 +166,7 @@ public class EventFormRequest extends HttpServlet {
 		EventForm eventForm = new EventForm(response.getWriter(), conn);
 		int eventFormID;
 		try {
-			eventFormID = eventForm.newEventForm(eventID, formID, precedingID, false);
+			eventFormID = eventForm.newEventForm(eventID, formID, precedingID, false, timeStart, timeEnd);
 		} catch (MoodlysisInternalServerError e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
@@ -211,6 +216,8 @@ public class EventFormRequest extends HttpServlet {
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
 		int previousID = -1;
 		Boolean isActive = false;
+		LocalDateTime timeStart;
+		LocalDateTime timeEnd;
 		try {
 			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
 			/*
@@ -230,6 +237,8 @@ public class EventFormRequest extends HttpServlet {
 			if (putObject.get("preceding-eventFormID") != null) {
 				previousID = Integer.parseInt(putObject.get("preceding-eventFormID").toString());
 			}
+			timeStart = LocalDateTime.parse(putObject.get("time-start").toString());
+			timeEnd = LocalDateTime.parse(putObject.get("time-end").toString());
 		} catch(ParseException e) {
 			//TODO
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
@@ -239,7 +248,7 @@ public class EventFormRequest extends HttpServlet {
 		Connection conn = DatabaseConnection.getConnection();
 		EventForm eventForm = new EventForm(response.getWriter(), conn);
 		try {
-			eventForm.editEventForm(eventFormID, previousID, isActive);
+			eventForm.editEventForm(eventFormID, previousID, isActive, timeStart, timeEnd);
 			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (MoodlysisInternalServerError e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());

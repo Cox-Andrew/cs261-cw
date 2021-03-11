@@ -3,12 +3,12 @@
     padding: 0px;
     box-sizing: border-box;
   }
-  
+
   html,
   body {
     height: 100%;
   }
-  
+
   body {
     display: flex;
     flex-direction: column;
@@ -19,7 +19,7 @@
     background-position: center;
     color: rgb(240, 240, 240);
   }
-  
+
   nav {
     display: flex;
     justify-content: space-around;
@@ -28,14 +28,14 @@
     background-color: #122a3d;
     font-family: "poppins", sans-serif;
   }
-  
+
   .logo {
     color: rgb(240, 240, 240);
     text-transform: uppercase;
     letter-spacing: 5px;
     font-size: 20px;
   }
-  
+
   .logo a {
     color: rgb(240, 240, 240);
     text-transform: uppercase;
@@ -43,7 +43,7 @@
     letter-spacing: 5px;
     font-size: 20px;
   }
-  
+
   .nav-links {
     display: flex;
     justify-content: space-around;
@@ -74,12 +74,12 @@
     margin: 5px;
     transition: all 0.3s ease;
   }
-  
+
   @media screen and (min-width: 769px) {
     .nav-links a {
       align-self: auto;
       letter-spacing: 3px;
-      padding: 9px 25px; 
+      padding: 9px 25px;
     }
 
     .nav-links a:hover{
@@ -117,7 +117,7 @@
       width: 60%;
     }
   }
-  
+
   @media screen and (max-width: 768px) {
     body {
       overflow-x: hidden;
@@ -165,11 +165,11 @@
       transition: 0.5s ease 0s;
   }
   }
-  
+
   .nav-active {
     transform: translateX(0%);
   }
-  
+
   @keyframes navLinkFade {
     from {
       opacity: 0;
@@ -180,7 +180,7 @@
       transform: translateX(0px);
     }
   }
-  
+
   .toggle .line1 {
     transform: rotate(-45deg) translate(-5px, 6px);
   }
@@ -190,7 +190,7 @@
   .toggle .line3 {
     transform: rotate(45deg) translate(-5px, -6px);
   }
-  
+
   .content {
     flex: 1 0 auto;
     padding: 20px;
@@ -206,7 +206,7 @@
     font-size: 24px;
     text-align: center;
   }
-  
+
   .footer {
     flex-shrink: 0;
     min-height: 15vh;
@@ -360,7 +360,7 @@
     position: relative;
     cursor: pointer;
   }
-  
+
   label:before {
     content: " ";
     display: block;
@@ -376,18 +376,18 @@
     transition-duration: 0.5s;
     transform: scale(0);
   }
-  
+
   label img {
     transition-duration: 0.2s;
     transform-origin: 50% 50%;
   }
-  
+
   :checked + label:before {
     content: "✔";
     background-color: #a1865b;
     transform: scale(1);
   }
-  
+
   :checked + label img {
     transform: scale(0.9);
     z-index: -1;

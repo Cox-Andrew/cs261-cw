@@ -9,6 +9,8 @@
       href="https://fonts.googleapis.com/css2?family=Poppins"
       rel="stylesheet"
     />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <link rel="stylesheet" href="AttendeePage.css"/>
     <title>Home</title>
   </head>
@@ -49,23 +51,23 @@
             <label>Choose the emoji which represents your mood<br><br></label>
             <ul class = "emojiList">
               <li>
-                <input type="radio" id="emoji1" value="emoji1" name = "emoji" required/>
+                <input type="radio" id="emoji1" value="-1.0" name = "emoji" required/>
                 <label for="emoji1"><img src="emoji1.png" height="40px" width="40px"/></label>
               </li>
               <li>
-                <input type="radio" id="emoji2" value="emoji2" name = "emoji"/>
+                <input type="radio" id="emoji2" value="-0.5" name = "emoji"/>
                 <label for="emoji2"><img src="emoji2.png" height="40px" width="40px"/></label>
               </li>
               <li>
-                <input type="radio" id="emoji3" value="emoji3" name = "emoji"/>
+                <input type="radio" id="emoji3" value="0.0" name = "emoji"/>
                 <label for="emoji3"><img src="emoji3.png" height="40px" width="40px"/></label>
               </li>
               <li>
-                <input type="radio" id="emoji4" value="emoji4" name = "emoji"/>
+                <input type="radio" id="emoji4" value="0.5" name = "emoji"/>
                 <label for="emoji4"><img src="emoji4.png" height="40px" width="40px"/></label>
               </li>
               <li>
-                <input type="radio" id="emoji5" value="emoji5" name = "emoji"/>
+                <input type="radio" id="emoji5" value="1.0" name = "emoji"/>
                 <label for="emoji5"><img src="emoji5.png" height="40px" width="40px"/></label>
               </li>
             </ul>
@@ -103,15 +105,15 @@
           <h4>Comprehensive feedback</h4>
           <form id="CForm" action="#" method="POST" onsubmit="return submitComprehensive();">
             <div class = "question1">
-              <label>Question 1:<br></label> 
+              <label>Question 1:<br></label>
             </div>
             <textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' id = "ques1" rows="2" cols="15" placeholder=" "></textarea>
             <div class = "question2">
-              <label>Question 2:<br></label> 
+              <label>Question 2:<br></label>
             </div>
             <textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' id = "ques2" rows="2" cols="15" placeholder=" "></textarea>
             <div class = "question3">
-              <label>Question 3:<br></label> 
+              <label>Question 3:<br></label>
             </div>
             <textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' id = "ques3" rows="2" cols="15" placeholder=" "></textarea>
             <br>
@@ -119,7 +121,7 @@
               <h5>This form can only be submitted once.</h5>
             </div>
             <input type = "submit" class = "submitFeed" id = "btnFeed" value="Submit">
-          </form>        
+          </form>
           <script>
               $(document).ready(function () {
                   $("#CForm").submit(function (e) {

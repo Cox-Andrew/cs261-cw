@@ -3,12 +3,12 @@
     padding: 0px;
     box-sizing: border-box;
   }
-  
+
   html,
   body {
     height: 100%;
   }
-  
+
   body {
     display: flex;
     flex-direction: column;
@@ -19,7 +19,7 @@
     background-position: center;
     color: rgb(240, 240, 240);
   }
-  
+
   nav {
     display: flex;
     justify-content: space-around;
@@ -28,14 +28,14 @@
     background-color: #122a3d;
     font-family: "poppins", sans-serif;
   }
-  
+
   .logo {
     color: rgb(240, 240, 240);
     text-transform: uppercase;
     letter-spacing: 5px;
     font-size: 20px;
   }
-  
+
   .logo a {
     color: rgb(240, 240, 240);
     text-transform: uppercase;
@@ -43,7 +43,7 @@
     letter-spacing: 5px;
     font-size: 20px;
   }
-  
+
   .nav-links {
     display: flex;
     justify-content: space-around;
@@ -74,12 +74,12 @@
     margin: 5px;
     transition: all 0.3s ease;
   }
-  
+
   @media screen and (min-width: 769px) {
     .nav-links a {
       align-self: auto;
       letter-spacing: 3px;
-      padding: 9px 25px; 
+      padding: 9px 25px;
     }
 
     .nav-links a:hover{
@@ -133,7 +133,7 @@
         color: rgb(240, 240, 240);
         text-decoration: none;
     }
-  
+
     .right{
       top: 50%;
       transform: translateY(-50%);
@@ -168,7 +168,7 @@
       width: 60%;
     }
   }
-  
+
   @media screen and (max-width: 768px) {
     body {
       overflow-x: hidden;
@@ -241,7 +241,7 @@
         color: rgb(240, 240, 240);
         text-decoration: none;
     }
-  
+
     .right{
       margin-top: 10%;
       padding: 5%;
@@ -266,11 +266,11 @@
         text-decoration: none;
     }
   }
-  
+
   .nav-active {
     transform: translateX(0%);
   }
-  
+
   @keyframes navLinkFade {
     from {
       opacity: 0;
@@ -281,7 +281,7 @@
       transform: translateX(0px);
     }
   }
-  
+
   .toggle .line1 {
     transform: rotate(-45deg) translate(-5px, 6px);
   }
@@ -291,7 +291,7 @@
   .toggle .line3 {
     transform: rotate(45deg) translate(-5px, -6px);
   }
-  
+
   .content {
     flex: 1 0 auto;
     margin-left: 10%;
@@ -315,4 +315,3 @@
     letter-spacing: 3px;
     font-size: 14px;
   }
-  
