@@ -8,7 +8,6 @@ function submitForm() {
 
 function hostSignIn(email, password) {
   host = {};
-  //retrieve hostID from cookie
   host["email"] = email;
   host["pass"] = password;
 

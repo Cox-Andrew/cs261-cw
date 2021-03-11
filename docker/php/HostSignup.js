@@ -25,7 +25,29 @@ function validateForm() {
     }
     else
     {
-        return true;
         // Call backend function here
-    }  
+        hostSignUp(fname, email, password);
+        return true;
+    }
+}
+
+function hostSignUp(name, email, password) {
+  host = {};
+  host["account-name"] = name;
+  host["email"] = email;
+  host["pass"] = password;
+
+  $.ajax({
+    type: "POST",
+    url: endpointToRealAddress("/hosts"),
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify(host),
+    async: false,
+    success: function(result, status, xhr){
+      hostID = result.hostID;
+      setCookie("hostID", hostID, 1);
+      window.location.href = "/HostHomepage.html";
+    }
+  });
 }
