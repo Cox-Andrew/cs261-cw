@@ -6,7 +6,7 @@ import 'package:moodlysis_app/models/event.dart';
 
 List<Event> generateEvents(int count) {
   List<Event> events = [];
-  DateTimeRange validRange = DateTimeRange(start: DateTime(2021, 1, 1, 12), end: DateTime.now());
+  DateTimeRange validRange = DateTimeRange(start: DateTime.now().subtract(Duration(days: 30)), end: DateTime.now().add(Duration(days: 30)));
   Random r = Random();
 
   for (int i=0; i<count; i++) {

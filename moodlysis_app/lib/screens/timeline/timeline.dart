@@ -15,14 +15,36 @@ class TimelineScreen extends StatefulWidget {
 }
 
 class _TimelineScreenState extends State<TimelineScreen> {
-  List<Event> _events = [];
+  List<Event> _liveEvents;
+  List<Event> _upcomingEvents;
 
-  void _updateEvents() => getUserEvents(globals.currentUser)
-      .then((events) => setState(() => _events = events));
+  void _updateEvents() {
+    getUserEvents(globals.currentUser).then((events) {
+      List<Event> liveEvents = [];
+      List<Event> upcomingEvents = [];
+
+      for (Event event in events) {
+        //TODO: implement past events archive
+        if (event.schedule.end.isBefore(DateTime.now())) continue;
+
+        if (event.schedule.start.isAfter(DateTime.now())) {
+          upcomingEvents.add(event);
+        } else {
+          liveEvents.add(event);
+        }
+      }
+
+      setState(() {
+        _liveEvents = liveEvents;
+        _upcomingEvents = upcomingEvents;
+      });
+    });
+  }
 
   @override
   void initState() {
     _updateEvents();
+
     super.initState();
   }
 
@@ -59,9 +81,9 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   Expanded(
                     child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: _events.length,
+                        itemCount: _liveEvents == null? 0 : _liveEvents.length,
                         itemBuilder: (context, i) {
-                          Event event = _events[i];
+                          Event event = _liveEvents[i];
                           return SizedBox(
                               width: MediaQuery.of(context).size.width * 3 / 4,
                               child: _EventCard(event));
@@ -90,9 +112,9 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   ),
                   Expanded(
                     child: ListView.builder(
-                        itemCount: _events.length,
+                        itemCount: _upcomingEvents == null ? 0 : _upcomingEvents.length,
                         itemBuilder: (context, i) {
-                          Event event = _events[i];
+                          Event event = _upcomingEvents[i];
                           return SizedBox(
                               height:
                                   MediaQuery.of(context).size.height * 1 / 5,
