@@ -8,6 +8,8 @@
       href="https://fonts.googleapis.com/css2?family=Poppins"
       rel="stylesheet"
     />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <link rel="stylesheet" href="CreateSession.css" />
     <title>Join Meeting</title>
   </head>
@@ -40,9 +42,11 @@
       <div class="create-meeting">
         <h1>Create a Session</h1>
         <form name="myForm" action="" onsubmit="return submitForm()" method="POST">
-          <label>Session Name: </label>      
+          <label>Session Name: </label>
           <div class="txtb">
             <input type="text" name="name" id="name" placeholder="Name" required>
+            <label><br>Session Description: </label>
+            <input type="name" class = "name" id="desc" placeholder="Description">
           </div>
           <br>
           <input type="submit" class = "submit" value="Create">
