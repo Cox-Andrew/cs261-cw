@@ -1,13 +1,13 @@
 
 
-var seriesIDString = getCookie("hostID");
-if (seriesIDString == "") {
+var hostIDString = getCookie("hostID");
+if (hostIDString == "") {
 	window.location.href = "/HostSignin.html"
 }
-var seriesID = parseInt(seriesIDString);
+var hostID = parseInt(hostIDString);
 
 
-$.getJSON(endpointToRealAddress("/series?hostID=" + seriesID), function(data) {
+$.getJSON(endpointToRealAddress("/series?hostID=" + hostID), function(data) {
 	data.seriesIDs.forEach(seriesID => {
 		var newLi = document.createElement("li");
 		var newA = document.createElement("a");
