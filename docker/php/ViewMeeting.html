@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="ViewMeeting.css" />
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <title>Home</title>
   </head>
   <body>
@@ -47,6 +48,10 @@
       <div class  = "general" id  = "general">
         <div class = "sub-content">
           <h3>General Feedback</h3>
+            <!-- general feedback is put into here -->
+            <div id="general-feedback-container">
+
+            </div>
             <div id="piechart_3d" style="width: 50vw;"></div>
         </div>
       </div>
@@ -54,7 +59,10 @@
       <div class = "feedback" id  = "feedback">
         <div class = "sub-content">
           <h3>Comprehensive Feedback</h3>
-            <div id="donutchart" style="width: 50vw;"></div>
+          <div id="comprehensive-feedback-container">
+            
+          </div>
+          <div id="donutchart" style="width: 50vw;"></div>
         </div>
       </div>
     </div>

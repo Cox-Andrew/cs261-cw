@@ -74,7 +74,7 @@ INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'multi', 5, 2, 'Wh
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'long', 6, 1, 'Ask your questions here');
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'long', 7, 1, 'Test Long Question');
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'short', 7, 2, 'Test Short Question');
-INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'multi', 7, 3, 'Test Multi Question', 'Option 1, Option 2, Option 3');
+INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'multi', 7, 3, 'Test Multi Question', '["Option 1", "Option 2", "Option 3"]');
 INSERT INTO QUESTIONS VALUES (nextval('QuestionsQuestionID'), 'rating', 7, 4, 'Test Rating Question', '1, 2, 3, 4, 5');
 --
 INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 1, -0.4, '2020-05-12 10:15:00');
@@ -112,6 +112,20 @@ INSERT INTO answers VALUES (nextval('answersanswerid'), 18, 1, 18, (select last_
 INSERT INTO Mood VALUES (nextval('moodsmoodid'), 5, 0.9, '2021-01-01 00:40:00');
 INSERT INTO answers VALUES (nextval('answersanswerid'), 0, 1, (select eventFormID from eventForms where eventid = 5 and formid = 0), (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-01 00:40:00', 'I think the event is going well!');
 
+
+-- feedback for "requirements validity" form in event 12
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 12, -0.5, '2021-01-04 00:30:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 24, 1, 25, (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-04 00:30:00', 'Response to test long question');
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 12, -0.2, '2021-01-04 00:30:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 25, 1, 25, (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-04 00:30:00', 'Response to test short question');
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 12, 0.5, '2021-01-04 00:30:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 26, 1, 25, (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-04 00:30:00', 'Option 1');
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 12, 0.7, '2021-01-04 00:30:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 27, 1, 25, (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-04 00:30:00', '4');
+
+-- general feedback event 12
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 12, 0.9, '2021-01-01 00:40:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 0, 1, (select eventFormID from eventForms where eventid = 12 and formid = 0), (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-01 00:40:00', 'I think the event is going well!');
 
 
 
