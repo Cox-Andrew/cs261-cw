@@ -207,9 +207,9 @@ OWNED BY ANSWERS.AnswerID;
 
 CREATE FUNCTION CreateFeedback() RETURNS TRIGGER AS $CreateFeedback$
   BEGIN
-    INSERT INTO EVENTFORMS(EventFormID, EventID, FormID, NumInEvent, IsActive)
+    INSERT INTO EVENTFORMS(EventFormID, EventID, FormID, NumInEvent, TimeStart, TimeEnd, IsActive)
     -- is general feedback always active?
-    VALUES (nextval('EventFormsEventFormID'), NEW.EventID, 0, 0, TRUE);
+    VALUES (nextval('EventFormsEventFormID'), NEW.EventID, 0, 0, NEW.TimeStart, NEW.TimeEnd, TRUE);
     RETURN NEW;
   END;
 $CreateFeedback$ LANGUAGE plpgsql;
