@@ -231,6 +231,12 @@
 }
 }
 
+@media (min-width: 1024px) {
+  .bg-image{
+    display: none;
+  }
+}
+
 @media (max-width: 1024px) and (min-width: 769px) {
   .fullscreen_video {
     height: 70vh;
