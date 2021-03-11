@@ -8,9 +8,9 @@ function submitForm() {
         pass: password
     }), function(response) {
         // store attendee in cookie
-        document.cookie = "attendeeID=" + response.attendeeID; 
+        document.cookie = "attendeeID=" + response.attendeeID;
         // redirect to signed in page
-        window.location.href = "/AttendeePage.html";
+        window.location.href = "/AttendeeHomepage.html";
     }).fail(function() {
         alert("user not found");
     });

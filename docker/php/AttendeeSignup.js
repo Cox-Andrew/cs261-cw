@@ -29,16 +29,16 @@ function validateForm() {
         $.post(endpointToRealAddress("/attendees"), JSON.stringify({
             email: email,
             pass: password,
-            "account-name": fname 
+            "account-name": fname
         }), function(response) {
             // store attendee in cookie
             setCookie("attendeeID", response.attendeeID, 1);
             // redirect to signed in page
-            window.location.href = "/AttendeePage.html";
+            window.location.href = "/AttendeeHomepage.html";
         }).fail(function() {
             alert("An error occurred");
         });
 
         return true;
-    }  
+    }
 }
