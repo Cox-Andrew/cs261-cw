@@ -9,7 +9,11 @@ function setInnerHTMLSanitized(element, unsanitized) {
   element.innerHTML = DOMPurify.sanitize(unsanitized.toString());
 }
 
-
+function setCookie(key, value, expiry) {
+        var expires = new Date();
+        expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
+        document.cookie = key + '=' + value + ';path=/' + ';expires=' + expires.toUTCString();
+}
 
 
 const navSlide = () => {
@@ -19,7 +23,7 @@ const navSlide = () => {
     burger.addEventListener("click", () => {
       //Toggle nav
       nav.classList.toggle("nav-active");
-  
+
       //Animate Links
       navLinks.forEach((link, index) => {
         if (link.style.animation) {
@@ -30,11 +34,10 @@ const navSlide = () => {
           }s`;
         }
       });
-  
+
       //Burger Animation
       burger.classList.toggle("toggle");
     });
   };
-  
+
   navSlide();
-  

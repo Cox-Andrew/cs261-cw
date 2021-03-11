@@ -8,6 +8,8 @@
       href="https://fonts.googleapis.com/css2?family=Poppins"
       rel="stylesheet"
     />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <link rel="stylesheet" href="CreateMeeting.css" />
     <title>Join Meeting</title>
   </head>
@@ -40,13 +42,17 @@
       <div class="create-meeting">
         <h1>Create a meeting</h1>
         <form name="myForm" action="" onsubmit="return submitForm()" method="POST">
-          <label>Meeting Name: </label>
+          <label>Meeting Title: </label>
           <div class="txtb">
             <input type="text" name="name" id="name" placeholder="Name" required>
             <label><br>Meeting Date: </label>
             <input type="date" class = "DateTime" id = "date" required>
-            <label><br>Meeting Time: </label>
-            <input type="time" class = "DateTime" id="time" required>
+            <label><br>Meeting Start Time: </label>
+            <input type="time" class = "DateTime" id="starttime" required>
+            <label><br>Meeting End Time: </label>
+            <input type="time" class = "DateTime" id="endtime" required>
+            <label><br>Meeting Description: </label>
+            <input type="name" class = "name" id="desc" placeholder="Description">
           </div>
           <br>
           <input type="submit" class = "submit" value="Create">
