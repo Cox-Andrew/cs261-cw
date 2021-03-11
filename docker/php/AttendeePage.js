@@ -111,6 +111,9 @@ function generalInsert(comments) {
 
 }
 
+var noForm = document.createElement("div");
+setInnerHTMLSanitized(noForm, "There is no feedback form right now" );
+
 function getComprehensive() {
   const currentDiv = document.getElementById("CForm");
   eventID = getCookie("eventID");
@@ -137,6 +140,7 @@ function getComprehensive() {
         var timeNow = new Date();
         formID = result["formID"];
         if (timeNow > dateStart && timeNow < dateEnd && formID != 0) {
+          setCookie("eventFormID", eventFormID , 1);
           $.ajax({
             type: "GET",
             url: endpointToRealAddress("/forms/" + formID),
@@ -152,6 +156,7 @@ function getComprehensive() {
                   dataType: "json",
                   async: false,
                   success: function(result, status, xhr){
+                    setCookie("questionID" + i, questionID , 1);
                     type = result.data["type"];
                     text = result.data["text"];
                     options = result.data["options"];
@@ -165,7 +170,7 @@ function getComprehensive() {
                       var questionEntry = document.createElement("textarea");
                       questionEntry.className = "textarea";
                       questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
-                      questionEntry.setAttribute("id","ques1");
+                      questionEntry.setAttribute("id","ques" + i);
                       questionEntry.setAttribute("rows","2");
                       questionEntry.setAttribute("cols","15");
                       questionEntry.setAttribute("placeholder"," ");
@@ -198,7 +203,7 @@ function getComprehensive() {
                     }
                   }
                 });
-                i += 1;
+                i++;
               });
               var onlySubmitOnce = document.createElement("div");
               onlySubmitOnce.setAttribute("id","msgFeed");
@@ -214,17 +219,45 @@ function getComprehensive() {
             }
           });
         }
+
       }
     });
   });
+  //currentDiv.appendChild(noForm);
+  return;
 
 }
 
 function submitComprehensive() {
-  var ques1 = document.getElementById('ques1').value;
-  var ques2 = document.getElementById('ques2').value;
-  var ques3 = document.getElementById('ques3').value;
-  alert('Template saved');
+  i = 1;
+  while(document.getElementById("ques" + i)) {
+    answer = document.getElementById("ques" + i).value;
+    submitAnswer(answer, i);
+    i++;
+  }
 
-  // Call backend function here
+}
+
+function submitAnswer(answer, numInForm) {
+  answers = {};
+  answers.data = {};
+  answers.data["response"] = answer;
+  answers.data["isAnonymous"] = getCookie("isAnonymous");
+  answers["attendeeID"] = getCookie("attendeeID");
+  answers["eventID"] = getCookie("eventID");
+  answers["eventFormID"] = getCookie("eventFormID");
+  answers["questionID"] = getCookie("questionID" + numInForm);
+
+  $.ajax({
+    type: "POST",
+    url: endpointToRealAddress("/answers"),
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify(answers),
+    async: false,
+    success: function(result, status, xhr){
+      //answerID = result.answerID;
+      //TODO
+    }
+  });
 }
