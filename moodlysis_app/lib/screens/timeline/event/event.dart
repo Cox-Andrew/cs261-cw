@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:moodlysis_app/screens/event/arguments.dart';
+import 'package:moodlysis_app/screens/timeline/event/arguments.dart';
 
 class EventScreen extends StatelessWidget {
   static const route = "/event";

@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:moodlysis_app/components/navigation.dart';
 import 'package:moodlysis_app/models/event.dart';
-import 'package:moodlysis_app/screens/event/arguments.dart';
+import 'package:moodlysis_app/screens/timeline/event/arguments.dart';
 import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 
