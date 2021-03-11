@@ -55,8 +55,8 @@ public class EventFormRequest extends HttpServlet {
 		output.put("formID", info.formID);
 		output.put("numInEvent", info.numInEvent);
 		output.put("isActive", info.isActive);
-		output.put("time-start", info.isActive);
-		output.put("time-end", info.isActive);
+		output.put("time-start", info.timeStart);
+		output.put("time-end", info.timeEnd);
 		
 		return output.toJSONString();
 	}

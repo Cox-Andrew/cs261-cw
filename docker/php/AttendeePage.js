@@ -129,19 +129,76 @@ function getComprehensive() {
       dataType: "json",
       async: false,
       success: function(result, status, xhr){
-        if (result.formID == 0) {
-          returnEventFormID = eventFormID;
-          answer["eventFormID"] = returnEventFormID;
+        timeStart = result["time-start"];
+        timeEnd = result["time-end"];
+        var dateStart = new Date(timeStart);
+        var dateEnd = new Date(timeEnd);
+        var timeNow = new Date();
+        if (timeNow > dateStart && timeNow < dateEnd) {
+          formID = result["formID"];
           $.ajax({
-            type: "POST",
-            url: endpointToRealAddress("/answers"),
+            type: "GET",
+            url: endpointToRealAddress("/forms/" + formID),
             dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify(answer),
             async: false,
             success: function(result, status, xhr){
-              //answerID = result.answerID;
-              //TODO
+              questionIDs = result["questionIDs"];
+              i = 1;
+              Array.from(questionID).forEach(questionID => {
+                $.ajax({
+                  type: "GET",
+                  url: endpointToRealAddress("/questions/" + questionID),
+                  dataType: "json",
+                  async: false,
+                  success: function(result, status, xhr){
+                    type = result.data["type"];
+                    text = result.data["text"];
+                    options = result.data["options"];
+                    var br = document.createElement("br");
+                    var questionDiv = document.createElement("div");
+                    questionDiv.className = "question1";
+                    var questionLabel = document.createElement("Label");
+                    setInnerHTMLSanitized(questionLabel, text );
+                    questionDiv.appendChild(questionLabel);
+                    if (type == "long") {
+                      var questionEntry = document.createElement("textarea");
+                      questionEntry.className = "textarea";
+                      questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+                      questionEntry.setAttribute("id","ques1");
+                      questionEntry.setAttribute("rows","2");
+                      questionEntry.setAttribute("cols","15");
+                      questionEntry.setAttribute("placeholder"," ");
+                      currentDiv.appendChild(questionDiv);
+                      currentDiv.appendChild(br);
+                      currentDiv.appendChild(questionEntry);
+                      var br = document.createElement("br");
+                      currentDiv.appendChild(br);
+                    }
+                    else if (type == "short") {
+                      //TODO only enter two words + make distinguishable
+                      var questionEntry = document.createElement("textarea");
+                      questionEntry.className = "textarea";
+                      questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+                      questionEntry.setAttribute("id","ques1");
+                      questionEntry.setAttribute("rows","2");
+                      questionEntry.setAttribute("cols","15");
+                      questionEntry.setAttribute("placeholder"," ");
+                      currentDiv.appendChild(questionDiv);
+                      currentDiv.appendChild(br);
+                      currentDiv.appendChild(questionEntry);
+                      var br = document.createElement("br");
+                      currentDiv.appendChild(br);
+                    }
+                    else if (type == "options") {
+                      //TODO
+                    }
+                    else if (type == "rating") {
+                      //TODO
+                    }
+                  }
+                });
+                i += 1;
+              });
               return;
             }
           });
@@ -149,15 +206,7 @@ function getComprehensive() {
       }
     });
   });
-  var dateStart = new Date(timeStart);
-  var dateEnd = new Date(timeEnd);
-  var br = document.createElement("br");
-  var eventName = document.createElement("a");
-  eventName.className = "eventName";
-  eventName.setAttribute("href","AttendeePage.html");
-  setInnerHTMLSanitized(eventName, title);
-  currentDiv.appendChild(eventName);
-  currentDiv.appendChild(br);
+
 }
 
 function submitComprehensive() {
