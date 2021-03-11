@@ -118,6 +118,7 @@
       box-sizing: border-box;
       border-radius: 8px;
       box-shadow: 0 0 20px rgb(190, 190, 190);
+      overflow-y :auto;
     }
     .live{
         display: block;
@@ -139,12 +140,13 @@
       display: block;
       position: relative;
       float: right;
-      padding: 5%;
+      padding: 5vh;
       width: 48%;
       height: 80%;
       box-sizing: border-box;
       border-radius: 8px;
       box-shadow: 0 0 20px rgb(190, 190, 190);
+      overflow-y: auto;
     }
     .upcoming{
         display: block;
@@ -296,11 +298,6 @@
     margin-right: 10%;
     font-family: "poppins", sans-serif;
   }
-
-
-
-
-
   .footer {
     flex-shrink: 0;
     min-height: 15vh;
