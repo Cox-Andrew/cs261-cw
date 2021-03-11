@@ -42,8 +42,24 @@ Response:
 ```
 
 ### 2.	Authenticate.
-Use OAuth2.0/OpenID?\
-Returns a token/something, TODO.
+
+Sign in as an attendee using email and password (TEMPORARY ENDPOINT WHILE SIGN IN IS NOT IMPLEMENTED)\
+`POST /v0/attendee-temp-sign-in`\
+`POST /v0/host-temp-sign-in`\
+Request
+```
+{
+	"email": "myaddress@email.com",
+	"password": "pass"
+}
+```
+Response
+`{"attendeeID": 1234}` or `{"hostID": 1234}`
+
+
+
+<!-- Use OAuth2.0/OpenID?\
+Returns a token/something, TODO. -->
 
 ### 3.	Change name.
 ```PUT /v0/attendees/{attendeeID}``` Working\
