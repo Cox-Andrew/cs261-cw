@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/services/authentication.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
@@ -111,28 +112,38 @@ class SignInFormState extends State<SignInForm> {
       _formKey.currentState.save();
 
       setState(() => _loading = true);
-      authenticateUser(_formData["email"], _formData["password"])
-          .then((user) {
-        if (user == null) {
+      authenticateUser(http.Client(), _formData["email"], _formData["password"])
+          .then((id) {
+        getUser(http.Client(), id).then((user) {
+          globals.currentUser = user;
+
           Scaffold.of(context).removeCurrentSnackBar();
           Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("Invalid credentials"),
+            content: Text(
+                'Authenticated as ${user.name}, id: ${user.id}, email: ${user.email}'),
+            backgroundColor: Colors.green,
+          ));
+
+          _focusNode.unfocus();
+          Future.delayed(Duration(milliseconds: 1500), () => Navigator.pushNamedAndRemoveUntil(context, "/timeline", (r) => false));
+        }).catchError((error) {
+          //TODO: fix and improve error handling
+          print("getUser error: $error");
+
+          Scaffold.of(context).removeCurrentSnackBar();
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text("Something went wrong, please try again."),
             backgroundColor: Theme.of(context).errorColor,
           ));
-          return;
-        }
-
-        globals.currentUser = user;
+        });
+      }).catchError((error) {
+        print("authenticateUser error: $error");
 
         Scaffold.of(context).removeCurrentSnackBar();
         Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Email: ${_formData["email"]}, Passwd: ${_formData["password"]}, User: $user'),
-          backgroundColor: Colors.green,
+          content: Text("Something went wrong, please try again."),
+          backgroundColor: Theme.of(context).errorColor,
         ));
-
-        _focusNode.unfocus();
-        Navigator.pushNamedAndRemoveUntil(context, "/timeline", (r) => false);
       }).whenComplete(() => setState(() => _loading = false));
     }
   }

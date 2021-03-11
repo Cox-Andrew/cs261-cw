@@ -178,30 +178,32 @@ class SignUpFormState extends State<SignUpForm> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      setState(() => _loading = true);
-      registerUser(_formData["name"], _formData["email"], _formData["password"])
-          .then((user) {
-        if (user == null) {
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("Registration failed"),
-            backgroundColor: Theme.of(context).errorColor,
-          ));
-          return;
-        }
-
-        globals.currentUser = user;
-
-        Scaffold.of(context).removeCurrentSnackBar();
-        Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Email: ${_formData["email"]}, Passwd: ${_formData["password"]}, User: $user'),
-          backgroundColor: Colors.green,
-        ));
-
-        _focusNode.unfocus();
-        Navigator.pushNamedAndRemoveUntil(context, "/timeline", (r) => false);
-      }).whenComplete(() => setState(() => _loading = false));
+      //TODO: reimplement
+      // setState(() => _loading = true);
+      // registerUser(_formData["name"], _formData["email"], _formData["password"])
+      //     .then((user) {
+      //   if (user == null) {
+      //     Scaffold.of(context).removeCurrentSnackBar();
+      //     Scaffold.of(context).showSnackBar(SnackBar(
+      //       content: Text("Registration failed"),
+      //       backgroundColor: Theme.of(context).errorColor,
+      //     ));
+      //     return;
+      //   }
+      //
+      //   globals.currentUser = user;
+      //
+      //   Scaffold.of(context).removeCurrentSnackBar();
+      //   Scaffold.of(context).showSnackBar(SnackBar(
+      //     content: Text(
+      //         'Email: ${_formData["email"]}, Passwd: ${_formData["password"]}, User: $user'),
+      //     backgroundColor: Colors.green,
+      //   ));
+      //
+      //   _focusNode.unfocus();
+      //   Navigator.pushNamedAndRemoveUntil(context, "/timeline", (r) => false);
+      // }).whenComplete(() => setState(() => _loading = false));
+      print("feature disabled");
     }
   }
 }
