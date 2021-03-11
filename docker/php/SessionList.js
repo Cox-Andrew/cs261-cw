@@ -7,14 +7,20 @@ if (hostID == "") {
 var hostID = parseInt(hostIDString);
 
 
-$.getJSON(endpointToRealAddress("/series?hostID=" + hostID), function(listOfSeries) {
-	for (const seriesID in listOfSeries) {
-		var newA = $("<a></a>").click(function() {
+$.getJSON(endpointToRealAddress("/series?hostID=" + hostID), function(data) {
+	data.seriesIDs.forEach(seriesID => {
+		var newLi = document.createElement("li");
+		var newA = document.createElement("a");
+		newA.setAttribute("href", "#");
+		$(newA).click(function() {
 			setCookie("seriesID", ""+seriesID, 1);
 			window.location.href = "/SessionPage.html"
 		});
-		var newA = document.createElement("a");
-		newA.setAttribute("onclick")
-		document.getElementById("session-list").appendChild
-	}
+		newLi.appendChild(newA);
+		document.getElementById("session-list").appendChild(newLi);
+
+		$.getJSON(endpointToRealAddress("/series/"+seriesID), function(seriesData) {
+			setInnerHTMLSanitized(newA, seriesData.data.title);
+		});
+	});
 });
