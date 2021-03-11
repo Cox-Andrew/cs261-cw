@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:moodlysis_app/components/navigation.dart';
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/screens/event/arguments.dart';
-import 'package:moodlysis_app/test_data.dart';
+import 'package:moodlysis_app/services/events.dart';
+import 'package:moodlysis_app/globals.dart' as globals;
 
 class TimelineScreen extends StatefulWidget {
   static const route = "/timeline";
@@ -14,11 +15,14 @@ class TimelineScreen extends StatefulWidget {
 }
 
 class _TimelineScreenState extends State<TimelineScreen> {
-  final List<Event> _testEvents = generateEvents(3);
+  List<Event> _events = [];
+
+  void _updateEvents() => getUserEvents(globals.currentUser)
+      .then((events) => setState(() => _events = events));
 
   @override
   void initState() {
-    _testEvents.add(Event("Apple conference about pears", "Hi, this is a 130 character-ish description. We will be examining the differences between our favourite fruits.", DateTime.now(), DateTime.now().add(Duration(hours: 1))));
+    _updateEvents();
     super.initState();
   }
 
@@ -27,6 +31,9 @@ class _TimelineScreenState extends State<TimelineScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Event Timeline"),
+        actions: [
+          IconButton(icon: Icon(Icons.refresh), onPressed: _updateEvents)
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -42,24 +49,22 @@ class _TimelineScreenState extends State<TimelineScreen> {
                       children: [
                         Text("Live events ",
                             style: Theme.of(context).textTheme.headline4),
-                        Icon(
-                            Icons.live_tv,
+                        Icon(Icons.live_tv,
                             color: Colors.red,
-                            size: Theme.of(context).textTheme.headline4.fontSize
-                        )
+                            size:
+                                Theme.of(context).textTheme.headline4.fontSize)
                       ],
                     ),
                   ),
                   Expanded(
                     child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: _testEvents.length,
+                        itemCount: _events.length,
                         itemBuilder: (context, i) {
-                          Event event = _testEvents[i];
+                          Event event = _events[i];
                           return SizedBox(
-                              width: MediaQuery.of(context).size.width*3/4,
-                              child: _EventCard(event)
-                          );
+                              width: MediaQuery.of(context).size.width * 3 / 4,
+                              child: _EventCard(event));
                         }),
                   ),
                 ],
@@ -85,13 +90,13 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   ),
                   Expanded(
                     child: ListView.builder(
-                        itemCount: _testEvents.length,
+                        itemCount: _events.length,
                         itemBuilder: (context, i) {
-                          Event event = _testEvents[i];
+                          Event event = _events[i];
                           return SizedBox(
-                              height: MediaQuery.of(context).size.height * 1/5,
-                              child: _EventCard(event)
-                          );
+                              height:
+                                  MediaQuery.of(context).size.height * 1 / 5,
+                              child: _EventCard(event));
                         }),
                   ),
                 ],
@@ -107,6 +112,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
 
 class _EventCard extends StatelessWidget {
   final Event event;
+
   _EventCard(this.event);
 
   @override
@@ -115,11 +121,7 @@ class _EventCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (DateTime.now().isAfter(event.schedule.start)) {
-            Scaffold.of(context).removeCurrentSnackBar();
-            Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text("Attending ${event.title}")));
             Future.delayed(Duration(milliseconds: 500), () {
-              // 5s over, navigate to a new page
               Navigator.pushNamed(context, "/event",
                   arguments: EventScreenArgs(event));
             });
@@ -130,16 +132,31 @@ class _EventCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(event.title, style: Theme.of(context).textTheme.headline5, overflow: TextOverflow.ellipsis, maxLines: 2,),
+              Text(
+                event.title,
+                style: Theme.of(context).textTheme.headline5,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
               Divider(),
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: Theme.of(context).textTheme.bodyText1.fontSize,),
-                  Text(" ${_humanReadableFormatter(event.schedule.start)} - ${_humanReadableFormatter(event.schedule.end)}", style: TextStyle(color: Theme.of(context).errorColor),),
+                  Icon(
+                    Icons.calendar_today,
+                    size: Theme.of(context).textTheme.bodyText1.fontSize,
+                  ),
+                  Text(
+                    " ${_humanReadableFormatter(event.schedule.start)} - ${_humanReadableFormatter(event.schedule.end)}",
+                    style: TextStyle(color: Theme.of(context).errorColor),
+                  ),
                 ],
               ),
               Divider(),
-              Text(event.description, overflow: TextOverflow.ellipsis, maxLines: 3,),
+              Text(
+                event.description,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+              ),
             ],
           ),
         ),
