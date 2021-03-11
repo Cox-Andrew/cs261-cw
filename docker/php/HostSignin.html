@@ -8,6 +8,8 @@
       href="https://fonts.googleapis.com/css2?family=Poppins"
       rel="stylesheet"
     />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <link rel="stylesheet" href="HostSignin.css" />
     <title>Sign in</title>
   </head>
@@ -38,13 +40,13 @@
       <div class="right">
         <div class="create-account">
           <h1>Sign in</h1>
-          <form name="myForm" action = "" onsubmit="return submitForm()" method="POST">
+          <form name="myForm" action = "" onsubmit="submitForm();return false;" method="POST">
             <label>Email Id: </label>
             <div class="txtb">
               <input type="text" name="email" id="email" placeholder="Email ID" required>
             </div>
 
-            <label>Password</label>      
+            <label>Password</label>
             <div class="txtb">
               <input type="password" name="password" id = "password" placeholder="Password" required>
             </div>

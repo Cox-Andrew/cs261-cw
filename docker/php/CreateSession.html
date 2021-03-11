@@ -41,7 +41,7 @@
     <div class="content">
       <div class="create-meeting">
         <h1>Create a Session</h1>
-        <form name="myForm" action="" onsubmit="return submitForm()" method="POST">
+        <form name="myForm" action="" onsubmit="submitForm();return false;" method="POST">
           <label>Session Name: </label>
           <div class="txtb">
             <input type="text" name="name" id="name" placeholder="Name" required>

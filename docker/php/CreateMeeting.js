@@ -29,9 +29,9 @@ function createMeeting(title, date, stime, ftime, desc) {
     data: JSON.stringify(event),
     async: false,
     success: function(result, status, xhr){
-        eventID = result.eventID;
-        setCookie("eventID", eventID, 1);
-        //window.location.href = "/MeetingPagemenu.html";
+      eventID = result.eventID;
+      setCookie("eventID", eventID, 1);
+      window.location.href = "/MeetingPagemenu.html";
     }
   });
 
