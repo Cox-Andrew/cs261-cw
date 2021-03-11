@@ -20,6 +20,7 @@ function feedback() {
       gen.style.display = "none";
     }
     feed.style.display = "block";
+    getComprehensive();
   } else {
     feed.style.display = "none";
   }
@@ -111,7 +112,7 @@ function generalInsert(comments) {
 }
 
 function getComprehensive() {
-  const currentDiv = document.getElementById("form");
+  const currentDiv = document.getElementById("CForm");
   eventID = getCookie("eventID");
   $.ajax({
     type: "GET",
@@ -134,8 +135,8 @@ function getComprehensive() {
         var dateStart = new Date(timeStart);
         var dateEnd = new Date(timeEnd);
         var timeNow = new Date();
-        if (timeNow > dateStart && timeNow < dateEnd) {
-          formID = result["formID"];
+        formID = result["formID"];
+        if (timeNow > dateStart && timeNow < dateEnd && formID != 0) {
           $.ajax({
             type: "GET",
             url: endpointToRealAddress("/forms/" + formID),
@@ -144,7 +145,7 @@ function getComprehensive() {
             success: function(result, status, xhr){
               questionIDs = result["questionIDs"];
               i = 1;
-              Array.from(questionID).forEach(questionID => {
+              Array.from(questionIDs).forEach(questionID => {
                 $.ajax({
                   type: "GET",
                   url: endpointToRealAddress("/questions/" + questionID),
@@ -199,6 +200,16 @@ function getComprehensive() {
                 });
                 i += 1;
               });
+              var onlySubmitOnce = document.createElement("div");
+              onlySubmitOnce.setAttribute("id","msgFeed");
+              setInnerHTMLSanitized(onlySubmitOnce, "This form can only be submitted once." );
+              currentDiv.appendChild(onlySubmitOnce);
+              var submitButton = document.createElement("input");
+              submitButton.setAttribute("id","btnFeed");
+              submitButton.setAttribute("class","submitFeed");
+              submitButton.setAttribute("type","submit");
+              submitButton.setAttribute("value","Submit");
+              currentDiv.appendChild(submitButton);
               return;
             }
           });
