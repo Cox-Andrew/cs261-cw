@@ -8,19 +8,19 @@ var seriesID = parseInt(seriesIDString);
 
 
 $.getJSON(endpointToRealAddress("/series/" + seriesID), function(data) {
-	data.seriesIDs.forEach(seriesID => {
+	data.eventIDs.forEach(eventID => {
 		var newLi = document.createElement("li");
 		var newA = document.createElement("a");
 		newA.setAttribute("href", "#");
 		$(newA).click(function() {
-			setCookie("seriesID", ""+seriesID, 1);
-			window.location.href = "/SessionPage.html"
+			setCookie("eventID", ""+eventID, 1);
+			window.location.href = "/MeetingPageMenu.html"
 		});
 		newLi.appendChild(newA);
-		document.getElementById("session-list").appendChild(newLi);
+		document.getElementById("meeting-list").appendChild(newLi);
 
-		$.getJSON(endpointToRealAddress("/series/"+seriesID), function(seriesData) {
-			setInnerHTMLSanitized(newA, seriesData.data.title);
+		$.getJSON(endpointToRealAddress("/events/"+eventID), function(eventData) {
+			setInnerHTMLSanitized(newA, eventData.data.title);
 		});
 	});
 });
