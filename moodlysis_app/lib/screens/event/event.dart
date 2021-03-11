@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:moodlysis_app/screens/event/arguments.dart';
 
 class EventScreen extends StatelessWidget {
+  static const route = "/event";
+
   @override
   Widget build(BuildContext context) {
     final EventScreenArgs args = ModalRoute.of(context).settings.arguments;

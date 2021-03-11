@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'package:moodlysis_app/components/navigation.dart';
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/screens/event/arguments.dart';
 import 'package:moodlysis_app/test_data.dart';
 
-class Timeline extends StatefulWidget {
+class TimelineScreen extends StatefulWidget {
+  static const route = "/timeline";
+
   @override
-  _TimelineState createState() => _TimelineState();
+  _TimelineScreenState createState() => _TimelineScreenState();
 }
 
-class _TimelineState extends State<Timeline> {
+class _TimelineScreenState extends State<TimelineScreen> {
   final List<Event> _testEvents = generateEvents(3);
 
   @override
@@ -97,6 +100,7 @@ class _TimelineState extends State<Timeline> {
           ],
         ),
       ),
+      bottomNavigationBar: MoodlysisBottomNavigationBar(TimelineScreen.route),
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:moodlysis_app/services/authentication.dart';
 
 class SignUpScreen extends StatelessWidget {
+  static const route = "/signup";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
