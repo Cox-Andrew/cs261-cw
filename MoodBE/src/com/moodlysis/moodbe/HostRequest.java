@@ -50,10 +50,12 @@ public class HostRequest extends HttpServlet {
     @SuppressWarnings("unchecked")
     public String getJSON(Host.hostInfo info) {
 		JSONObject output = new JSONObject();
-		output.put("hostID", info.hostID);
-		output.put("email", info.email);
-		output.put("pass", info.pass);
-		output.put("account-name", info.account);
+		JSONObject data = new JSONObject();
+//		output.put("hostID", info.hostID);
+		data.put("email", info.email);
+//		output.put("pass", info.pass);
+		data.put("account-name", info.account);
+		output.put("data", data);
 		return output.toJSONString();
 	}
     
