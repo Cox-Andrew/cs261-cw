@@ -112,10 +112,12 @@ function generalInsert(comments) {
 }
 
 var noForm = document.createElement("div");
+noForm.setAttribute("id","noForm");
 setInnerHTMLSanitized(noForm, "There is no feedback form right now" );
 
 function getComprehensive() {
   const currentDiv = document.getElementById("CForm");
+  boolform = true;
   eventID = getCookie("eventID");
   $.ajax({
     type: "GET",
@@ -140,6 +142,11 @@ function getComprehensive() {
         var timeNow = new Date();
         formID = result["formID"];
         if (timeNow > dateStart && timeNow < dateEnd && formID != 0) {
+          boolform = false;
+          var remNoForm = document.getElementById("noForm");
+          if (remNoForm != null) {
+            remNoForm.remove();
+          }
           setCookie("eventFormID", eventFormID , 1);
           $.ajax({
             type: "GET",
@@ -161,9 +168,11 @@ function getComprehensive() {
                     text = result.data["text"];
                     options = result.data["options"];
                     var br = document.createElement("br");
+                    br.setAttribute("id","br");
                     var questionDiv = document.createElement("div");
                     questionDiv.className = "question1";
                     var questionLabel = document.createElement("Label");
+                    questionLabel.setAttribute("id", "formLabel");
                     setInnerHTMLSanitized(questionLabel, text );
                     questionDiv.appendChild(questionLabel);
                     if (type == "long") {
@@ -178,6 +187,7 @@ function getComprehensive() {
                       currentDiv.appendChild(br);
                       currentDiv.appendChild(questionEntry);
                       var br = document.createElement("br");
+                      br.setAttribute("id","br");
                       currentDiv.appendChild(br);
                     }
                     else if (type == "short") {
@@ -223,9 +233,35 @@ function getComprehensive() {
       }
     });
   });
-  //currentDiv.appendChild(noForm);
+  if (boolform) {
+    removeForm();
+    currentDiv.appendChild(noForm);
+  }
   return;
 
+}
+
+function removeForm() {
+  i = 1;
+  while(document.getElementById("ques" + i)) {
+    formQ = document.getElementById("ques" + i);
+    formQ.remove();
+    br = document.getElementById("br");
+    br.remove();
+    br = document.getElementById("br");
+    br.remove();
+    labelQ = document.getElementById("formLabel");
+    labelQ.remove();
+    i++;
+  }
+  if (document.getElementById("btnFeed")) {
+    submitButton = document.getElementById("btnFeed");
+    submitButton.remove();
+  }
+  if (document.getElementById("msgFeed")) {
+    onlySubmitOnce = document.getElementById("msgFeed");
+    onlySubmitOnce.remove();
+  }
 }
 
 function submitComprehensive() {
