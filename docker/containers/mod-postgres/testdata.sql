@@ -95,3 +95,23 @@ INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 10, -0.5, '2021-11-10 10:06:11'
 INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 11, -0.8, '2021-11-21 10:52:00');
 INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 0.0, '2021-01-01 00:00:00');
 INSERT INTO MOOD VALUES (nextval('MoodsMoodID'), 12, 0.3, '2021-01-01 00:30:00');
+
+
+-- default mood for ratings and multi choice
+
+-- insert some sample answers
+
+-- response to "End of event" form in event 5 with event form 18
+INSERT INTO answers VALUES (nextval('answersanswerid'), 5, 1, 18, 0, FALSE, FALSE, '2021-01-01 00:30:00', '3');
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 5, 0.5, '2021-01-01 00:30:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 6, 1, 18, (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-01 00:30:00', 'The explaination of .. was not very good');
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 5, 0.7, '2021-01-01 00:30:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 18, 1, 18, (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-01 00:30:00', 'No, I dont have any questions');
+
+-- general feedback for event 5
+INSERT INTO Mood VALUES (nextval('moodsmoodid'), 5, 0.9, '2021-01-01 00:40:00');
+INSERT INTO answers VALUES (nextval('answersanswerid'), 0, 1, (select eventFormID from eventForms where eventid = 5 and formid = 0), (select last_value from moodsmoodid), FALSE, FALSE, '2021-01-01 00:40:00', 'I think the event is going well!');
+
+
+
+
