@@ -220,7 +220,9 @@ public class EventForm implements EventFormInterface {
 	    		eventFormEdit = conn.prepareStatement(queryUpdate);
 	    		eventFormEdit.setInt(1, numInEvent);
 	    		eventFormEdit.setBoolean(2, isActive);
-	    		eventFormEdit.setInt(3, eventFormID);
+	    		eventFormEdit.setTimestamp(3, Timestamp.valueOf(timeStart));
+	    		eventFormEdit.setTimestamp(4, Timestamp.valueOf(timeStart));
+	    		eventFormEdit.setInt(5, eventFormID);
 	    		eventFormEdit.executeUpdate();
 			}
 			conn.commit();
