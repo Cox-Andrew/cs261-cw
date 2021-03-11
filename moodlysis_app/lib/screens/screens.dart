@@ -6,3 +6,4 @@ export 'timeline/timeline.dart';
 export 'timeline/event/event.dart';
 
 export 'add-event/add-event.dart';
+export 'account/account.dart';

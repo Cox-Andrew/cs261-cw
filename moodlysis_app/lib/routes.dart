@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:moodlysis_app/screens/account/account.dart';
 
 import 'package:moodlysis_app/screens/screens.dart';
 
