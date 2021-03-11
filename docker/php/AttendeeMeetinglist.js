@@ -18,17 +18,52 @@ function liveEventDisplay(eventIDs) {
       dataType: "json",
       async: false,
       success: function(result, status, xhr){
-        title = result.data.title;
+        title = result.data["title"];
+        timeStart = result.data["time-start"];
+        timeEnd = result.data["time-end"];
       }
     });
-    var br = document.createElement("br");
-    var eventName = document.createElement("a");
-    eventName.className = "eventName";
-    eventName.setAttribute("href","AttendeePage.html");
-    eventName.setAttribute("onclick", "joinEvent(" + eventID + ")");
-    setInnerHTMLSanitized(eventName, "Meeting name:- " + title);
-    currentDiv.appendChild(eventName);
-    currentDiv.appendChild(br);
+    var dateStart = new Date(timeStart);
+    var dateEnd = new Date(timeEnd);
+    if (loadTime > dateStart && loadTime < dateEnd) {
+      var br = document.createElement("br");
+      var eventName = document.createElement("a");
+      eventName.className = "eventName";
+      eventName.setAttribute("href","AttendeePage.html");
+      eventName.setAttribute("onclick", "joinEvent(" + eventID + ")");
+      setInnerHTMLSanitized(eventName, title);
+      currentDiv.appendChild(eventName);
+      currentDiv.appendChild(br);
+    }
+  });
+}
+
+function upcomingEventDisplay(eventIDs) {
+
+  const currentDiv = document.getElementById("upcoming");
+  Array.from(eventIDs).forEach(eventID => {
+    $.ajax({
+      type: "GET",
+      url: endpointToRealAddress("/events/" + eventID),
+      dataType: "json",
+      async: false,
+      success: function(result, status, xhr){
+        title = result.data["title"];
+        timeStart = result.data["time-start"];
+        timeEnd = result.data["time-end"];
+      }
+    });
+    var dateStart = new Date(timeStart);
+    if (loadTime < dateStart) {
+      var br = document.createElement("br");
+      var eventName = document.createElement("a");
+      eventName.className = "eventName";
+      eventName.setAttribute("href","AttendeePage.html");
+      eventName.setAttribute("onclick", "joinEvent(" + eventID + ")");
+      setInnerHTMLSanitized(eventName, dateStart.toLocaleString() + " " + title);
+      currentDiv.appendChild(eventName);
+      currentDiv.appendChild(br);
+    }
 
   });
 }
@@ -48,5 +83,7 @@ function registeredEventIDs() {
   return eventIDs;
 }
 
+var loadTime = new Date();
 eventIDs = registeredEventIDs();
 liveEventDisplay(eventIDs);
+upcomingEventDisplay(eventIDs);
