@@ -128,20 +128,13 @@ function comprepensiveFeedbackSubmissionDisplayFactory(form) {
 
 
 function getGeneralFeedbackSubmission(id) {
-return document.getElementById(base + id);
+return document.getElementById(answerBase + id);
 }
-
-function setInnerHTMLSanitized(element, unsanitized) {
-  if (unsanitized == null) unsanitized = "";
-  element.innerHTML = DOMPurify.sanitize(unsanitized.toString());
-}
-
-
 
 
 
 // var base = " http://backend.mood-net/v0";
-var base = " http://localhost:8001/v0";
+// var base = " http://localhost:8001/v0";
 
 var timeOfLastUpdateUnparsed = "2001-01-22T19:33:02";
 var timeOfLastUpdate = Date.parse(timeOfLastUpdateUnparsed);
@@ -180,19 +173,6 @@ var formsCache = []; // stores data like this:
 // }
 
 
-function endpointToRealAddress(endpoint) {
-  url = new URL(window.location.protocol + "//" + window.location.host + "/backend.php");
-  url.searchParams.append("target", "/v0" + endpoint);
-  return url.toString();
-}
-
-function fillArray(length, value) {
-  var arr = new Array(length);
-  for (var i=0; i<length; i++){
-    arr[i] = value;
-  }
-  return arr;
-}
 
 
 var eventData = null;

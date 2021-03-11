@@ -1,3 +1,17 @@
+function endpointToRealAddress(endpoint) {
+  url = new URL(window.location.protocol + "//" + window.location.host + "/backend.php");
+  url.searchParams.append("target", "/v0" + endpoint);
+  return url.toString();
+}
+
+function setInnerHTMLSanitized(element, unsanitized) {
+  if (unsanitized == null) unsanitized = "";
+  element.innerHTML = DOMPurify.sanitize(unsanitized.toString());
+}
+
+
+
+
 const navSlide = () => {
     const burger = document.querySelector(".burger");
     const nav = document.querySelector(".nav-links");
