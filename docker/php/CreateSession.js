@@ -24,7 +24,7 @@ function createSession(title, desc) {
     success: function(result, status, xhr){
       seriesID = result.seriesID;
       setCookie("seriesID", seriesID, 1);
-      window.location.href = "/MeetingPage.html";
+      window.location.href = "/SessionPage.html";
     }
   });
 }

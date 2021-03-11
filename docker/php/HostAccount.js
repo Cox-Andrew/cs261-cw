@@ -9,7 +9,7 @@ var hostID = parseInt(hostIDString);
 
 
 function fillInHostAccountInfo () {
-	$.getJSON(endpointToRealAddress("/hosts/" + hostID), function(attendee) {
+	$.getJSON(endpointToRealAddress("/hosts/" + hostID), function(host) {
 		setInnerHTMLSanitized($("#fullname")[0], attendee.data["account-name"]);
 		setInnerHTMLSanitized($("#email")[0], attendee.data["email"]);
 	})
