@@ -31,6 +31,45 @@ function getCookie(cname) {
   return "";
 }
 
+// download event data
+
+// call like this:
+/*
+getAllEventData(eventID, function(eventData) {
+  // do stuff with eventData
+});
+*/
+function getAllEventData(eventID, callback) {
+  $.getJSON(endpointToRealAddress("/events/" + eventID), function (event) {
+    event["forms"] = [];
+
+    var uncompleted_forms = event.formIDs.length;
+    event.formIDs.forEach(formID => {
+      $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
+        // need to add this, the form GET doesn't return this, it's only in the request
+        form["formID"] = formID;
+        form["questions"] = [];
+        event["forms"][event.formIDs.indexOf(formID)] = form;
+
+        var uncompleted_questions = form.questionIDs.length;
+        form.questionIDs.forEach(questionID => {
+          $.getJSON(endpointToRealAddress("/questions/" + questionID), function(question) {
+            // insert into questions
+            form.questions[form.questionIDs.indexOf(questionID)] = question;
+
+            if (--uncompleted_questions == 0) {
+              if (--uncompleted_forms == 0) {
+                // we have finished getting event data
+                callback(event);
+              }
+            }
+          });
+        });
+      });
+    });
+  });
+}
+
 
 const navSlide = () => {
     const burger = document.querySelector(".burger");

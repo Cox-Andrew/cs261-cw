@@ -230,49 +230,47 @@ var formsCache = []; // stores data like this:
 
 
 
-var eventData = null;
+// var eventData = null;
 
-// download event data
-function getAllEventData(eventID) {
+// // download event data
+// function getAllEventData(eventID, callback) {
+//   $.getJSON(endpointToRealAddress("/events/" + eventID), function (event) {
+//     event["forms"] = [];
 
-$.getJSON(endpointToRealAddress("/events/" + eventID), function (event) {
-  eventData = event;
-  event["forms"] = [];
+//     var uncompleted_forms = event.formIDs.length;
+//     event.formIDs.forEach(formID => {
+//       $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
+//         // need to add this, the form GET doesn't return this, it's only in the request
+//         form["formID"] = formID;
+//         form["questions"] = [];
+//         event["forms"][event.formIDs.indexOf(formID)] = form;
 
-  var uncompleted_forms = event.formIDs.length;
-  event.formIDs.forEach(formID => {
-    $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
-      // need to add this, the form GET doesn't return this, it's only in the request
-      form["formID"] = formID;
-      form["questions"] = [];
-      event["forms"][event.formIDs.indexOf(formID)] = form;
+//         var uncompleted_questions = form.questionIDs.length;
+//         form.questionIDs.forEach(questionID => {
+//           $.getJSON(endpointToRealAddress("/questions/" + questionID), function(question) {
+//             // insert into questions
+//             form.questions[form.questionIDs.indexOf(questionID)] = question;
 
-      var uncompleted_questions = form.questionIDs.length;
-      form.questionIDs.forEach(questionID => {
-        $.getJSON(endpointToRealAddress("/questions/" + questionID), function(question) {
-          // insert into questions
-          form.questions[form.questionIDs.indexOf(questionID)] = question;
+//             if (--uncompleted_questions == 0) {
+//               if (--uncompleted_forms == 0) {
+//                 // we have finished getting event data
+//                 callback(event);
+//               }
+//             }
+//           });
+//         });
+//       });
+//     });
+//   });
+// }
 
-          if (--uncompleted_questions == 0) {
-            if (--uncompleted_forms == 0) {
-              // we have finished getting event data - now start filling in feedback
+var eventData;
 
-              console.log(JSON.stringify(eventData));
-              console.log(eventData);
-              updateFeedback();
-              setInterval(updateFeedback, 5000);
-            }
-          }
-
-        });
-      });
-    });
-  });
+getAllEventData(eventID, function(ev_data) {
+  eventData = ev_data;
+  updateFeedback();
+  setInterval(updateFeedback, 5000);
 });
-}
-
-
-getAllEventData(eventID);
 
 
 function updateFeedback() {
