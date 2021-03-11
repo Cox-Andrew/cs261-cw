@@ -30,33 +30,13 @@ function createMeeting(title, date, stime, ftime, desc) {
     type: "POST",
     url: endpointToRealAddress("/events"),
     dataType: "json",
-    //dataType: "text",
     contentType: "application/json",
     data: JSON.stringify(event),
+    async: false,
     success: function(result, status, xhr){
-        //reponse = JSON.parse(result);
         eventID = result.eventID;
         setCookie("eventID", eventID, 1);
-        return alert("pass");
-    }/*,
-    error: function(err) {
-      return alert("fail")
-    },
-    complete: function(response, textStatus) {
-      return alert("Hey: " + textStatus);
-    },
-    always: function() {
-      return alert("help");
-    }*/
+    }
   });
 
-/*
-  $.post(endpointToRealAddress("/events"), JSON.stringify({event}), function(response) {
-      // store event in cookie
-      setCookie("eventID", eventID, 1);
-      //window.location.href = "/AttendeePage.html";
-  }).fail(function() {
-      alert("event not found");
-  });
-  */
 }
