@@ -126,6 +126,7 @@ class SignInFormState extends State<SignInForm> {
           backgroundColor: Colors.green,
         ));
 
+        _focusNode.unfocus();
         Navigator.pushNamedAndRemoveUntil(context, "/timeline", (r) => false);
       }).whenComplete(() => setState(() => _loading = false));
     }

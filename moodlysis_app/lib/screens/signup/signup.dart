@@ -194,6 +194,7 @@ class SignUpFormState extends State<SignUpForm> {
           backgroundColor: Colors.green,
         ));
 
+        _focusNode.unfocus();
         Navigator.pushNamedAndRemoveUntil(context, "/timeline", (r) => false);
       }).whenComplete(() => setState(() => _loading = false));
     }
