@@ -304,7 +304,7 @@ CREATE FUNCTION GetInviteCode() RETURNS TRIGGER AS $GetInviteCode$
     IC VARCHAR(10);
   BEGIN
     LOOP
-      IC := SUBSTRING(MD5(''||NOW()::TEXT||RANDOM()::TEXT) FOR 8);
+      IC := UPPER(SUBSTRING(MD5(''||NOW()::TEXT||RANDOM()::TEXT) FOR 8));
       BEGIN
         UPDATE EVENTS
         SET InviteCode = IC
