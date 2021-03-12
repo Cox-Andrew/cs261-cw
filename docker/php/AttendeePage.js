@@ -30,6 +30,16 @@ function showDiv() {
   document.getElementById("msg").style.display= " block";
 }
 
+function edit()
+{
+  document.getElementById("btnFeed").disabled = false;
+  document.getElementById("btnFeed").style.backgroundColor = "transparent";
+  document.getElementById("btnFeed").style.cursor = "pointer";
+  document.getElementById("msgFeed").style.display = "none";
+  document.getElementById("EditResponse").style.display = "none";
+  return true;
+}
+
 function submitGeneral() {
   var emoji = document.getElementsByName('emoji');
   var emojiValue = null;
