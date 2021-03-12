@@ -12,9 +12,7 @@ import java.util.Date;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.AttendeeInterface;
-import com.moodlysis.moodbe.requestexceptions.MoodlysisForbidden;
-import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
-import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
+import com.moodlysis.moodbe.requestexceptions.*;
 
 public class Attendee implements AttendeeInterface {
 	
@@ -29,7 +27,7 @@ public class Attendee implements AttendeeInterface {
 	
 	
 	@Override
-	public int newAttendee(String accountName, String pass, String email, LocalDateTime expires) throws MoodlysisInternalServerError {
+	public int newAttendee(String accountName, String pass, String email, LocalDateTime expires) throws MoodlysisInternalServerError, MoodlysisBadRequest {
 		
 		String strStmt;
 		PreparedStatement stmt;
@@ -37,6 +35,18 @@ public class Attendee implements AttendeeInterface {
 		
 		try {
 			conn.setAutoCommit(false);
+			
+			// check that email doesn't already exist
+			strStmt = ""
+			+ "SELECT FROM attendee \n"
+			+ "WHERE email = ?;";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setString(1, email);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				rs.close();
+				throw new MoodlysisBadRequest("Account with this email already exists");
+			}
 			
 			// otherwise insert the new values
 			strStmt = ""

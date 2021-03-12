@@ -15,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Host;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisBadRequest;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
@@ -162,6 +163,9 @@ public class HostRequest extends HttpServlet {
 			hostID = host.newHost(email, pass, account);
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
+			return;
+		} catch (MoodlysisBadRequest e){
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
 			return;
 		} finally {
 			try {

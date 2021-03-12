@@ -9,6 +9,7 @@ import java.sql.Statement;
 
 import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.HostInterface;
+import com.moodlysis.moodbe.requestexceptions.MoodlysisBadRequest;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
@@ -75,11 +76,23 @@ public class Host implements HostInterface {
 	
 
 	@Override
-	public int newHost(String email, String pass, String account) throws MoodlysisInternalServerError {
+	public int newHost(String email, String pass, String account) throws MoodlysisInternalServerError, MoodlysisBadRequest {
 		PreparedStatement hostInsert  = null;
 		ResultSet hostKey = null;
 		int hostID = -1;
 		try {
+			// check host email doesn't already exist
+			String strStmt = ""
+			+ "SELECT FROM host \n"
+			+ "WHERE email = ?;";
+			PreparedStatement stmt = conn.prepareStatement(strStmt);
+			stmt.setString(1, email);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				rs.close();
+				throw new MoodlysisBadRequest("host with this email already exists");
+			}
+			
 			conn.setAutoCommit(false);
     		String query = "INSERT INTO HOST VALUES (nextval('HostsHostID'),?,?,?)";
     		hostInsert = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
