@@ -33,7 +33,7 @@ function pastEventDisplay(eventIDs) {
   if (i == 0) {
     var noEvents = document.createElement("div");
     noEvents.className = "noEvents";
-    setInnerHTMLSanitized(noEvents, "You have no past events.");
+    setInnerHTMLSanitized(noEvents, "You have no past meetings.");
     currentDiv.appendChild(noEvents);
   }
 
