@@ -223,6 +223,7 @@ function getComprehensive() {
                 });
                 var checkbox = document.createElement("div");
                 checkbox.className = "checkbox";
+                checkbox.setAttribute = ("id","checkbox");
                 var checkinput = document.createElement("input");
                 var checktext = document.createTextNode(" Anonymous");
                 checkinput.setAttribute("type","checkbox");
