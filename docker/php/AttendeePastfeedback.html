@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="AttendeePastfeedback.css"/>
+    <title>Home</title>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="index.html"><h4>MOODLYSIS</h4></a>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Aboutus.html">About us</a>
+        </li>
+        <li>
+          <a href="faq.html">FAQs</a>
+        </li>
+        <form method = "POST" action = "">
+          <button name = "EndSession" class = "EndSession">End Session</button>
+        </form>
+      </ul>
+      <div class="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
+
+    <div class="content">
+      <div class = "heading">
+        <button onclick="general()">General Feedback</button>
+        <div class = "hidden"><br></div>
+        <button onclick="feedback()">Comprehensive Feedback</button>
+      </div>
+
+      <div class  = "general" id  = "general">
+        <div class = "form">
+          <h3>General feedback</h3>
+            <label>Choose the emoji which represents your mood<br><br></label>
+            <ul class = "emojiList">
+              <li>
+                <input type="radio" id="emoji1" value="emoji1" name = "emoji" required/>
+                <label for="emoji1"><img src="emoji1.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji2" value="emoji2" name = "emoji"/>
+                <label for="emoji2"><img src="emoji2.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji3" value="emoji3" name = "emoji"/>
+                <label for="emoji3"><img src="emoji3.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji4" value="emoji4" name = "emoji"/>
+                <label for="emoji4"><img src="emoji4.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji5" value="emoji5" name = "emoji"/>
+                <label for="emoji5"><img src="emoji5.png" height="40px" width="40px"/></label>
+              </li>
+            </ul>
+            <label><br>Comments<br></label>
+            <div class="comments" style='font-size: 14px; font-family: "poppins", sans-serif; text-align: left; padding-left: 5vw;'>Comments</div>
+            <br>
+        </div>
+      </div>
+
+      <div class = "feedback" id  = "feedback">
+        <div class = "form">
+          <h4>Comprehensive feedback</h4>
+            <div class = "question1">
+              <label>Question 1:<br></label> 
+            </div>
+            <div class = "answer1">
+                answer
+            </div>
+            
+            <div class = "question2">
+              <label>Question 2:<br></label> 
+            </div>
+            <div class = "answer2">
+                answer
+            </div>
+            
+            <div class = "question3">
+              <label>Question 3:<br></label> 
+            </div>
+            <div class = "answer3">
+                answer
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+      Moodlysis-Mood Analysis Application
+      </div>
+    </footer>
+    <script src="app.js"></script>
+    <script src="AttendeePastfeedback.js"></script>
+  </body>
+</html>
