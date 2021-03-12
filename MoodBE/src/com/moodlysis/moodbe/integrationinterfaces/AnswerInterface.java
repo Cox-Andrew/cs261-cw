@@ -16,7 +16,7 @@ public interface AnswerInterface {
 		public int attendeeID;
 		public int eventFormID;
 		public int moodID;
-		public Float moodValue;
+		public Double moodValue;
 		public boolean isEdited;
 		public LocalDateTime timeSubmitted;
 		public String response;

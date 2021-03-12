@@ -9,6 +9,8 @@
       href="https://fonts.googleapis.com/css2?family=Poppins"
       rel="stylesheet"
     />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <link rel="stylesheet" href="AttendeePastfeedback.css"/>
     <title>Home</title>
   </head>
@@ -36,67 +38,8 @@
     </nav>
 
     <div class="content">
-      <div class = "heading">
-        <button onclick="general()">General Feedback</button>
-        <div class = "hidden"><br></div>
-        <button onclick="feedback()">Comprehensive Feedback</button>
-      </div>
-
-      <div class  = "general" id  = "general">
-        <div class = "form">
-          <h3>General feedback</h3>
-            <label>Choose the emoji which represents your mood<br><br></label>
-            <ul class = "emojiList">
-              <li>
-                <input type="radio" id="emoji1" value="emoji1" name = "emoji" required/>
-                <label for="emoji1"><img src="emoji1.png" height="40px" width="40px"/></label>
-              </li>
-              <li>
-                <input type="radio" id="emoji2" value="emoji2" name = "emoji"/>
-                <label for="emoji2"><img src="emoji2.png" height="40px" width="40px"/></label>
-              </li>
-              <li>
-                <input type="radio" id="emoji3" value="emoji3" name = "emoji"/>
-                <label for="emoji3"><img src="emoji3.png" height="40px" width="40px"/></label>
-              </li>
-              <li>
-                <input type="radio" id="emoji4" value="emoji4" name = "emoji"/>
-                <label for="emoji4"><img src="emoji4.png" height="40px" width="40px"/></label>
-              </li>
-              <li>
-                <input type="radio" id="emoji5" value="emoji5" name = "emoji"/>
-                <label for="emoji5"><img src="emoji5.png" height="40px" width="40px"/></label>
-              </li>
-            </ul>
-            <label><br>Comments<br></label>
-            <div class="comments" style='font-size: 14px; font-family: "poppins", sans-serif; text-align: left; padding-left: 5vw;'>Comments</div>
-            <br>
-        </div>
-      </div>
-
       <div class = "feedback" id  = "feedback">
-        <div class = "form">
-          <h4>Comprehensive feedback</h4>
-            <div class = "question1">
-              <label>Question 1:<br></label> 
-            </div>
-            <div class = "answer1">
-                answer
-            </div>
-            
-            <div class = "question2">
-              <label>Question 2:<br></label> 
-            </div>
-            <div class = "answer2">
-                answer
-            </div>
-            
-            <div class = "question3">
-              <label>Question 3:<br></label> 
-            </div>
-            <div class = "answer3">
-                answer
-            </div>
+        <div class = "form" id = "form">
         </div>
       </div>
     </div>

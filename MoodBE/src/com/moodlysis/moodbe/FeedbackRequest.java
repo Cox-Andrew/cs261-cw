@@ -45,6 +45,7 @@ public class FeedbackRequest extends HttpServlet {
 		String timeUpdatedSinceString = request.getParameter("time-updated-since");
 		
 		int eventID;
+		int attendeeID;
 		
 		// must include eventID
 		if (eventIDString == null) {
@@ -72,6 +73,7 @@ public class FeedbackRequest extends HttpServlet {
 		
 
 		Feedback.FeedbackInfo feedbackInfo = null;
+		Feedback.FeedbackAttendeeInfo feedbackAttendeeInfo = null;
 		
 		// GET /v0/feedback?eventID={eventID}&time-updated-since={time-updated-since}
 		if (attendeeIDString == null && timeUpdatedSinceString != null) {
@@ -121,14 +123,47 @@ public class FeedbackRequest extends HttpServlet {
 				}
 			}
 			
+		} else if (attendeeIDString != null && timeUpdatedSinceString == null) {
+			Connection conn = DatabaseConnection.getConnection();
+			Feedback feedback = new Feedback(response.getWriter(), conn);
+			
+			try {
+				try {
+					attendeeID = Integer.parseInt(attendeeIDString);
+				} catch (NumberFormatException e) {
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "unable to parse attendeeID: " + e.toString());
+					return;
+				}
+				feedbackAttendeeInfo = feedback.getAttendeeFeedback(eventID, attendeeID);
+			} catch (MoodlysisInternalServerError e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "database error: " + e.toString());
+				e.printStackTrace();
+				return;
+			} catch (MoodlysisNotFound e) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, "database error: " + e.toString());
+				e.printStackTrace();
+				return;
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
 		} else {
 			// TODO add other situations of attendeeIDString and timeUpdatedSinceString
 			response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 			return;
 		}
-		
-		String responseJSON = getJSON(feedbackInfo);
-		
+		String responseJSON = "";
+		if (feedbackInfo != null) {
+			responseJSON = getJSON(feedbackInfo);
+		}
+		if (feedbackAttendeeInfo != null) {
+			responseJSON = getJSON(feedbackAttendeeInfo);
+		}
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().print(responseJSON);
@@ -165,6 +200,43 @@ public class FeedbackRequest extends HttpServlet {
 				ansObj.put("answerID", ansInfo.answerID);
 				if (ansInfo.moodValue != null)
 					ansObj.put("mood-value", ansInfo.moodValue);
+				ansObj.put("is-edited", ansInfo.isEdited);
+				ansObj.put("time-updated", ansInfo.timeSubmitted.toString());
+				JSONObject data = new JSONObject();
+				data.put("response", ansInfo.response);
+				ansObj.put("data", data);
+				answers.add(ansObj);
+			}
+			subObj.put("answers", answers);
+			list.add(subObj);
+		}
+		output.put("list", list);
+		return output.toJSONString();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getJSON(Feedback.FeedbackAttendeeInfo info) {
+		
+		JSONObject output = new JSONObject();
+		output.put("eventID", info.eventID);
+		output.put("contains", info.list.size());
+		
+		JSONArray list = new JSONArray();
+		for (Feedback.SubmissionInfo subInfo : info.list) {
+			JSONObject subObj = new JSONObject();
+			subObj.put("formID", subInfo.formID);
+			subObj.put("eventFormID", subInfo.eventFormID);
+			subObj.put("account-name", subInfo.accountName);
+			subObj.put("attendeeID", subInfo.attendeeID);
+			subObj.put("time-updated", subInfo.timeUpdated.toString());
+			subObj.put("is-edited", subInfo.isEdited);
+			
+			JSONArray answers = new JSONArray();
+			for (Answer.AnswerInfo ansInfo : subInfo.answers) {
+				JSONObject ansObj = new JSONObject();
+				ansObj.put("questionID", ansInfo.questionID);
+				ansObj.put("answerID", ansInfo.answerID);
+				ansObj.put("mood-value", ansInfo.moodValue.toString());
 				ansObj.put("is-edited", ansInfo.isEdited);
 				ansObj.put("time-updated", ansInfo.timeSubmitted.toString());
 				JSONObject data = new JSONObject();
