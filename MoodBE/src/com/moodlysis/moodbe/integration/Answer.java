@@ -182,9 +182,52 @@ public class Answer implements AnswerInterface {
 	}
 
 	@Override
-	public boolean editAnswer(int answerID, Date timeSubmitted, String response) throws SQLException {
+	public boolean editAnswer(int answerID, Instant now, boolean isAnonymous, String response) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO Auto-generated method stub
-		return false;
+		String strStmt;
+		PreparedStatement stmt;
+		ResultSet rs;
+		try {
+			
+			conn.setAutoCommit(false);
+			
+			
+			strStmt = ""
+			+ "SELECT * FROM ANSWERS "
+			+ "WHERE AnswerID = ?";
+			stmt = conn.prepareStatement(strStmt);
+			stmt.setInt(1, answerID);
+			rs = stmt.executeQuery();
+			if (!rs.next()) {
+				throw new MoodlysisNotFound("Answer not found. Answer may have expired or been deleted.");
+			}
+			
+			strStmt = ""
+			+ "UPDATE Answers SET IsEdited = ?, TimeSubmitted = ?, Response = ?, IsAnonymous = ? WHERE AnswerID = ?";
+			stmt = conn.prepareStatement(strStmt, Statement.RETURN_GENERATED_KEYS);
+			stmt.setBoolean(1, true);
+			stmt.setTimestamp(2, Timestamp.from(now));
+			stmt.setString(3, response);
+			stmt.setBoolean(4, isAnonymous);
+			stmt.setInt(5, answerID);
+			stmt.executeUpdate();
+			conn.commit();
+			conn.setAutoCommit(true);
+			return true;
+			
+			
+			
+			
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch(SQLException er) {
+				er.printStackTrace(this.writer);
+			}
+			e.printStackTrace(writer);
+			e.printStackTrace();
+			throw new MoodlysisInternalServerError(e.toString());
+		}
 	}
 
 

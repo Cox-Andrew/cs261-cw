@@ -28,7 +28,7 @@ public interface AnswerInterface {
 	public int newAnswer(int attendeeID, int questionID, int eventFormID, Instant timeSubmitted, String response, boolean isAnonymous) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// PUT /v0/answers/{answerID}
-	public boolean editAnswer(int answerID, Date timeSubmitted, String response) throws SQLException;
+	public boolean editAnswer(int answerID, Instant now, boolean isAnonymous, String response) throws  MoodlysisInternalServerError, MoodlysisNotFound;
 
 	public AnswerInfo getAnswerInfo(int answerID, int verificationID, boolean verificationIDIsHost) throws MoodlysisInternalServerError, MoodlysisForbidden, MoodlysisBadRequest;
 }
