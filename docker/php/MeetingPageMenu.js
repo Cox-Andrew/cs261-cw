@@ -10,6 +10,10 @@ $.getJSON(endpointToRealAddress("/events/" + hostID), function(data) {
 	setInnerHTMLSanitized(document.getElementsByClassName("MeetingName")[0], data.data.title);
 });
 
+$.getJSON(endpointToRealAddress("/invite-code?eventID=" + hostID), function(data) {
+	setInnerHTMLSanitized(document.getElementsByClassName("MeetingName")[1], data["invite-code"]);
+});
+
 
 function deleteEvent() {
 	$.ajax({
