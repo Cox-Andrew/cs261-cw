@@ -4,6 +4,7 @@ function getComprehensive() {
   attendeeID = getCookie("attendeeID");
   eventFormID = getCookie("eventFormID");
   formID = getCookie("formID");
+  i=0;
   $.ajax({
     type: "GET",
     url: endpointToRealAddress("/feedback?eventID=" + eventID + "&attendeeID=" + attendeeID),
@@ -16,6 +17,7 @@ function getComprehensive() {
         if (element["eventFormID"] == eventFormID) {
           answers = element["answers"];
           Array.from(answers).forEach(answer => {
+            i++;
             questionID = answer["questionID"];
             answerID = answer["questionID"];
             mood = answer["mood-value"];
@@ -83,6 +85,11 @@ function getComprehensive() {
           });
         }
       });
+      if (i==0) {
+        var noFeedback = document.createElement("div");
+        setInnerHTMLSanitized(noFeedback, "You did not submit anything for this form");
+        currentDiv.appendChild(noFeedback);
+      }
       var br = document.createElement("br");
       currentDiv.appendChild(br);
     }

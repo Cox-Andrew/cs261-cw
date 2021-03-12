@@ -8,6 +8,7 @@ function viewForm(eventFormID, formID) {
 
 function getEventFormsFromEvent(event) {
   attendeeID = getCookie("attendeeID");
+  i=0;
 
   const currentDiv = document.getElementById("links");
   Array.from(event.eventFormIDs).forEach(eventFormID => {
@@ -17,6 +18,7 @@ function getEventFormsFromEvent(event) {
       dataType: "json",
       async: false,
       success: function(result, status, xhr){
+        i++;
         formID = result["formID"];
         $.ajax({
           type: "GET",
@@ -38,7 +40,7 @@ function getEventFormsFromEvent(event) {
                 formName.className = "formName";
                 formName.setAttribute("href","AttendeePastfeedback.html");
                 formName.setAttribute("onclick", "viewForm(" + eventFormID + ", " + formID + ")");
-                setInnerHTMLSanitized(formName, title + ": " + desc);
+                setInnerHTMLSanitized(formName, i + ". " + title + ": " + desc);
                 currentDiv.appendChild(formName);
                 currentDiv.appendChild(br);
               }
