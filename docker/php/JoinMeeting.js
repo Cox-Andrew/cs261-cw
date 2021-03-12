@@ -28,6 +28,9 @@ function joinMeeting(inviteCode) {
       eventID = result.eventID;
       setCookie("eventID", eventID, 1);
       window.location.href = "/AttendeePage.html";
+    },
+    error: function(status, xhr){
+      //if repeat then say already part of event
     }
   });
 }
