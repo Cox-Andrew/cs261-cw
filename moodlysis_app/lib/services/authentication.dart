@@ -8,10 +8,10 @@ class AuthenticationException implements Exception {}
 
 Future<int> authenticateUser(http.Client client, String email, String password) async {
   final Map<String, String> body = {"email": email, "pass": password};
+  //TODO: change to final endpoint
   final response = await client.post('$backendURI/attendee-temp-sign-in', body: json.encode(body));
 
-  //TODO: ask whether to use MoodlysisNotFound or account not found
-  if (response.body.contains('account not found')) throw AuthenticationException();
+  if (response.statusCode == 404) throw AuthenticationException();
 
   return json.decode(response.body)["attendeeID"];
 }
