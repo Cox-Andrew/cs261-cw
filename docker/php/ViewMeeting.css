@@ -103,11 +103,36 @@
         cursor: pointer;
         transition: 0.5s ease 0s;
     }
+    .left{
+      display: block;
+      position: relative;
+      width: 40%; 
+      float: left;
+    }
+    .right{
+      display: block;
+      position: relative;
+      width: 40%; 
+      float: right;
+      text-align: left;
+    }
   }
 
   @media screen and (max-width: 1024px) {
     .nav-links {
       width: 60%;
+    }
+    .left{
+      display: block;
+      position: relative;
+      width: 100%; 
+    }
+    .right{
+      display: block;
+      position: relative;
+      width: 100%; 
+      padding-left: 5vw;
+      text-align: left;
     }
   }
   
@@ -154,6 +179,16 @@
         cursor: pointer;
         transition: 0.5s ease 0s;
     }
+    .left{
+      display: block;
+      position: relative;
+      width: 100%; 
+    }
+    .right{
+      display: block;
+      position: relative;
+      width: 100%; 
+    }
   }
   
   .nav-active {
@@ -195,7 +230,6 @@
     letter-spacing: 3px;
     font-weight: bold;
     font-size: 20px;
-    
     text-transform: uppercase;
   }
   .host a {
@@ -263,7 +297,6 @@
   .hidden{
     display: none;
   }
-
   
   .sub-content{
     flex: 1 0 auto;
@@ -274,6 +307,7 @@
     border-radius: 8px;
     box-shadow: 0 0 20px rgb(190, 190, 190);
     font-family: "poppins", sans-serif;
+    overflow: auto;
   }
   .sub-content h3{
     margin-top: 0;
