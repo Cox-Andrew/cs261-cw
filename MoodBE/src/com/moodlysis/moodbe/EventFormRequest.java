@@ -54,7 +54,7 @@ public class EventFormRequest extends HttpServlet {
 		output.put("eventID", info.eventID);
 		output.put("formID", info.formID);
 		output.put("numInEvent", info.numInEvent);
-		output.put("isActive", info.isActive);
+		output.put("is-active", info.isActive);
 		if (info.timeStart != null)
 			output.put("time-start", info.timeStart.toString());
 		if (info.timeEnd != null)

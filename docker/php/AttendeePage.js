@@ -138,13 +138,9 @@ function getComprehensive() {
       dataType: "json",
       async: false,
       success: function(result, status, xhr){
-        timeStart = result["time-start"];
-        timeEnd = result["time-end"];
-        var dateStart = new Date(timeStart);
-        var dateEnd = new Date(timeEnd);
-        var timeNow = new Date();
+        activity = result["is-active"];
         formID = result["formID"];
-        if (timeNow > dateStart && timeNow < dateEnd && formID != 0) {
+        if (activity && formID != 0) {
           boolform = false;
           if (removeForm(eventFormID)) {
             if (getCookie("eventFormID") != getCookie("submittedEventFormID")) {
