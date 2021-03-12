@@ -25,18 +25,18 @@ INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 3, 'DB Project', 'Deutsche
 INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 2, 'New Tech', '');
 INSERT INTO SERIES VALUES (nextval('SeriesSeriesID'), 5, 'Test', 'Test series');
 --
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Requirements', 'First meeting for the project planning', TIMESTAMP '2020-1-11 13:30:0', TIMESTAMP '2020-1-11 13:30:0' + INTERVAL '45 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 1', 'First prototype presentation', TIMESTAMP '2021-6-14 13:30:0', TIMESTAMP '2021-6-14 13:30:0' + INTERVAL '45 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 2', 'Second prototype presentation', TIMESTAMP '2021-4-16 17:0:0', TIMESTAMP '2021-4-16 17:0:0' + INTERVAL '120 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 2, 'Workshop AI', 'Workshop on how AI can help DB', TIMESTAMP '2020-7-12 14:30:0', TIMESTAMP '2020-7-12 14:30:0' + INTERVAL '60 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 3, 'Prototype Q&A', 'Questions about the prototype can be asked', TIMESTAMP '2021-10-8 11:0:0', TIMESTAMP '2021-10-8 11:0:0' + INTERVAL '90 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 4, 'Finance Plan', 'DB Finance Plan Presentation', TIMESTAMP '2020-9-4 15:0:0', TIMESTAMP '2020-9-4 15:0:0' + INTERVAL '30 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 1', 'DB Project Methodology', TIMESTAMP '2021-10-22 14:0:0', TIMESTAMP '2021-10-22 14:0:0' + INTERVAL '60 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 2', 'DB Project Sprint 1', TIMESTAMP '2021-2-25 16:30:0', TIMESTAMP '2021-2-25 16:30:0' + INTERVAL '90 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Client Q&A', 'Q&A about Project', TIMESTAMP '2021-12-25 12:0:0', TIMESTAMP '2021-12-25 12:0:0' + INTERVAL '120 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 1', 'Lecture on Econometrics', TIMESTAMP '2020-5-15 10:0:0', TIMESTAMP '2020-5-15 10:0:0' + INTERVAL '90 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 2', 'Lecture on the Stock Market', TIMESTAMP '2021-1-17 14:30:0', TIMESTAMP '2021-1-17 14:30:0' + INTERVAL '30 minutes');
-INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 7, 'Test 1', 'First Test of the Series', TIMESTAMP '2021-9-16 10:30:0', TIMESTAMP '2021-9-16 10:30:0' + INTERVAL '60 minutes');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Requirements', 'First meeting for the project planning', TIMESTAMP '2020-1-11 13:30:0', TIMESTAMP '2020-1-11 13:30:0' + INTERVAL '45 minutes', '2PC69NMG');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 1', 'First prototype presentation', TIMESTAMP '2021-6-14 13:30:0', TIMESTAMP '2021-6-14 13:30:0' + INTERVAL '45 minutes', '96ZSGV1Q');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 1, 'Presentation 2', 'Second prototype presentation', TIMESTAMP '2021-4-16 17:0:0', TIMESTAMP '2021-4-16 17:0:0' + INTERVAL '120 minutes', 'G2WQ5XDW');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 2, 'Workshop AI', 'Workshop on how AI can help DB', TIMESTAMP '2020-7-12 14:30:0', TIMESTAMP '2020-7-12 14:30:0' + INTERVAL '60 minutes', '1YI51GVZ');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 3, 'Prototype Q&A', 'Questions about the prototype can be asked', TIMESTAMP '2021-10-8 11:0:0', TIMESTAMP '2021-10-8 11:0:0' + INTERVAL '90 minutes', 'KZN4DUDC');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 4, 'Finance Plan', 'DB Finance Plan Presentation', TIMESTAMP '2020-9-4 15:0:0', TIMESTAMP '2020-9-4 15:0:0' + INTERVAL '30 minutes', 'EZQ54I2U');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 1', 'DB Project Methodology', TIMESTAMP '2021-10-22 14:0:0', TIMESTAMP '2021-10-22 14:0:0' + INTERVAL '60 minutes', '1KJSHL9X');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Project Meeting 2', 'DB Project Sprint 1', TIMESTAMP '2021-2-25 16:30:0', TIMESTAMP '2021-2-25 16:30:0' + INTERVAL '90 minutes', '9C6TRX0Y');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 5, 'Client Q&A', 'Q&A about Project', TIMESTAMP '2021-12-25 12:0:0', TIMESTAMP '2021-12-25 12:0:0' + INTERVAL '120 minutes', 'P68Z2NME');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 1', 'Lecture on Econometrics', TIMESTAMP '2020-5-15 10:0:0', TIMESTAMP '2020-5-15 10:0:0' + INTERVAL '90 minutes', '3VIZS356');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 6, 'Lecture 2', 'Lecture on the Stock Market', TIMESTAMP '2021-1-17 14:30:0', TIMESTAMP '2021-1-17 14:30:0' + INTERVAL '30 minutes', 'V6K3TP1G');
+INSERT INTO EVENTS VALUES (nextval('EventsEventID'), 7, 'Test 1', 'First Test of the Series', TIMESTAMP '2021-9-16 10:30:0', TIMESTAMP '2021-9-16 10:30:0' + INTERVAL '60 minutes', '7SI4A3AF');
 --
 INSERT INTO FORMS VALUES (nextval('FormsFormID'), 1, 'Requirements Validity', '');
 INSERT INTO FORMS VALUES (nextval('FormsFormID'), 1, 'Quality of Presentation', '');
