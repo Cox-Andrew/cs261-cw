@@ -47,8 +47,10 @@ public class EventForm implements EventFormInterface {
 			formID = table.getInt("FormID");
 			numInEvent = table.getInt("NumInEvent");
 			isActive = table.getBoolean("IsActive");
-			info.timeStart = table.getTimestamp("TimeStart").toLocalDateTime();
-			info.timeEnd = table.getTimestamp("TimeEnd").toLocalDateTime();
+			java.sql.Timestamp timeStartSQL = table.getTimestamp("TimeStart");
+			if (!table.wasNull()) info.timeStart = timeStartSQL.toLocalDateTime();
+			java.sql.Timestamp timeEndSQL = table.getTimestamp("timeend");
+			if (!table.wasNull()) info.timeEnd = timeEndSQL.toLocalDateTime();
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch(SQLException e) {

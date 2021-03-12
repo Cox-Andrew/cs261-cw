@@ -41,15 +41,16 @@ getAllEventData(eventID, function(eventData) {
 */
 function getAllEventData(eventID, callback) {
   $.getJSON(endpointToRealAddress("/events/" + eventID), function (event) {
-    event["forms"] = [];
 
-    var uncompleted_forms = event.formIDs.length;
+    var uncompleted_sub_event = event.formIDs.length + event.eventFormIDs.length;
+
     event.forms = [];
+    event.eventForms = [];
+
     event.formIDs.forEach(formID => {
       $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
         // need to add this, the form GET doesn't return this, it's only in the request
         form["formID"] = formID;
-        form["questions"] = [];
 
         // find the first place in forms array where this form should be placed and that hasn't already been filled in
         // this to fix a bug where there couldn't be duplicates in the forms list
@@ -59,7 +60,7 @@ function getAllEventData(eventID, callback) {
         }
         event.forms[formIndex] = form;
 
-        var uncompleted_questions = form.questionIDs.length;
+        var uncompleted_sub_form = form.questionIDs.length;
         form.questions = [];
         form.questionIDs.forEach(questionID => {
           $.getJSON(endpointToRealAddress("/questions/" + questionID), function(question) {
@@ -71,14 +72,24 @@ function getAllEventData(eventID, callback) {
             }
             form.questions[questionIndex] = question;
 
-            if (--uncompleted_questions == 0) {
-              if (--uncompleted_forms == 0) {
+            if (--uncompleted_sub_form == 0) {
+              if (--uncompleted_sub_event == 0) {
                 // we have finished getting event data
                 callback(event);
               }
             }
           });
         });
+      });
+    });
+    event.eventFormIDs.forEach(eventFormID => {
+      $.get(endpointToRealAddress("/event-forms/" + eventFormID), function(eventForm) {
+        var eventFormIndex = form.eventFormIDs.indexOf(eventFormID);
+        form.eventForms[eventFormIndex] = eventForm;
+
+        if (--uncompleted_sub_event == 0) {
+          callback(event);
+        }
       });
     });
   });

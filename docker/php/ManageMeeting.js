@@ -1,48 +1,48 @@
-var temp1 = document.getElementById("template1");
-var temp2 = document.getElementById("template2");
-function template1() {
-  if (temp1.style.display === "none" || temp1.style.display === '')
-  {
-    if(temp2.style.display !== "none" || temp2.style.display !== '')
-    {
-      temp2.style.display = "none";
-    }
-    temp1.style.display = "block";
-  } else {
-    temp1.style.display = "none";
-  }
-}
-function template2() {
-  if (temp2.style.display === "none" || temp2.style.display === '')
-  {
-    if(temp1.style.display !== "none" || temp1.style.display !== '')
-    {
-      temp1.style.display = "none";
-    }    
-    temp2.style.display = "block"; 
-  } else {
-    temp2.style.display = "none";
-  }
-}
+// var temp1 = document.getElementById("template1");
+// var temp2 = document.getElementById("template2");
+// function template1() {
+//   if (temp1.style.display === "none" || temp1.style.display === '')
+//   {
+//     if(temp2.style.display !== "none" || temp2.style.display !== '')
+//     {
+//       temp2.style.display = "none";
+//     }
+//     temp1.style.display = "block";
+//   } else {
+//     temp1.style.display = "none";
+//   }
+// }
+// function template2() {
+//   if (temp2.style.display === "none" || temp2.style.display === '')
+//   {
+//     if(temp1.style.display !== "none" || temp1.style.display !== '')
+//     {
+//       temp1.style.display = "none";
+//     }    
+//     temp2.style.display = "block"; 
+//   } else {
+//     temp2.style.display = "none";
+//   }
+// }
 function showDiv() {
   document.getElementById("msg").style.display= " block";
 }
-function submitTemplate1() {
-  var q1 = document.getElementById('q1').value;
-  var q2 = document.getElementById('q2').value;
-  var q3 = document.getElementById('q3').value;
-  alert('Template saved');
+// function submitTemplate1() {
+//   var q1 = document.getElementById('q1').value;
+//   var q2 = document.getElementById('q2').value;
+//   var q3 = document.getElementById('q3').value;
+//   alert('Template saved');
 
-  // Call backend function here
-}
-function submitTemplate2() {
-  var ques1 = document.getElementById('ques1').value;
-  var ques2 = document.getElementById('ques2').value;
-  var ques3 = document.getElementById('ques3').value;
-  alert('Template saved');
+//   // Call backend function here
+// }
+// function submitTemplate2() {
+//   var ques1 = document.getElementById('ques1').value;
+//   var ques2 = document.getElementById('ques2').value;
+//   var ques3 = document.getElementById('ques3').value;
+//   alert('Template saved');
 
-  // Call backend function here
-}
+//   // Call backend function here
+// }
 
 
 
@@ -52,6 +52,13 @@ function submitTemplate2() {
 // the large container div elements
 var pageForms = [];
 var pageBubbles = [];
+
+function switchForms(newOpenForm) {
+  pageForms.forEach(pageForm => {
+    pageForm.style.display = "none";
+  });
+  newOpenForm.style.display = "block";
+}
 
 
 
@@ -82,12 +89,15 @@ function blankQuestionFactory(hasOptions=false) {
   if (hasOptions) questionhtml += '<div class="options"></div>';
 
   var wrapper = document.createElement("div");
-  wrapper.innerHTML = formhtml;
+  wrapper.innerHTML = questionhtml;
   return wrapper;
 }
 
 function blankBubbleFactory() {
-
+  var bubblehtml = `<button></button>`;
+  var wrapper = document.createElement("div");
+  wrapper.innerHTML = bubblehtml;
+  return wrapper.childNodes[0];
 }
 
 // create a new form in the browser (not in db yet)
@@ -124,26 +134,27 @@ function createAndDisplayForm(eventFormID, formID, form) {
   for (const i in form.questions) {
     var question = form.questions[i];
     var questionID = form.questionIDs[i];
-    createQuestion(question, questionID, formNode, i+1);
+    createQuestion(question, questionID, formNode, parseInt(i)+1);
   }
 
   // add a bubble at the top of the screen
-
+  var bubbleNode = blankBubbleFactory();
+  setInnerHTMLSanitized(bubbleNode, form.data.title);
+  document.getElementById("heading").prepend(bubbleNode);
+  $(bubbleNode).click(function() {
+    switchForms(templateNode);
+  });
 
   // add the form to the page
+  templateNode.style.display = "none";
+  pageForms.push(templateNode);
+  document.getElementById("page-content").appendChild(templateNode);
 
 
-  // set up page events to switch between bubbles
-
-
-  
-
-  return newNode;
 }
 
-function createQuestion(questionID, question, appendTo, questionDisplayNumber) {
-
-  var questionWrapper = blankQuestionFactory();
+function createQuestion(question, questionID, appendTo, questionDisplayNumber) {
+  var questionWrapper = blankQuestionFactory(question.data.type == "multi");
 
   // add text like "Question 1 - multi" in the <label>
   setInnerHTMLSanitized(questionWrapper.getElementsByTagName("label")[0], "Question " + questionDisplayNumber + " - " + question.data.type);
@@ -176,6 +187,30 @@ function createQuestion(questionID, question, appendTo, questionDisplayNumber) {
   
 }
 
+function newForm(callback) {
+
+  $.post(endpointToRealAddress("/forms"), JSON.stringify({
+    "hostID": hostID,
+    "data": {
+      "title": "Untitled Form",
+      "description": ""
+    }
+  }), function(formResult) {
+    var formID = JSON.parse(formResult).formID;
+    // add to current event
+    $.post(endpointToRealAddress("/event-forms"), JSON.stringify({
+      "eventID": eventID,
+      "formID": formID,
+      "time-start": null,
+      "time-end": null,
+      "is-active": false,
+      "preceding-eventFormID": null // TODO
+    }), function(eventFormResult) {
+      var eventFormID = JSON.parse(formResult).eventFormID;
+      callback(formID, eventFormID);
+    });
+  });
+}
 
 
 
@@ -185,6 +220,13 @@ if (eventIDString == "") {
   window.location.href = "/MeetingList.html"
 }
 var eventID = parseInt(eventIDString);
+
+// get hostID
+var hostIDString = getCookie("hostID");
+if (hostIDString == "") {
+  window.location.href = "/HostSignIn.html"
+}
+var hostID = parseInt(hostIDString);
 
 
 // The following items are added to eventData:
@@ -202,8 +244,9 @@ getAllEventData(eventID, function(e_d) {
     var eventFormID = eventData.eventFormIDs[i];
     var formID = eventData.formIDs[i];
     var form = eventData.forms[i];
-
-    createAndDisplayForm(eventFormID, formID, form);
+    if (formID != 0) {
+      createAndDisplayForm(eventFormID, formID, form);
+    }
   }
 });
 
