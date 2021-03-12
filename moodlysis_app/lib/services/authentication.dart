@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/models/user.dart';
+import 'package:moodlysis_app/constants.dart';
 
-const backendURI = 'http://192.168.1.171:8001/v0';
 class AuthenticationException implements Exception {}
 
 Future<int> authenticateUser(http.Client client, String email, String password) async {
