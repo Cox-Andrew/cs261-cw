@@ -44,18 +44,32 @@ function getAllEventData(eventID, callback) {
     event["forms"] = [];
 
     var uncompleted_forms = event.formIDs.length;
+    event.forms = [];
     event.formIDs.forEach(formID => {
       $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
         // need to add this, the form GET doesn't return this, it's only in the request
         form["formID"] = formID;
         form["questions"] = [];
-        event["forms"][event.formIDs.indexOf(formID)] = form;
+
+        // find the first place in forms array where this form should be placed and that hasn't already been filled in
+        // this to fix a bug where there couldn't be duplicates in the forms list
+        var formIndex = event.formIDs.indexOf(formID);
+        while (event.forms[formIndex] != null) {
+          formIndex = event.formIDs.indexOf(formID, formIndex + 1);
+        }
+        event.forms[formIndex] = form;
 
         var uncompleted_questions = form.questionIDs.length;
+        form.questions = [];
         form.questionIDs.forEach(questionID => {
           $.getJSON(endpointToRealAddress("/questions/" + questionID), function(question) {
+
             // insert into questions
-            form.questions[form.questionIDs.indexOf(questionID)] = question;
+            var questionIndex = form.questionIDs.indexOf(questionID);
+            while (form.questions[questionIndex] != null) {
+              questionIndex = form.questions.indexOf(questionID, questionIndex + 1);
+            }
+            form.questions[questionIndex] = question;
 
             if (--uncompleted_questions == 0) {
               if (--uncompleted_forms == 0) {
