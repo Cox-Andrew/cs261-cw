@@ -3,6 +3,11 @@
     padding: 0px;
     box-sizing: border-box;
   }
+
+  
+  .DateTime{
+    font-family: "poppins", sans-serif;
+  }
   
   html,
   body {

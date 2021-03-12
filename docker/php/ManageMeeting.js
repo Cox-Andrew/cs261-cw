@@ -70,8 +70,11 @@ function blankFormFactory() {
     <div class = "form">
       <h3 class="template-title"></h3>
       <h4 class="template-description"></h4>
-      <form id = "temp1" >
-        <input type = "submit" class = "submitTemp1" value="Save"></input>
+      <p class="is-active"></p>
+      <form class="event-form-parameters" >
+        <label>Start Time:</label><input type="time" class="DateTime time-start"></input><br>
+        <label>End Time:</label><input type="time" class="DateTime time-end"></input><br>
+        <input type = "submit" class = "submitForm" value="Save"></input>
       </form>
     </div>
   </div>
@@ -121,14 +124,53 @@ function submitDisplayForm(displayFormNumber) {
 
 }
 
+function formatTime(dateObject) {
+  var hour = dateObject.getHours();
+  var min  = dateObject.getMinutes();
 
-function createAndDisplayForm(eventFormID, formID, form) {
+  hour = (hour < 10 ? "0" : "") + hour;
+  min = (min < 10 ? "0" : "") + min;
+
+  return hour+":"+min;
+
+}
+
+function parseTime(timeObj, timeString) {
+  var time = timeString.match("^(..):(..)$");
+  timeObj.setHours(time[1])
+  timeObj.setMinutes(time[2]);
+  return timeObj;
+}
+
+
+
+
+function createAndDisplayForm(eventFormID, formID, eventForm, form) {
 
   // make form title and description
   var templateNode = blankFormFactory();
+  $(templateNode.getElementsByClassName("submitForm"))
+
+  templateNode.setAttribute("id", "eventForm" + eventFormID);
   var formNode = templateNode.getElementsByClassName("form")[0];
   setInnerHTMLSanitized(formNode.getElementsByClassName("template-title")[0], form.data.title);
   setInnerHTMLSanitized(formNode.getElementsByClassName("template-description")[0], form.data.description);
+
+  var timeStartText = "Start time not defined";
+  if (eventForm["time-start"] != null){
+    formNode.getElementsByClassName("time-start")[0].setAttribute("value", formatTime(new Date(eventForm["time-start"])));
+    // setInnerHTMLSanitized(formNode.getElementsByClassName("time-start")[0], timeStartText);
+  }
+
+  // var endTimeText = "End time not defined";
+  if (eventForm["time-end"] != null) {
+    formNode.getElementsByClassName("time-end")[0].setAttribute("value", formatTime(new Date(eventForm["time-end"]))); 
+    // endTimeText = new Date(eventForm.timeEnd).toLocaleString();
+  }
+  // setInnerHTMLSanitized(formNode.getElementsByClassName("time-end")[0], endTimeText);
+  var isActiveText = "Not Active";
+  if (eventForm.isActive) isActiveText = "Currently Active";
+  setInnerHTMLSanitized(formNode.getElementsByClassName("is-active")[0], isActiveText);
 
   // create questions
   for (const i in form.questions) {
@@ -150,6 +192,7 @@ function createAndDisplayForm(eventFormID, formID, form) {
   pageForms.push(templateNode);
   document.getElementById("page-content").appendChild(templateNode);
 
+  return templateNode;
 
 }
 
@@ -162,7 +205,10 @@ function createQuestion(question, questionID, appendTo, questionDisplayNumber) {
   // insert the current data
   setInnerHTMLSanitized(questionWrapper.getElementsByTagName("textarea")[0], question.data.text);
 
-  // add options
+  // set the id of the form element
+  questionWrapper.getElementsByTagName("textarea")[0].setAttribute("id", "question" + questionID);
+
+  // add options TODO this doesn't work but we're not implementing multichoice anyway
   if (question.data.type == "multi") {
     question.data.options.forEach(option => {
 
@@ -187,8 +233,18 @@ function createQuestion(question, questionID, appendTo, questionDisplayNumber) {
   
 }
 
-function newForm(callback) {
+function newFormRequestToBackend(callback) {
 
+  // insert placeholder null values in eventForms and forms
+  var nextIndex = eventData.eventFormIDs.length + 1;
+
+  eventData.formIDs[nextIndex] = null;
+  eventData.eventFormIDs[nextIndex] = null;
+  eventData.eventForms[nextIndex] = null;
+  eventData.forms[nextIndex] = null;
+
+  var remaining_leaf_requests = 2;
+  
   $.post(endpointToRealAddress("/forms"), JSON.stringify({
     "hostID": hostID,
     "data": {
@@ -196,20 +252,115 @@ function newForm(callback) {
       "description": ""
     }
   }), function(formResult) {
-    var formID = JSON.parse(formResult).formID;
-    // add to current event
+    var formID = formResult.formID;
+    eventData.formIDs[nextIndex] = formID;
+    // re-get from database & add to data structure
+    $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
+      eventData.forms[nextIndex] = form;
+      form["formID"] = formID; // need to add because it is missing from the response
+      if (--remaining_leaf_requests == 0) callback(nextIndex);
+    });
+
+    // create eventForm (add form to current event)
     $.post(endpointToRealAddress("/event-forms"), JSON.stringify({
       "eventID": eventID,
       "formID": formID,
-      "time-start": null,
-      "time-end": null,
+      "time-start": eventData.data["time-start"],
+      "time-end": eventData.data["time-end"],
       "is-active": false,
-      "preceding-eventFormID": null // TODO
+      "preceding-eventFormID": 0 // TODO
     }), function(eventFormResult) {
-      var eventFormID = JSON.parse(formResult).eventFormID;
-      callback(formID, eventFormID);
+      var eventFormID = eventFormResult.eventFormID;
+      eventData.eventFormIDs[nextIndex] = eventFormID;
+
+      // re-get from database & add to data structure
+      $.getJSON(endpointToRealAddress("/event-forms/" + eventFormID), function(eventForm) {
+        eventData.eventForms[nextIndex] = eventForm;
+        if (--remaining_leaf_requests == 0) callback(nextIndex);
+      });
+
     });
+
   });
+}
+
+
+function newForm() {
+  newFormRequestToBackend(function(index) {
+    var eventFormID = eventData.eventFormIDs[index];
+    var formID = eventData.formIDs[index];
+    var form = eventData.forms[index];
+    var eventForm = eventData.eventForms[index];
+    var newFormNode = createAndDisplayForm(eventFormID, formID, eventForm, form);
+    switchForms(newFormNode);
+
+  });
+}
+
+function submitForm(eventFormID) {
+
+  var documentForm = document.getElementById("eventForm" + eventFormID).getElementsByClassName("form")[0];
+
+  // update eventForm
+  var eventFormParameters = documentForm.getElementsByClassName("event-form-parameters")[0];
+  // var textInTimeStartBox = eventFormParameters.getElementsByClassName("time-start")[0].value;
+  // var textInTimeEndBox = eventFormParameters.getElementsByClassName("time-end")[0].value;
+  
+  // // parse the dates
+  // var newStartTime;
+  // var newEndTime;
+  // if (eventData.data["time-start"] != null) {
+  //   newStartTime = new Date(eventData.data["time-start"]);
+  // } else {
+  //   alert("Error: the event date is not set!");
+  //   return;
+  // }
+  // if (eventData.data["time-end"] != null) {
+  //   newEndTime = new Date(eventData.data["time-end"]);
+  // } else {
+  //   alert("Error: the event date is not set!");
+  //   return;
+  // }
+
+
+  // var timeInTimeStartBox = parseTime(newStartTime, textInTimeStartBox);
+  // var timeInTimeEndBox = parseTime(newStartTime, textInTimeEndBox);
+
+
+
+
+  // timeInTimeStartBox.setMilliseconds(0);
+  // timeInTimeEndBox.setMilliseconds(0);
+
+  // n
+
+  var form = eventData.forms[eventData.eventFormIDs.indexof(eventFormID)];
+  form.questions.forEach(question => {
+    // check if the question has been edited in the webpage
+    var textInQuestionBox = documentForm.getElementById("question" + question.questionID).value;
+    if (textInQuestionBox != question.data.text) {
+      // change the representation in eventData
+      question.data.text = textInQuestionBox;
+      // make a copy to get into the right format for the PUT
+      var questionInPutFormat = {
+        data: question.data
+      };
+      // update database
+      $.ajax({
+        url: endpointToRealAddress("/questions/"+ question.questionID),
+        type: 'PUT',
+        data: JSON.stringify(questionInPutFormat),
+        success: function(result) {
+            // TODO
+        }
+      });
+    }
+  });
+
+
+  // get all the data from the webpage. compare it to eventData, then update if necessary
+
+
 }
 
 
@@ -244,10 +395,13 @@ getAllEventData(eventID, function(e_d) {
     var eventFormID = eventData.eventFormIDs[i];
     var formID = eventData.formIDs[i];
     var form = eventData.forms[i];
+    var eventForm = eventData.eventForms[i];
     if (formID != 0) {
-      createAndDisplayForm(eventFormID, formID, form);
+      createAndDisplayForm(eventFormID, formID, eventForm, form);
     }
   }
 });
+
+
 
 
