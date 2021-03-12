@@ -1,16 +1,12 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/models/user.dart';
 import 'package:moodlysis_app/test_data.dart';
+import 'package:moodlysis_app/constants.dart';
 
-final Map<String, int> _testCodeIDs = {
-  'ABCDEFGH': 1,
-  '12345678': 2,
-};
-
-final Map<int, Event> _testIDEvents = {
-  1: Event("Alphabet class", "learn ur abcs", DateTime.now().subtract(Duration(minutes: 5)), DateTime.now().add(Duration(minutes: 55))),
-  2: Event("Maths", "algebra hours", DateTime.now().add(Duration(days: 5, hours: 2)), DateTime.now().add(Duration(days: 5, hours: 3))),
-};
+class InvalidCodeException implements Exception {}
 
 Future<List<Event>> getUserEvents(User user) async {
   //TODO: API events request
@@ -19,18 +15,16 @@ Future<List<Event>> getUserEvents(User user) async {
   return events;
 }
 
-Future<int> registerForEvent(String inviteCode) async {
-  //TODO: API event registration
-  await Future.delayed(Duration(milliseconds: 500));
-  if (_testCodeIDs.containsKey(inviteCode)) return _testCodeIDs[inviteCode];
+Future<int> registerForEvent(http.Client client, String inviteCode, int attendeeID) async {
+  final Map<String, dynamic> body = {"invite-code": inviteCode, "attendeeID": attendeeID,};
+  final response = await client.post('$backendURI/register-event', body: json.encode(body));
 
-  return null;
+  if (response.statusCode == 404) throw InvalidCodeException();
+
+  return json.decode(response.body)['eventID'];
 }
 
 Future<Event> getEvent(int eventID) async {
   //TODO: request event by ID
-  await Future.delayed(Duration(milliseconds: 500));
-  if (_testIDEvents.containsKey(eventID)) return _testIDEvents[eventID];
-
-  return null;
+  return Event("Placeholder", "A placeholder event before API integration", DateTime.now(), DateTime.now());
 }
