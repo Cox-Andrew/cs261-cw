@@ -84,8 +84,8 @@ function getAllEventData(eventID, callback) {
     });
     event.eventFormIDs.forEach(eventFormID => {
       $.get(endpointToRealAddress("/event-forms/" + eventFormID), function(eventForm) {
-        var eventFormIndex = form.eventFormIDs.indexOf(eventFormID);
-        form.eventForms[eventFormIndex] = eventForm;
+        var eventFormIndex = event.eventFormIDs.indexOf(eventFormID);
+        event.eventForms[eventFormIndex] = eventForm;
 
         if (--uncompleted_sub_event == 0) {
           callback(event);
