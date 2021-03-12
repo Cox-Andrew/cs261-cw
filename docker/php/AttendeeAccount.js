@@ -17,7 +17,7 @@ function fillInHostAccountInfo () {
 	;
 }
 
-function deleteHost() {
+function deleteAttendee() {
 	$.ajax({
 		url: endpointToRealAddress("/attendees/" + hostID),
 		type: "DELETE",
