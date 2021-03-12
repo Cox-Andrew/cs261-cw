@@ -147,8 +147,14 @@ function getComprehensive() {
         if (timeNow > dateStart && timeNow < dateEnd && formID != 0) {
           boolform = false;
           if (removeForm(eventFormID)) {
-            form = document.getElementById("CForm");
-            form.setAttribute("onsubmit","submitComprehensive(); return false");
+            if (getCookie("eventFormID") != getCookie("submittedEventFormID")) {
+              form = document.getElementById("CForm");
+              form.setAttribute("onsubmit","submitComprehensive(); return false");
+            }
+            else {
+              form = document.getElementById("CForm");
+              form.setAttribute("onsubmit","editComprehensive(); return false");
+            }
             var remNoForm = document.getElementById("noForm");
             if (remNoForm != null) {
               remNoForm.remove();
@@ -201,7 +207,7 @@ function getComprehensive() {
                         var questionEntry = document.createElement("textarea");
                         questionEntry.className = "textarea";
                         questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
-                        questionEntry.setAttribute("id","ques1");
+                        questionEntry.setAttribute("id","ques" + i);
                         questionEntry.setAttribute("rows","2");
                         questionEntry.setAttribute("cols","15");
                         questionEntry.setAttribute("placeholder"," ");
@@ -209,6 +215,7 @@ function getComprehensive() {
                         currentDiv.appendChild(br);
                         currentDiv.appendChild(questionEntry);
                         var br = document.createElement("br");
+                        br.setAttribute("id","br");
                         currentDiv.appendChild(br);
                       }
                       else if (type == "options") {
@@ -223,7 +230,7 @@ function getComprehensive() {
                 });
                 var checkbox = document.createElement("div");
                 checkbox.className = "checkbox";
-                checkbox.setAttribute = ("id","checkbox");
+                checkbox.setAttribute("id","AnonComp");
                 var checkinput = document.createElement("input");
                 var checktext = document.createTextNode(" Anonymous");
                 checkinput.setAttribute("type","checkbox");
@@ -245,8 +252,11 @@ function getComprehensive() {
                 submitButton.setAttribute("id","btnFeed");
                 submitButton.setAttribute("class","submitFeed");
                 submitButton.setAttribute("type","submit");
-                submitButton.setAttribute("value","Submit");
-                //submitButton.setAttribute("onclick","editButton()");
+                if (getCookie("eventFormID") != getCookie("submittedEventFormID")) {
+                  submitButton.setAttribute("value","Submit");
+                } else {
+                  submitButton.setAttribute("value","Edit Submission");
+                }
                 currentDiv.appendChild(submitButton);
                 return;
               }
@@ -307,8 +317,12 @@ function removeForm(eventFormID) {
       labelQ.remove();
       i++;
     }
-    if (document.getElementById("checkbox")) {
-      rem = document.getElementById("checkbox");
+    if (document.getElementById("AnonymousComp")) {
+      rem = document.getElementById("AnonymousComp");
+      rem.remove();
+    }
+    if (document.getElementById("AnonComp")) {
+      rem = document.getElementById("AnonComp");
       rem.remove();
     }
     if (document.getElementById("br")) {
@@ -340,6 +354,7 @@ function submitComprehensive() {
   form.setAttribute("onsubmit","editComprehensive(); return false");
   newButton = document.getElementById("btnFeed");
   newButton.setAttribute("value","Edit Submission");
+  setCookie("submittedEventFormID", getCookie("eventFormID"), 1);
 }
 
 function submitAnswer(answer, numInForm) {

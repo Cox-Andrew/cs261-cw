@@ -104,7 +104,7 @@ public class Form implements FormInterface {
 			if (table.wasNull()) {
 				desc = "";
 			}
-			String query2 = "SELECT * FROM QUESTIONS WHERE FormID = ?";
+			String query2 = "SELECT * FROM QUESTIONS WHERE FormID = ? ORDER BY NumInForm ASC";
 			questionsGet = conn.prepareStatement(query2);
 			questionsGet.setInt(1, formID);
 			table2 = questionsGet.executeQuery();
