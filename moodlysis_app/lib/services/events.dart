@@ -10,13 +10,11 @@ class InvalidCodeException implements Exception {}
 Future<List<Event>> getUserEvents(http.Client client, User user) async {
   final response = await client.get('$backendURI/register-event?attendeeID=${user.id}');
   List<dynamic> eventIDs = json.decode(response.body)['eventIDs'];
-  print(eventIDs);
 
   List<Event> events = List<Event>();
   for (int eventID in eventIDs) {
     events.add(await getEvent(client, eventID));
   }
-  print(events);
 
   return events;
 }
