@@ -8,6 +8,8 @@
       href="https://fonts.googleapis.com/css2?family=Poppins"
       rel="stylesheet"
     />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <link rel="stylesheet" href="ManageMeeting.css" />
     <title>Home</title>
   </head>
@@ -45,7 +47,8 @@
 
       <div class  = "template1" id  = "template1">
         <div class = "form">
-          <h3>Template 1</h3>
+          <h3 class="template-title">Template Title</h3>
+          <h4 class="template-description">Template Description</h4>
           <form id = "temp1" onsubmit="return submitTemplate1();">
             <label>Question 1<br></label>
             <textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' id = "q1" rows="2" cols="15">Is the voice of the speaker audible to you?</textarea>
