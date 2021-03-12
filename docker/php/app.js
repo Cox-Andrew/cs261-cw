@@ -43,9 +43,11 @@ function getAllEventData(eventID, callback) {
   $.getJSON(endpointToRealAddress("/events/" + eventID), function (event) {
 
     var uncompleted_sub_event = event.formIDs.length + event.eventFormIDs.length;
+    if (uncompleted_sub_event == 0) callback(event);
 
     event.forms = [];
     event.eventForms = [];
+
 
     event.formIDs.forEach(formID => {
       $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
@@ -60,7 +62,14 @@ function getAllEventData(eventID, callback) {
         }
         event.forms[formIndex] = form;
 
+        // there might be no questions in this form, if so decrement uncompleted_sub_event immediately
         var uncompleted_sub_form = form.questionIDs.length;
+        if (uncompleted_sub_form == 0) {
+          if (--uncompleted_sub_event == 0) {
+            // we have finished getting event data
+            callback(event);
+          }
+        }
         form.questions = [];
         form.questionIDs.forEach(questionID => {
           $.getJSON(endpointToRealAddress("/questions/" + questionID), function(question) {
