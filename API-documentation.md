@@ -225,6 +225,21 @@ Request:
 Delete an event\
 ```DELETE /v0/events/{eventID}``` Working
 
+Get event-form\
+`GET /v0/event-forms/{eventFormID}`\
+Response:
+```
+{
+	"eventFormID": 423423,
+	"eventID": 432423,
+	"formID": 354234,
+	"time-start": null,
+	"time-end": null,
+	"is-active": false,
+	"num-in-event": 1
+}
+```
+
 Add a form to an event\
 ```POST /v0/event-forms``` Working, but always inserts at the end of an event regardless of preceding-eventFormID\
 Request:
@@ -258,7 +273,7 @@ Request:
 }
 ```
 
-Delete a form from an event
+Delete a form from an event\
 ```DELETE /v0/event-forms/{eventFormID}``` Working
 
 
