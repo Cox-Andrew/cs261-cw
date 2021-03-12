@@ -116,8 +116,8 @@ class _JoinFormState extends State<JoinForm> {
       _formKey.currentState.save();
 
       setState(() => _loading = true);
-      registerForEvent(http.Client(), _inviteCode, globals.currentUser.id)
-          .then((eventID) => getEvent(eventID))
+      registerForEvent(http.Client(), _inviteCode, globals.currentUser)
+          .then((eventID) => getEvent(http.Client(), eventID))
           .then((event) => _handleRegistrationSuccess(event))
           .catchError((e, s) => _handleInvalidCode(e, s),
               test: (e) => e is InvalidCodeException)

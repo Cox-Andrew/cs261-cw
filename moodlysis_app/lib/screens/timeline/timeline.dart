@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/navigation.dart';
 import 'package:moodlysis_app/models/event.dart';
@@ -19,7 +20,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
   List<Event> _upcomingEvents;
 
   void _updateEvents() {
-    getUserEvents(globals.currentUser).then((events) {
+    getUserEvents(http.Client(), globals.currentUser).then((events) {
       List<Event> liveEvents = [];
       List<Event> upcomingEvents = [];
 
