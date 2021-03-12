@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -117,13 +118,16 @@ class SignInFormState extends State<SignInForm> {
       authenticateUser(http.Client(), _formData["email"], _formData["password"])
           .then((int id) => getUser(http.Client(), id))
           .then((User user) => _handleAuthenticationSuccess(user))
-          .catchError((e) => _handleAuthenticationFailure(),
+          .catchError((e, s) => _handleAuthenticationError(e, s),
               test: (e) => e is AuthenticationException)
-          .catchError((error, stackTrace) => _handleError(error, stackTrace))
+          .catchError((e, s) => _handleConnectionError(e, s),
+              test: (e) => e is SocketException)
+          .catchError((e, s) => _handleError(e, s))
           .whenComplete(() => setState(() => _loading = false));
     }
   }
 
+  //TODO: code duplication restructure project and resolve
   void _handleAuthenticationSuccess(User user) {
     globals.currentUser = user;
 
@@ -141,7 +145,10 @@ class SignInFormState extends State<SignInForm> {
             context, "/timeline", (r) => false));
   }
 
-  void _handleAuthenticationFailure() {
+  void _handleAuthenticationError(dynamic error, StackTrace stackTrace) {
+    print("Error: $error");
+    print("StackTrace: $stackTrace");
+
     Scaffold.of(context).removeCurrentSnackBar();
     Scaffold.of(context).showSnackBar(SnackBar(
       content: RichText(
@@ -149,6 +156,21 @@ class SignInFormState extends State<SignInForm> {
         TextSpan(text: 'Invalid credentials', style: TextStyle(fontWeight: FontWeight.bold)),
         TextSpan(text: ', please try again.'),
       ])),
+      backgroundColor: Theme.of(context).errorColor,
+    ));
+  }
+
+  void _handleConnectionError(dynamic error, StackTrace stackTrace) {
+    print("Error: $error");
+    print("StackTrace: $stackTrace");
+
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: RichText(
+          text: TextSpan(children: [
+            TextSpan(text: 'Connection failed', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: ', please try again.'),
+          ])),
       backgroundColor: Theme.of(context).errorColor,
     ));
   }
