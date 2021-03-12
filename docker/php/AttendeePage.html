@@ -17,7 +17,7 @@
   <body>
     <nav>
       <div class="logo">
-        <a href="index.html"><h4>MOODLYSIS</h4></a>
+        <a href="AttendeeHomepage.html"><h4>MOODLYSIS</h4></a>
       </div>
       <ul class="nav-links">
         <li>
@@ -73,6 +73,10 @@
             </ul>
             <label><br>Comments<br></label>
             <textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' id="comments" rows="5" cols="15" placeholder="Enter your comments" required></textarea>
+            <div class="checkbox">
+              <input type="checkbox" name="anonymous" id="AnonymousGeneral" placeholder="Anonymous">
+              Anonymous
+            </div>
             <br>
             <div id="msgGen">
               <h5>Please wait for 15 seconds to resubmit</h5>
@@ -104,7 +108,19 @@
         <div class = "form">
           <h4>Comprehensive feedback</h4>
           <form id="CForm" action="#" method="POST" onsubmit="submitComprehensive(); return false">
+            <div class="checkbox">
+              <input type="checkbox" name="anonymous" id="AnonymousComp" placeholder="Anonymous">
+              Anonymous
+            </div>
+            <br>
+            <div id="msgFeed">
+              <h5>This form can only be submitted once.</h5>
+            </div>
+            <input type = "submit" class = "submitFeed" id = "btnFeed" value="Submit">
           </form>
+          <div id = "EditResponse" style="display: none;">
+            <button id = "editBtn" class= "edit" onclick="edit();" value="Edit submission">Edit submission</button>
+          </div> 
           <script>
               $(document).ready(function () {
                   $("#CForm").submit(function (e) {
@@ -113,6 +129,7 @@
                     $("#btnFeed").css("background-color","rgb(122, 120, 120)");
                     $("#btnFeed").css("cursor","no-drop");
                     $("#msgFeed").css("display","block");
+                    $("#EditResponse").css("display","block");                    
                     return true;
                   });
               });
