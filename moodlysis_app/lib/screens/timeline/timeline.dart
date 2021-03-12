@@ -21,8 +21,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
 
   void _updateEvents() {
     getUserEvents(http.Client(), globals.currentUser).then((events) {
-      List<Event> liveEvents = [];
-      List<Event> upcomingEvents = [];
+      List<Event> liveEvents = List<Event>();
+      List<Event> upcomingEvents = List<Event>();
 
       for (Event event in events) {
         //TODO: implement past events archive

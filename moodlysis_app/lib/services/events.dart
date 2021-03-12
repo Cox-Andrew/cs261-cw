@@ -9,6 +9,8 @@ class InvalidCodeException implements Exception {}
 
 Future<List<Event>> getUserEvents(http.Client client, User user) async {
   final response = await client.get('$backendURI/register-event?attendeeID=${user.id}');
+
+  if (response.statusCode == 404) return List<Event>();
   List<dynamic> eventIDs = json.decode(response.body)['eventIDs'];
 
   return Future.wait(eventIDs.map((eventID) => getEvent(client, eventID)));
