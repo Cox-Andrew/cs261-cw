@@ -20,6 +20,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
   List<Event> _upcomingEvents;
 
   void _updateEvents() {
+    //TODO: error catching e.g. connection failed
     getUserEvents(http.Client(), globals.currentUser).then((events) {
       List<Event> liveEvents = List<Event>();
       List<Event> upcomingEvents = List<Event>();

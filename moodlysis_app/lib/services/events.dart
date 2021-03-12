@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/models/user.dart';
 import 'package:moodlysis_app/constants.dart';
-
-class InvalidCodeException implements Exception {}
+import 'package:moodlysis_app/services/exceptions.dart';
 
 Future<List<Event>> getUserEvents(http.Client client, User user) async {
   final response = await client.get('$backendURI/register-event?attendeeID=${user.id}');
@@ -20,7 +19,7 @@ Future<int> registerForEvent(http.Client client, String inviteCode, User user) a
   final Map<String, dynamic> body = {"invite-code": inviteCode, "attendeeID": user.id,};
   final response = await client.post('$backendURI/register-event', body: json.encode(body));
 
-  if (response.statusCode == 404) throw InvalidCodeException();
+  if (response.statusCode == 404) throw ResultNotFoundException();
 
   return json.decode(response.body)['eventID'];
 }

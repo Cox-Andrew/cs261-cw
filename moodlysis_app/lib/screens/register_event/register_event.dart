@@ -6,6 +6,7 @@ import 'package:moodlysis_app/components/navigation.dart';
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
+import 'package:moodlysis_app/services/exceptions.dart';
 
 class RegisterEventScreen extends StatelessWidget {
   static const route = "/register_event";
@@ -120,7 +121,7 @@ class _JoinFormState extends State<JoinForm> {
           .then((eventID) => getEvent(http.Client(), eventID))
           .then((event) => _handleRegistrationSuccess(event))
           .catchError((e, s) => _handleInvalidCode(e, s),
-              test: (e) => e is InvalidCodeException)
+              test: (e) => e is ResultNotFoundException)
           .catchError((e, s) => _handleError(e, s))
           .whenComplete(() => setState(() => _loading = false));
     }

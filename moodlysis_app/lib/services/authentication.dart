@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/models/user.dart';
 import 'package:moodlysis_app/constants.dart';
-
-class AuthenticationException implements Exception {}
+import 'package:moodlysis_app/services/exceptions.dart';
 
 Future<int> authenticateUser(http.Client client, String email, String password) async {
   final Map<String, String> body = {"email": email, "pass": password};
@@ -24,9 +23,11 @@ Future<int> registerUser(http.Client client, String name, String email, String p
   return json.decode(response.body)['attendeeID'];
 }
 
-Future<User> getUser(http.Client client, int id) async {
-  final response = await client.get('$backendURI/attendees/$id');
+Future<User> getUser(http.Client client, int userID) async {
+  final response = await client.get('$backendURI/attendees/$userID');
+
+  if (response.statusCode == 404) throw ResultNotFoundException();
   final Map<String, dynamic> data = json.decode(response.body)['data'];
-  
-  return User(id, data['email'], data['account-name']);
+
+  return User(userID, data['email'], data['account-name']);
 }
