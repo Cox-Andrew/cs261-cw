@@ -116,7 +116,11 @@ class _JoinFormState extends State<JoinForm> {
         if (eventID == null) {
           Scaffold.of(context).removeCurrentSnackBar();
           Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("Invalid code, please try again"),
+            content: RichText(
+                text: TextSpan(children: [
+                  TextSpan(text: 'Invalid code', style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: ', please try again.'),
+                ])),
             backgroundColor: Theme.of(context).errorColor,
           ));
           return;

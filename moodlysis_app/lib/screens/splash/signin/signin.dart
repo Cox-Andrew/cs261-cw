@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:moodlysis_app/models/user.dart';
 import 'package:moodlysis_app/services/authentication.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 
@@ -113,38 +115,57 @@ class SignInFormState extends State<SignInForm> {
 
       setState(() => _loading = true);
       authenticateUser(http.Client(), _formData["email"], _formData["password"])
-          .then((id) {
-        getUser(http.Client(), id).then((user) {
-          globals.currentUser = user;
-
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Authenticated as ${user.name}, id: ${user.id}, email: ${user.email}'),
-            backgroundColor: Colors.green,
-          ));
-
-          _focusNode.unfocus();
-          Future.delayed(Duration(milliseconds: 1500), () => Navigator.pushNamedAndRemoveUntil(context, "/timeline", (r) => false));
-        }).catchError((error) {
-          //TODO: fix and improve error handling
-          print("getUser error: $error");
-
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("Something went wrong, please try again."),
-            backgroundColor: Theme.of(context).errorColor,
-          ));
-        });
-      }).catchError((error) {
-        print("authenticateUser error: $error");
-
-        Scaffold.of(context).removeCurrentSnackBar();
-        Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text("Something went wrong, please try again."),
-          backgroundColor: Theme.of(context).errorColor,
-        ));
-      }).whenComplete(() => setState(() => _loading = false));
+          .then((int id) => getUser(http.Client(), id))
+          .then((User user) => _handleAuthenticationSuccess(user))
+          .catchError((e) => _handleAuthenticationFailure(),
+              test: (e) => e is AuthenticationException)
+          .catchError((error, stackTrace) => _handleError(error, stackTrace))
+          .whenComplete(() => setState(() => _loading = false));
     }
+  }
+
+  void _handleAuthenticationSuccess(User user) {
+    globals.currentUser = user;
+
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(
+          'Authenticated as ${user.name}, id: ${user.id}, email: ${user.email}'),
+      backgroundColor: Colors.green,
+    ));
+
+    _focusNode.unfocus();
+    Future.delayed(
+        Duration(milliseconds: 1500),
+        () => Navigator.pushNamedAndRemoveUntil(
+            context, "/timeline", (r) => false));
+  }
+
+  void _handleAuthenticationFailure() {
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: RichText(
+          text: TextSpan(children: [
+        TextSpan(text: 'Invalid credentials', style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: ', please try again.'),
+      ])),
+      backgroundColor: Theme.of(context).errorColor,
+    ));
+  }
+
+  //TODO: implement specific error handling for failed connection etc.
+  void _handleError(dynamic error, StackTrace stackTrace) {
+    print("Error: $error");
+    print("StackTrace: $stackTrace");
+
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: RichText(
+          text: TextSpan(children: [
+            TextSpan(text: 'Something went wrong', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: ', please try again.'),
+          ])),
+      backgroundColor: Theme.of(context).errorColor,
+    ));
   }
 }
