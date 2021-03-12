@@ -18,7 +18,7 @@ Future<int> authenticateUser(http.Client client, String email, String password) 
 
 //TODO endpoint not fully implemented can register with already in use email
 Future<int> registerUser(http.Client client, String name, String email, String password) async {
-  final Map<String, String> body = {"name": name, "email": email, "pass": password};
+  final Map<String, String> body = {"account-name": name, "email": email, "pass": password};
   final response = await client.post('$backendURI/attendees', body: json.encode(body));
   
   return json.decode(response.body)['attendeeID'];
