@@ -32,16 +32,16 @@ function pastEventDisplay(eventIDs) {
   });
   if (i == 0) {
     var noEvents = document.createElement("div");
-    eventName.className = "eventName";
-    setInnerHTMLSanitized(eventName, "You have no past events.");
-    currentDiv.appendChild(eventName);
+    noEvents.className = "noEvents";
+    setInnerHTMLSanitized(noEvents, "You have no past events.");
+    currentDiv.appendChild(noEvents);
   }
 
 }
 
 function registeredEventIDs() {
   attendeeID = getCookie("attendeeID");
-
+  eventIDs = [];
   $.ajax({
     type: "GET",
     url: endpointToRealAddress("/register-event?attendeeID=" + attendeeID),
