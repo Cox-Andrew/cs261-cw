@@ -30,16 +30,6 @@ function showDiv() {
   document.getElementById("msg").style.display= " block";
 }
 
-function edit()
-{
-  document.getElementById("btnFeed").disabled = false;
-  document.getElementById("btnFeed").style.backgroundColor = "transparent";
-  document.getElementById("btnFeed").style.cursor = "pointer";
-  document.getElementById("msgFeed").style.display = "none";
-  document.getElementById("EditResponse").style.display = "none";
-  return true;
-}
-
 function submitGeneral() {
   var emoji = document.getElementsByName('emoji');
   var emojiValue = null;
@@ -157,6 +147,8 @@ function getComprehensive() {
         if (timeNow > dateStart && timeNow < dateEnd && formID != 0) {
           boolform = false;
           if (removeForm(eventFormID)) {
+            form = document.getElementById("CForm");
+            form.setAttribute("onsubmit","submitComprehensive(); return false");
             var remNoForm = document.getElementById("noForm");
             if (remNoForm != null) {
               remNoForm.remove();
@@ -229,15 +221,31 @@ function getComprehensive() {
                   });
                   i++;
                 });
+                var checkbox = document.createElement("div");
+                checkbox.className = "checkbox";
+                var checkinput = document.createElement("input");
+                var checktext = document.createTextNode(" Anonymous");
+                checkinput.setAttribute("type","checkbox");
+                checkinput.setAttribute("name","anonymous");
+                checkinput.setAttribute("id","AnonymousComp");
+                checkinput.setAttribute("placeholder","Anonymous");
+                checkbox.appendChild(checkinput);
+                checkbox.appendChild(checktext);
+                currentDiv.appendChild(checkbox);
+
+                var br = document.createElement("br");
+                currentDiv.appendChild(br);
+
                 var onlySubmitOnce = document.createElement("div");
                 onlySubmitOnce.setAttribute("id","msgFeed");
-                setInnerHTMLSanitized(onlySubmitOnce, "This form can only be submitted once." );
+                setInnerHTMLSanitized(onlySubmitOnce, "You can edit your feedback in 5 seconds." );
                 currentDiv.appendChild(onlySubmitOnce);
                 var submitButton = document.createElement("input");
                 submitButton.setAttribute("id","btnFeed");
                 submitButton.setAttribute("class","submitFeed");
                 submitButton.setAttribute("type","submit");
                 submitButton.setAttribute("value","Submit");
+                //submitButton.setAttribute("onclick","editButton()");
                 currentDiv.appendChild(submitButton);
                 return;
               }
@@ -255,6 +263,34 @@ function getComprehensive() {
 
 }
 
+function editComprehensive() {
+  i = 1;
+  while(document.getElementById("ques" + i)) {
+    answer = document.getElementById("ques" + i).value;
+    editAnswer(answer, i);
+    i++;
+  }
+}
+
+function editAnswer(answer, numInForm) {
+  answers = {};
+  answers.data = {};
+  answers.data["response"] = answer;
+  answers.data["isAnonymous"] = getCookie("isAnonymous");
+
+  $.ajax({
+    type: "PUT",
+    url: endpointToRealAddress("/answers/" + getCookie("answerID" + i)),
+    dataType: "json",
+    data: JSON.stringify(answers),
+    async: false,
+    success: function(result, status, xhr){
+      //answerID = result.answerID;
+      //TODO
+    }
+  });
+}
+
 function removeForm(eventFormID) {
   i = 1;
   check = false;
@@ -269,6 +305,14 @@ function removeForm(eventFormID) {
       labelQ = document.getElementById("formLabel");
       labelQ.remove();
       i++;
+    }
+    if (document.getElementById("checkbox")) {
+      rem = document.getElementById("checkbox");
+      rem.remove();
+    }
+    if (document.getElementById("br")) {
+      rem = document.getElementById("br");
+      rem.remove();
     }
     if (document.getElementById("btnFeed")) {
       submitButton = document.getElementById("btnFeed");
@@ -291,7 +335,10 @@ function submitComprehensive() {
     submitAnswer(answer, i);
     i++;
   }
-
+  form = document.getElementById("CForm");
+  form.setAttribute("onsubmit","editComprehensive(); return false");
+  newButton = document.getElementById("btnFeed");
+  newButton.setAttribute("value","Edit Submission");
 }
 
 function submitAnswer(answer, numInForm) {
@@ -312,7 +359,7 @@ function submitAnswer(answer, numInForm) {
     data: JSON.stringify(answers),
     async: false,
     success: function(result, status, xhr){
-      //answerID = result.answerID;
+      setCookie("answerID"+numInForm, result.answerID,1);
       //TODO
     }
   });
