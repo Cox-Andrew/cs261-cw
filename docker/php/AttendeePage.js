@@ -72,7 +72,7 @@ function generalInsert(comments) {
   answer["questionID"] = 0;
   answer.data = {};
   answer.data["response"] = comments;
-  answer.data["isAnonymous"] = getCookie("isAnonymous");
+  answer.data["isAnonymous"] = document.getElementById("AnonymousGeneral").checked;
   $.ajax({
     type: "GET",
     url: endpointToRealAddress("/events/" + eventID),
@@ -277,7 +277,7 @@ function editAnswer(answer, numInForm) {
   answers = {};
   answers.data = {};
   answers.data["response"] = answer;
-  answers.data["isAnonymous"] = getCookie("isAnonymous");
+  answers.data["isAnonymous"] = document.getElementById("AnonymousComp").checked;
 
   $.ajax({
     type: "PUT",
@@ -346,7 +346,7 @@ function submitAnswer(answer, numInForm) {
   answers = {};
   answers.data = {};
   answers.data["response"] = answer;
-  answers.data["isAnonymous"] = getCookie("isAnonymous");
+  answers.data["isAnonymous"] = document.getElementById("AnonymousComp").checked;
   answers["attendeeID"] = getCookie("attendeeID");
   answers["eventID"] = getCookie("eventID");
   answers["eventFormID"] = getCookie("eventFormID");
