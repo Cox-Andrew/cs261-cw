@@ -11,12 +11,7 @@ Future<List<Event>> getUserEvents(http.Client client, User user) async {
   final response = await client.get('$backendURI/register-event?attendeeID=${user.id}');
   List<dynamic> eventIDs = json.decode(response.body)['eventIDs'];
 
-  List<Event> events = List<Event>();
-  for (int eventID in eventIDs) {
-    events.add(await getEvent(client, eventID));
-  }
-
-  return events;
+  return Future.wait(eventIDs.map((eventID) => getEvent(client, eventID)));
 }
 
 Future<int> registerForEvent(http.Client client, String inviteCode, User user) async {
