@@ -54,17 +54,40 @@ class EventScreen extends StatelessWidget {
             ]),
             Divider(),
             _live
-                ? Column(children: [
-                    GeneralFeedbackForm(),
-                    Divider(),
-                    ComprehensiveFeedbackForm(),
-                  ])
+                ? Expanded(child: FeedbackTabs())
                 : Expanded(
                     child: Align(
                         alignment: FractionalOffset(0.5, 0.3),
-                        child: Text("This event hasn't started yet.", style: Theme.of(context).textTheme.headline3, textAlign: TextAlign.center,))),
+                        child: Text(
+                          "This event hasn't started yet.",
+                          style: Theme.of(context).textTheme.headline3,
+                          textAlign: TextAlign.center,
+                        ))),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class FeedbackTabs extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: TabBar(tabs: [
+          Tab(
+              icon: Icon(Icons.sentiment_satisfied_alt,
+                  color: Theme.of(context).primaryColor)),
+          Tab(
+              icon:
+                  Icon(Icons.feedback, color: Theme.of(context).primaryColor)),
+        ]),
+        body: TabBarView(children: [
+          GeneralFeedbackForm(),
+          ComprehensiveFeedbackForm(),
+        ]),
       ),
     );
   }
@@ -83,41 +106,35 @@ class ComprehensiveFeedbackFormState extends State<ComprehensiveFeedbackForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
-        key: _formKey,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text("Comprehensive Feedback",
-                  style: Theme.of(context).textTheme.headline5),
-              Column(
-                children: [
-                  Text(
-                      "This is a short question This is a short question This is a short question This is a short question"),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Response",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.text,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Required';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text("Comprehensive feedback",
+                style: Theme.of(context).textTheme.headline5),
+          ),
+          Divider(),
+          Column(
+            children: [
+              Text(
+                  "This is a short question This is a short question This is a short question This is a short question"),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Response",
+                  border: OutlineInputBorder(),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text('Processing Data')));
-                  }
-                },
-                child: Text('Submit'),
-              ),
-            ]));
+            ],
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text('Submit'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -134,40 +151,34 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
-        key: _formKey,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text("General feedback",
-                  style: Theme.of(context).textTheme.headline5),
-              Column(
-                children: [
-                  Text(
-                      "This is a short question This is a short question This is a short question This is a short question"),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Response",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.text,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Required';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text("General feedback",
+                style: Theme.of(context).textTheme.headline5),
+          ),
+          Divider(),
+          Column(
+            children: [
+              Text(
+                  "This is a short question This is a short question This is a short question This is a short question"),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Response",
+                  border: OutlineInputBorder(),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text('Processing Data')));
-                  }
-                },
-                child: Text('Submit'),
-              ),
-            ]));
+            ],
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text('Submit'),
+          ),
+        ],
+      ),
+    );
   }
 }
