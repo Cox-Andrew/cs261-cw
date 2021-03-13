@@ -424,15 +424,36 @@ function generatePageData(event) {
       async: false,
       success: function(result, status, xhr){
         formNo++;
-        var compHTML = `<div class = "sub-content">
-          <h3>Comprehensive Feedback</h3>
-          <div id="feedback-container` + formNo +  `" class = "fLeft">
-            <h4>Questions</h4>
+        if (getCookie("activatedForm" + formNo) == 2) {
+          var compHTML = `<div class = "sub-content">
+            <h3>Comprehensive Feedback</h3>
+            <div id="feedback-container` + formNo +  `" class = "fLeft">
+              <h4>Questions</h4>
+            </div>
+            <button type = "button" class = "activateForm" id = "btnFeed` + formNo + `" onclick="test2(` + formNo +`,` + eventFormID + `)" disabled="disabled">Form has ended</button>
           </div>
-          <button type = "button" class = "activateForm" id = "btnFeed` + formNo + `" onclick="test(` + formNo +`,` + eventFormID + `)">Activate</button>
-        </div>
-        `;
-
+          `;
+        }
+        else if (getCookie("activatedForm" + formNo) == 1) {
+          var compHTML = `<div class = "sub-content">
+            <h3>Comprehensive Feedback</h3>
+            <div id="feedback-container` + formNo +  `" class = "fLeft">
+              <h4>Questions</h4>
+            </div>
+            <button type = "button" class = "activateForm" id = "btnFeed` + formNo + `" onclick="test2(` + formNo +`,` + eventFormID + `)">End form</button>
+          </div>
+          `;
+        }
+        else {
+          var compHTML = `<div class = "sub-content">
+            <h3>Comprehensive Feedback</h3>
+            <div id="feedback-container` + formNo +  `" class = "fLeft">
+              <h4>Questions</h4>
+            </div>
+            <button type = "button" class = "activateForm" id = "btnFeed` + formNo + `" onclick="test(` + formNo +`,` + eventFormID + `)">Activate</button>
+          </div>
+          `;
+        }
         var genHTML = `<div class = "sub-content">
           <h3>General Feedback</h3>
             <div id="feedback-container` + formNo +  `" class = "fLeft">
@@ -450,6 +471,10 @@ function generatePageData(event) {
         }
         temp.setAttribute("id","temp" + formNo);
         currentDiv.appendChild(temp);
+        if (getCookie("activatedForm" + formNo) == 2) {
+          $("#btnFeed" + formNo).css("cursor","no-drop");
+          $("#btnFeed" + formNo).css("background-color","rgb(122, 120, 120)");
+        }
         pageForms.push(temp);
         var formID = result["formID"];
         pageLoadFeedback(eventFormID,formID,formNo);
@@ -490,6 +515,7 @@ function test(formNo, eventFormID) {
     $("#btnFeed" + formNo).css("cursor","pointer");
     setInnerHTMLSanitized(document.getElementById("btnFeed" + formNo) ,"End form");
   }, 5000);
+  setCookie("activatedForm" + formNo,1,1);
 
 }
 
@@ -514,6 +540,7 @@ function test2(formNo, eventFormID) {
   setInnerHTMLSanitized(document.getElementById("btnFeed" + formNo) ,"Form has ended");
   $("#btnFeed" + formNo).css("cursor","no-drop");
   $("#btnFeed" + formNo).css("background-color","rgb(122, 120, 120)");
+  setCookie("activatedForm" + formNo,2,1);
 
 
 }
