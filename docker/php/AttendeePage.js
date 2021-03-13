@@ -143,7 +143,7 @@ function getComprehensive() {
         if (activity && formID != 0) {
           boolform = false;
           if (removeForm(eventFormID)) {
-            if (getCookie("eventFormID") != getCookie("submittedEventFormID")) {
+            if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
               form = document.getElementById("CForm");
               form.setAttribute("onsubmit","submitComprehensive(); return false");
             }
@@ -248,7 +248,7 @@ function getComprehensive() {
                 submitButton.setAttribute("id","btnFeed");
                 submitButton.setAttribute("class","submitFeed");
                 submitButton.setAttribute("type","submit");
-                if (getCookie("eventFormID") != getCookie("submittedEventFormID")) {
+                if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
                   submitButton.setAttribute("value","Submit");
                 } else {
                   submitButton.setAttribute("value","Edit Submission");
@@ -350,7 +350,7 @@ function submitComprehensive() {
   form.setAttribute("onsubmit","editComprehensive(); return false");
   newButton = document.getElementById("btnFeed");
   newButton.setAttribute("value","Edit Submission");
-  setCookie("submittedEventFormID", getCookie("eventFormID"), 1);
+  setCookie("submittedEventFormID", ("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")), 1);
 }
 
 function submitAnswer(answer, numInForm) {

@@ -1,5 +1,6 @@
 var temp1 = document.getElementById("general");
 var temp2 = document.getElementById("feedback");
+/*
 function general() {
   if (temp1.style.display === "none" || temp1.style.display === '')
   {
@@ -18,12 +19,12 @@ function feedback() {
     if(temp1.style.display !== "none" || temp1.style.display !== '')
     {
       temp1.style.display = "none";
-    }    
-    temp2.style.display = "block"; 
+    }
+    temp2.style.display = "block";
   } else {
     temp2.style.display = "none";
   }
-}
+*/
 function showDiv() {
   document.getElementById("msg").style.display= " block";
 }
@@ -117,12 +118,13 @@ function generalFeedbackSubmissionDisplayFactory(id) {
   return submissionNode;
 }
 
-function comprepensiveFeedbackSubmissionDisplayFactory(form) {
+function comprepensiveFeedbackSubmissionDisplayFactory(form, responseNumber) {
 
   var outputNode = document.createElement("div");
   outputNode.setAttribute("class", "filled-form");
 
   outputNode.appendChild(document.createElement("div")).setAttribute("class", "time-updated");
+  /*
   outputNode.appendChild(document.createElement("div")).setAttribute("class", "account-name");
 
   var form_title_node = outputNode.appendChild(document.createElement("div"));
@@ -132,21 +134,38 @@ function comprepensiveFeedbackSubmissionDisplayFactory(form) {
   var form_description_node = outputNode.appendChild(document.createElement("div"));
   form_description_node.setAttribute("class", "form-description");
   setInnerHTMLSanitized(form_description_node, form.data.description);
+  */
+  for (quest = 0; quest < form.questionIDs.length; quest++) {
+    questionID = form.questionIDs[quest];
+    $.ajax({
+      type: "GET",
+      url: endpointToRealAddress("/questions/" + questionID),
+      dataType: "json",
+      async: false,
+      success: function(question, status, xhr){
+        var question_node = document.createElement("div");
+        var question_text_node = document.createElement("h3");
 
-  for (var question_number in form.questions) {
-    var question = form.questions[question_number];
-    var answer = document.createElement("div");
-    answer.setAttribute("class", "answer " + question.data.type);
+        question_node.setAttribute("class", "question-text");
+        setInnerHTMLSanitized(question_text_node, question.data.text);
+        question_node.appendChild(question_text_node);
 
-    var question_text_node = document.createElement("div");
-    question_text_node.setAttribute("class", "question-text");
-    setInnerHTMLSanitized(question_text_node, question.data.text);
-    answer.appendChild(question_text_node);
-    answer.appendChild(document.createElement("div")).setAttribute("class", "time-updated");
-    answer.appendChild(document.createElement("div")).setAttribute("class", "response");
-    answer.appendChild(document.createElement("div")).setAttribute("class", "is-edited");
-    answer.appendChild(document.createElement("div")).setAttribute("class", "mood-value");
-    outputNode.appendChild(answer);
+        var answers = document.createElement("div");
+        answers.setAttribute("class", "answers");
+        question_node.appendChild(answers);
+          for (responseNo = 0; responseNo < responseNumber; responseNo++) {
+            var answer = document.createElement("div");
+            answer.className = "answer";
+            answer.appendChild(document.createElement("div")).setAttribute("class", "account-name");
+            answer.appendChild(document.createElement("div")).setAttribute("class", "time-updated");
+            answer.appendChild(document.createElement("div")).setAttribute("class", "response");
+            answer.appendChild(document.createElement("div")).setAttribute("class", "is-edited");
+            answer.appendChild(document.createElement("div")).setAttribute("class", "mood-value");
+            answers.appendChild(answer);
+          }
+        outputNode.appendChild(question_node);
+      }
+    });
   }
 
   return outputNode;
@@ -163,119 +182,174 @@ var timeOfLastUpdateUnparsed = "2000-01-01T00:00:00";
 var timeOfLastUpdate = Date.parse(timeOfLastUpdateUnparsed);
 var answerBase = "answer";
 var eventData;
-
+/*
 getAllEventData(eventID, function(ev_data) {
   eventData = ev_data;
   updateFeedback();
   setInterval(updateFeedback, 5000);
 });
-
-
-function updateFeedback() {
+*/
+function updateFeedback(eventFormID, formNo) {
   console.log("updating feedback");
   $.getJSON(endpointToRealAddress("/feedback?eventID=" + eventID + "&time-updated-since=" + timeOfLastUpdateUnparsed), function(data) {
-
     console.log(data);
-    data.list.forEach(submission => {
-      
-    // for (var i = 0; i < data.list.length; i++) {
-      // submission = data.list[i];
-      
-      // need to store the newest time-submitted sent by the server so that we are working on the server's clock, not the client's.
-      // store the parsed and unparsed versions so that the unparsed can be sent next time - easier than converting back to string
-      var thisTime = Date.parse(submission["time-updated"]);
-      if (thisTime > timeOfLastUpdate) {
-        timeOfLastUpdate = thisTime;
-        timeOfLastUpdateUnparsed = submission["time-updated"];
+
+    var node;
+
+    // TODO check it is not already in the document
+    submissions = [];
+    names = [];
+    totanswers = [];
+    questionIDs = [];
+    var responseNumber = 0;
+    // find the correct eventform
+    data.list.forEach(eventForm => {
+      if (eventForm.eventFormID == eventFormID) {
+        submissions.push(eventForm);
+        responseNumber++;
       }
-
-
-
-
-
-      if (submission.formID == 0 /* general feedback form */) {
-
-        var node;
-
-        // check if the answer has already been output to the page before
-        var oldResponse = document.getElementById(answerBase + submission.answers[0].answerID);
-        if (oldResponse != null){
-          node = oldResponse;
-        } else {
-          // create a new submission element in the document to place the data.
-          node = generalFeedbackSubmissionDisplayFactory(submission.answers[0].answerID);
+    });
+    if (data.list.length != 0) {
+      data.list[0].answers.forEach(answer => {
+        questionIDs.push(answer["questionID"]);
+      });
+    }
+    //GET QUESTION INFO
+    if (submissions.length != 0) {
+      formID = submissions[0]["formID"];
+      $.ajax({
+        type: "GET",
+        url: endpointToRealAddress("/forms/" + formID),
+        dataType: "json",
+        async: false,
+        success: function(result, status, xhr){
+          node = comprepensiveFeedbackSubmissionDisplayFactory(result, responseNumber);
         }
+      });
 
-
-        // populate
-        setInnerHTMLSanitized(node.getElementsByClassName("time-updated")[0], submission.answers[0]["time-updated"]);
-
-        if (submission["account-name"] == null){
-          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], "(anonymous user)");
-        } else {
-          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], submission["account-name"]);
-        }
-        setInnerHTMLSanitized(node.getElementsByClassName("response")[0], submission.answers[0].data.response);
-        setInnerHTMLSanitized(node.getElementsByClassName("is-edited")[0], submission["is-edited"]);
-        setInnerHTMLSanitized(node.getElementsByClassName("mood-value")[0], submission.answers[0]["mood-value"]);
-
-        // display
-        document.getElementById("general-feedback-container").prepend(node);
-
-
+      for (questNo = 0; questNo < questionIDs.length; questNo++) {
+        var ans_node = node.getElementsByClassName("answers")[questNo];
+        j=0;
+        data.list.forEach(eventForm => {
+          if (eventForm.eventFormID == eventFormID) {
+            var an_node = ans_node.getElementsByClassName("answer")[j];
+            setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"]);
+            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[j]["time-updated"]).toLocaleString());
+            setInnerHTMLSanitized(an_node.getElementsByClassName("response")[0], eventForm.answers[j].data["response"]);
+            if (eventForm.answers[j]["is-edited"]) {
+              setInnerHTMLSanitized(an_node.getElementsByClassName("is-edited")[0], "(edited)");
+            }
+            setInnerHTMLSanitized(an_node.getElementsByClassName("mood-value")[0], "Sentiment: " + eventForm.answers[j]["mood-value"]);
+            j++;
+          }
+        });
       }
+      var root = document.getElementById("feedback-container" + formNo);
+      root.appendChild(node);
+    }
+  });
+}
 
-
-
-      else { // comprepensive feedback
-
-
-        // TODO check it is not already in the document
-
-        // find the correct form
-        var formIndex = eventData.formIDs.indexOf(submission.formID);
-        if (formIndex == null) return;
-        var form = eventData.forms[formIndex];
-
-        var node = comprepensiveFeedbackSubmissionDisplayFactory(form);
-
-        setInnerHTMLSanitized(node.getElementsByClassName("time-updated")[0], submission["time-updated"]);
-        if (submission["account-name" == null])
-          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], "(anonymous user)");
-        else
-          setInnerHTMLSanitized(node.getElementsByClassName("account-name")[0], submission["account-name"]);
-
-        var node_answers = node.getElementsByClassName("answer");
-        for (answer_num in submission.answers) {
-          var answer = submission.answers[answer_num];
-          // find where to put it in the node
-          var position = form.questionIDs.indexOf(answer.questionID);
-          var ans_node = node_answers[position];
-          setInnerHTMLSanitized(ans_node.getElementsByClassName("time-updated")[0], answer["time-updated"]);
-          setInnerHTMLSanitized(ans_node.getElementsByClassName("response")[0], answer.data["response"]);
-          setInnerHTMLSanitized(ans_node.getElementsByClassName("is-edited")[0], answer["is-edited"]);
-          setInnerHTMLSanitized(ans_node.getElementsByClassName("mood-value")[0], answer["mood-value"]);
-
-          // set the id of the answer
-          ans_node.setAttribute("id", "answer" + answer.answerID);
-        }
+var pageForms = [];
 
 
 
 
+function switchForms(newOpenForm) {
+  pageForms.forEach(pageForm => {
+    pageForm.style.display = "none";
+  });
+  newOpenForm.style.display = "block";
+}
 
-        document.getElementById("comprehensive-feedback-container").prepend(node);
-
-
-
-
-        
-
+function getEventFormsFromEvent(event) {
+  const currentDiv = document.getElementById("heading");
+  p=0;
+  Array.from(event.eventFormIDs).forEach(eventFormID => {
+    $.ajax({
+      type: "GET",
+      url: endpointToRealAddress("/event-forms/" + eventFormID),
+      dataType: "json",
+      async: false,
+      success: function(result, status, xhr){
+        p++;
+        formID = result["formID"];
+        $.ajax({
+          type: "GET",
+          url: endpointToRealAddress("/forms/" + formID),
+          dataType: "json",
+          async: false,
+          success: function(result, status, xhr){
+            title = result.data["title"];
+            var hidden = document.createElement("div");
+            hidden.className = "hidden"
+            var formName = document.createElement("button");
+            formName.className = "formName";
+            var temp = document.getElementById("temp" + p);
+            $(formName).click(function() {
+              switchForms(temp);
+            });
+            setInnerHTMLSanitized(formName, p + ". " + title);
+            currentDiv.appendChild(formName);
+            currentDiv.appendChild(hidden);
+          }
+        });
       }
-
     });
   });
-
 }
+
+function generatePageData(event) {
+  formNo=0;
+  const currentDiv = document.getElementById("content");
+  Array.from(event.eventFormIDs).forEach(eventFormID => {
+    $.ajax({
+      type: "GET",
+      url: endpointToRealAddress("/event-forms/" + eventFormID),
+      dataType: "json",
+      async: false,
+      success: function(result, status, xhr){
+        formNo++;
+        compHTML = `<div class = "sub-content">
+          <h3>Comprehensive Feedback</h3>
+          <div id="donutchart" style="width: 50vw;" class = "left"></div>
+          <div id="feedback-container` + formNo +  `" class = "right">
+            <h4>Questions</h4>
+          </div>
+        </div>`;
+        genHTML = `<div class = "sub-content">
+          <h3>General Feedback</h3>
+          <div id="piechart_3d" style="width: 50vw;" class = "left"></div>
+            <!-- general feedback is put into here -->
+            <div id="feedback-container` + formNo +  `" class = "right">
+              <h4>Questions</h4>
+            </div>
+        </div>`;
+        var temp = document.createElement("div");
+        if (formNo == 1) {
+          temp.className = "general";
+          temp.innerHTML = genHTML;
+        }
+        else {
+          temp.className = "feedback";
+          temp.innerHTML = compHTML;
+        }
+        temp.setAttribute("id","temp" + formNo);
+        currentDiv.appendChild(temp);
+        pageForms.push(temp);
+
+        getAllEventData( eventID , function(ev_data) {
+          eventData = ev_data;
+          updateFeedback(eventFormID, formNo);
+          setInterval(updateFeedback(eventFormID, formNo), 5000);
+        });
+      }
+    });
+  });
+  getEventFormsFromEvent(event);
+}
+
+eventID = getCookie("eventID");
+getAllEventData(eventID, generatePageData);
 
 // setInterval(updateFeedback, 5000); // update every 5 secs
