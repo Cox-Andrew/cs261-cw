@@ -121,6 +121,7 @@ var chartIntervalID = setInterval(function () {drawChart()}, 5000);
 function drawChart() {
   var eventTimeStart = null;
   var eventTimeEnd = null;
+  var drawChartCheck = true;
   //GET mood data
   $.ajax({
     type: "GET",
@@ -154,6 +155,10 @@ function drawChart() {
         var avMoodValue = ((moodValue / moodCount) + 1)*50;
         if (moodCount != 0) {
           moodData.push([eventTimeStart, avMoodValue]);
+          drawChartCheck = true;
+        }
+        else if (moodCount == 0) {
+          drawChartCheck = false;
         }
         eventTimeStart = eventTimeInterval;
       }
@@ -177,8 +182,9 @@ function drawChart() {
   };
 
   var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-  chart.draw(data, options);
+  if (drawChartCheck) {
+    chart.draw(data, options);
+  }
 }
 
 
