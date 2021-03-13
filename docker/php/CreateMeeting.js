@@ -20,6 +20,15 @@ function createMeeting(title, date, stime, ftime, desc) {
   event.data["time-start"] = date + "T" + stime + ":00"
   event.data["time-end"] = date + "T" + ftime + ":00"
 
+  // check that the time-end is after time-start
+  var parsedTimeStart = new Date(event.data["time-start"]);
+  var parsedTimeEnd = new Date(event.data["time-end"]);
+
+  if (parsedTimeStart.getTime() >= parsedTimeEnd.getTime()) {
+    document.getElementById("error").innerHTML = "Meeting End Time must be after Meeting Start Time";
+    return false;
+  }
+
 
   $.ajax({
     type: "POST",
