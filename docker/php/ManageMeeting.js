@@ -72,10 +72,15 @@ function blankFormFactory() {
       <h4 class="template-description"></h4>
       <p class="is-active"></p>
       <form class="event-form-parameters" >
-        <label>Start Time:</label><input type="time" class="DateTime time-start"></input><br>
-        <label>End Time:</label><input type="time" class="DateTime time-end"></input><br>
-
         <input type="button" class="submitForm" value="Save"></button>
+        <!--<label>Start Time:</label><input type="time" class="DateTime time-start"></input><br>
+        <label>End Time:</label><input type="time" class="DateTime time-end"></input><br> -->
+
+        <label>Title</label>
+        <input type="text" class="form-title"></input>
+        <label>Description</label>
+        <input type="text" class="form-description"></input>
+
 
       </form>
       <div class="question-inputs"></div>
@@ -101,12 +106,12 @@ function blankFormFactory() {
 // create a place for a question to be displayed
 function blankQuestionFactory(hasOptions=false) {
   
-  var questionhtml = `<label></label><br><textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' rows="2" cols="15"></textarea>`;
-  if (hasOptions) questionhtml += '<div class="options"></div>';
+  var questionhtml = `<div><label></label><input type="button" class="deleteQuestion" value="Delete"></button><textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' rows="2" cols="15"></textarea></div>`;
+  // if (hasOptions) questionhtml += '<div class="options"></div>';
 
   var wrapper = document.createElement("div");
   wrapper.innerHTML = questionhtml;
-  return wrapper;
+  return wrapper.childNodes[0];
 }
 
 function blankBubbleFactory() {
@@ -178,29 +183,29 @@ function createAndDisplayForm(eventFormID, formID, eventForm, form) {
 
   templateNode.setAttribute("id", "eventForm" + eventFormID);
   var formNode = templateNode.getElementsByClassName("form")[0];
+
   setInnerHTMLSanitized(formNode.getElementsByClassName("template-title")[0], form.data.title);
   setInnerHTMLSanitized(formNode.getElementsByClassName("template-description")[0], form.data.description);
 
-  var timeStartText = "Start time not defined";
-  if (eventForm["time-start"] != null){
-    formNode.getElementsByClassName("time-start")[0].setAttribute("value", formatTime(new Date(eventForm["time-start"])));
-    // setInnerHTMLSanitized(formNode.getElementsByClassName("time-start")[0], timeStartText);
-  }
+  // var timeStartText = "Start time not defined";
+  // if (eventForm["time-start"] != null){
+  //   formNode.getElementsByClassName("time-start")[0].setAttribute("value", formatTime(new Date(eventForm["time-start"])));
+  //   // setInnerHTMLSanitized(formNode.getElementsByClassName("time-start")[0], timeStartText);
+  // }
 
-  // var endTimeText = "End time not defined";
-  if (eventForm["time-end"] != null) {
-    formNode.getElementsByClassName("time-end")[0].setAttribute("value", formatTime(new Date(eventForm["time-end"]))); 
-    // endTimeText = new Date(eventForm.timeEnd).toLocaleString();
-  }
-  // setInnerHTMLSanitized(formNode.getElementsByClassName("time-end")[0], endTimeText);
-  var isActiveText = "Not Active";
-  if (eventForm.isActive) isActiveText = "Currently Active";
-  setInnerHTMLSanitized(formNode.getElementsByClassName("is-active")[0], isActiveText);
+  // // var endTimeText = "End time not defined";
+  // if (eventForm["time-end"] != null) {
+  //   formNode.getElementsByClassName("time-end")[0].setAttribute("value", formatTime(new Date(eventForm["time-end"]))); 
+  //   // endTimeText = new Date(eventForm.timeEnd).toLocaleString();
+  // }
+
+
+  formNode.getElementsByClassName("form-title")[0].setAttribute("value", form.data.title);
+  formNode.getElementsByClassName("form-description")[0].setAttribute("value", form.data.description);
 
   // create questions
-  for (const i in form.questions) {
+  for (var i=0; i<form.questions.length; i++) {
     var question = form.questions[i];
-    var questionID = form.questionIDs[i];
     createQuestion(question, eventFormID, formNode.getElementsByClassName("question-inputs")[0], parseInt(i)+1);
   }
 
@@ -223,16 +228,22 @@ function createAndDisplayForm(eventFormID, formID, eventForm, form) {
 }
 
 function createQuestion(question, eventFormID, appendTo, questionDisplayNumber) {
-  var questionWrapper = blankQuestionFactory(question.data.type == "multi");
+  var questionOnPage = blankQuestionFactory(question.data.type == "multi");
+
+  // bind delete button
+  $(questionOnPage.getElementsByClassName("deleteQuestion")).click(function() {
+    deleteQuestion(eventFormID, question.questionID);
+    return false;
+  });
 
   // add text like "Question 1 - multi" in the <label>
-  setInnerHTMLSanitized(questionWrapper.getElementsByTagName("label")[0], "Question " + questionDisplayNumber + " - " + question.data.type);
+  setInnerHTMLSanitized(questionOnPage.getElementsByTagName("label")[0], "Question " + questionDisplayNumber + " - " + question.data.type);
 
   // insert the current data
-  setInnerHTMLSanitized(questionWrapper.getElementsByTagName("textarea")[0], question.data.text);
+  setInnerHTMLSanitized(questionOnPage.getElementsByTagName("textarea")[0], question.data.text);
 
   // set the id of the form element
-  questionWrapper.getElementsByTagName("textarea")[0].setAttribute("id", "eventForm" + eventFormID + "question" + question.questionID);
+  questionOnPage.setAttribute("id", "eventForm" + eventFormID + "question" + question.questionID);
 
   // add options TODO this doesn't work but we're not implementing multichoice anyway
   if (question.data.type == "multi") {
@@ -245,14 +256,15 @@ function createQuestion(question, eventFormID, appendTo, questionDisplayNumber) 
 
       // add option box to the form
       setInnerHTMLSanitized(optionBox, option);
-      questionWrapper.getElementsByClassName("options")[0].appendChild(optionBox);
+      questionOnPage.getElementsByClassName("options")[0].appendChild(optionBox);
     });
   }
 
   // append the question to the form
-  questionWrapper.childNodes.forEach(questionPart => {
-    appendTo.appendChild(questionPart);
-  });
+  appendTo.appendChild(questionOnPage);
+  // questionOnPage.childNodes.forEach(questionPart => {
+  //   appendTo.appendChild(questionPart);
+  // });
 
 
 
@@ -362,9 +374,36 @@ function submitForm(eventFormID) {
   // n
 
   var form = eventData.forms[eventData.eventFormIDs.indexOf(eventFormID)];
+
+  var textInTitleBox = document.getElementById("eventForm" + eventFormID).getElementsByClassName("form-title")[0].value;
+  var textInDescriptionBox = document.getElementById("eventForm" + eventFormID).getElementsByClassName("form-description")[0].value;
+  if (textInTitleBox != form.data.title || textInDescriptionBox != form.data.description) {
+    var newData = {
+      "title": textInTitleBox,
+      "description": textInDescriptionBox
+    };
+    $.ajax({
+      url: endpointToRealAddress("/forms/"+ form.formID),
+      type: 'PUT',
+      data: JSON.stringify({
+        data: newData
+      }),
+      success: function(result) {
+        form.data = newData;
+        // change the title in the bubble and form elements on page
+        setInnerHTMLSanitized(document.getElementById("eventForm" + eventFormID + "bubble"), textInTitleBox);
+        setInnerHTMLSanitized(document.getElementById("eventForm" + eventFormID).getElementsByClassName("template-title")[0], textInTitleBox);
+        setInnerHTMLSanitized(document.getElementById("eventForm" + eventFormID).getElementsByClassName("template-description")[0], textInDescriptionBox);
+
+      }
+    });
+  }
+
+
   form.questions.forEach(question => {
     // check if the question has been edited in the webpage
-    var textInQuestionBox = document.getElementById("eventForm" + eventFormID + "question" + question.questionID).value;
+    var textInQuestionBox = document.getElementById("eventForm" + eventFormID + "question" + question.questionID).getElementsByClassName("textarea")[0].value;
+    
     if (textInQuestionBox != question.data.text) {
       // change the representation in eventData
       question.data.text = textInQuestionBox;
@@ -378,7 +417,7 @@ function submitForm(eventFormID) {
         type: 'PUT',
         data: JSON.stringify(questionInPutFormat),
         success: function(result) {
-            // TODO
+
         }
       });
     }
@@ -449,6 +488,36 @@ function deleteEventForm(eventFormID) {
 
     }
   });
+}
+
+
+function deleteQuestion(eventFormID, questionID) {
+  $.ajax({
+    url: endpointToRealAddress("/questions/"+ questionID),
+    type: 'DELETE',
+    success: function(result) {
+      // var displayedQuestionToDelete = document.getElementById("eventForm" + eventFormID + "question" + question.questionID);
+      // bubbleToDelete.parentElement.removeChild(bubbleToDelete);
+
+      // delete from eventData
+      var formIndex = eventData.eventFormIDs.indexOf(eventFormID);
+      var questionIndex = eventData.forms[formIndex].questionIDs.indexOf(questionID);
+      eventData.forms[formIndex].questionIDs.splice(questionIndex, 1);
+      eventData.forms[formIndex].questions.splice(questionIndex, 1);
+      var form = eventData.forms[formIndex];
+
+      // regenreate form on page
+      var formNode = document.getElementById("eventForm" + eventFormID);
+      formNode.getElementsByClassName("question-inputs")[0].innerHTML = "";
+      for (var i=0; i<form.questions.length; i++) {
+        var question = form.questions[i];
+        createQuestion(question, eventFormID, formNode.getElementsByClassName("question-inputs")[0], parseInt(i)+1);
+      }
+
+
+    }
+  });
+
 }
 
 

@@ -294,6 +294,10 @@
     color: rgb(240, 240, 240);
     font-size: 14px;
   }
+  .form .deleteQuestion {
+    display: block;
+    text-align: left;
+  }
   .textarea
   {
     color: rgb(240, 240, 240);
