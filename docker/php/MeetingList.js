@@ -1,13 +1,13 @@
 
 
-var seriesIDString = getCookie("seriesID");
-if (seriesIDString == "") {
+var hostIDString = getCookie("seriesID");
+if (hostIDString == "") {
 	window.location.href = "/SeriesList.html"
 }
-var seriesID = parseInt(seriesIDString);
+var eventID = parseInt(hostIDString);
 
 
-$.getJSON(endpointToRealAddress("/series/" + seriesID), function(data) {
+$.getJSON(endpointToRealAddress("/series/" + eventID), function(data) {
 	data.eventIDs.forEach(eventID => {
 		var newLi = document.createElement("li");
 		var newA = document.createElement("a");
