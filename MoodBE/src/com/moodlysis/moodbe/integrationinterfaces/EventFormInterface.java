@@ -26,7 +26,7 @@ public interface EventFormInterface {
 	public int newEventForm(int eventID, int formID, int previousID, Boolean isActive, LocalDateTime timeStart, LocalDateTime timeEnd) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// PUT /v0/event-forms/{eventFormID}
-	public boolean editEventForm(int eventFormID, int preceedingEventFormID ,Boolean isActive, LocalDateTime timeStart, LocalDateTime timeEnd) throws MoodlysisInternalServerError, MoodlysisNotFound;
+	public boolean editEventForm(int eventFormID, int preceedingEventFormID ,Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	// DELETE /v0/event-forms/{eventFormD}
 	public boolean deleteEventForm(int eventFormID) throws MoodlysisInternalServerError, MoodlysisNotFound;

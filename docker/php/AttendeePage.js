@@ -138,7 +138,7 @@ function getComprehensive() {
       dataType: "json",
       async: false,
       success: function(result, status, xhr){
-        activity = result["is-active"];
+        activity = result["isActive"];
         formID = result["formID"];
         if (activity && formID != 0) {
           boolform = false;

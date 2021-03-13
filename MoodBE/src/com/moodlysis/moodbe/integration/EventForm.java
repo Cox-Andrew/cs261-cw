@@ -158,7 +158,7 @@ public class EventForm implements EventFormInterface {
 	}
 
 	@Override
-	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive, LocalDateTime timeStart, LocalDateTime timeEnd) throws MoodlysisInternalServerError, MoodlysisNotFound {
+	public boolean editEventForm(int eventFormID, int previousID ,Boolean isActive) throws MoodlysisInternalServerError, MoodlysisNotFound {
 		// TODO fix so if error occurs return false but still execute finally statement
 		// previousID -2 to continue without changing the position
 		PreparedStatement eventFormEdit  = null;
@@ -209,22 +209,18 @@ public class EventForm implements EventFormInterface {
 			}
 			if (previousID == -2) {
 				//TODO don't change NumInEvent 
-				String queryUpdate = "UPDATE EVENTFORMS SET IsActive = ?, TimeStart = ?, TimeEnd = ? WHERE EventFormID = ?";
+				String queryUpdate = "UPDATE EVENTFORMS SET IsActive = ? WHERE EventFormID = ?";
 				eventFormEdit = conn.prepareStatement(queryUpdate);
 	    		eventFormEdit.setBoolean(1, isActive);
-	    		eventFormEdit.setTimestamp(2, Timestamp.valueOf(timeStart));
-	    		eventFormEdit.setTimestamp(3, Timestamp.valueOf(timeStart));
-	    		eventFormEdit.setInt(4, eventFormID);
+	    		eventFormEdit.setInt(2, eventFormID);
 	    		eventFormEdit.executeUpdate();
 			}
 			else {
-	    		String queryUpdate = "UPDATE EVENTFORMS SET NumInEvent = ?, IsActive = ?, TimeStart = ?, TimeEnd = ? WHERE EventFormID = ?";
+	    		String queryUpdate = "UPDATE EVENTFORMS SET NumInEvent = ?, IsActive = ? WHERE EventFormID = ?";
 	    		eventFormEdit = conn.prepareStatement(queryUpdate);
 	    		eventFormEdit.setInt(1, numInEvent);
 	    		eventFormEdit.setBoolean(2, isActive);
-	    		eventFormEdit.setTimestamp(3, Timestamp.valueOf(timeStart));
-	    		eventFormEdit.setTimestamp(4, Timestamp.valueOf(timeStart));
-	    		eventFormEdit.setInt(5, eventFormID);
+	    		eventFormEdit.setInt(3, eventFormID);
 	    		eventFormEdit.executeUpdate();
 			}
 			conn.commit();

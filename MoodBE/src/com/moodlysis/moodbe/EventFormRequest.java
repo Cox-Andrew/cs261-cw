@@ -54,7 +54,7 @@ public class EventFormRequest extends HttpServlet {
 		output.put("eventID", info.eventID);
 		output.put("formID", info.formID);
 		output.put("numInEvent", info.numInEvent);
-		output.put("is-active", info.isActive);
+		output.put("isActive", info.isActive);
 		if (info.timeStart != null)
 			output.put("time-start", info.timeStart.toString());
 		if (info.timeEnd != null)
@@ -221,8 +221,8 @@ public class EventFormRequest extends HttpServlet {
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
 		int previousID = -1;
 		Boolean isActive = false;
-		LocalDateTime timeStart;
-		LocalDateTime timeEnd;
+		LocalDateTime timeStart = null;
+		LocalDateTime timeEnd = null;
 		try {
 			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
 			/*
@@ -242,8 +242,12 @@ public class EventFormRequest extends HttpServlet {
 			if (putObject.get("preceding-eventFormID") != null) {
 				previousID = Integer.parseInt(putObject.get("preceding-eventFormID").toString());
 			}
-			timeStart = LocalDateTime.parse(putObject.get("time-start").toString());
-			timeEnd = LocalDateTime.parse(putObject.get("time-end").toString());
+			if (putObject.get("time-start") != null) {
+				timeStart = LocalDateTime.parse(putObject.get("time-start").toString());
+			}
+			if (putObject.get("time-end") != null) {
+				timeEnd = LocalDateTime.parse(putObject.get("time-end").toString());
+			}
 		} catch(ParseException e) {
 			//TODO
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
@@ -253,7 +257,7 @@ public class EventFormRequest extends HttpServlet {
 		Connection conn = DatabaseConnection.getConnection();
 		EventForm eventForm = new EventForm(response.getWriter(), conn);
 		try {
-			eventForm.editEventForm(eventFormID, previousID, isActive, timeStart, timeEnd);
+			eventForm.editEventForm(eventFormID, previousID, isActive);
 			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (MoodlysisInternalServerError e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
