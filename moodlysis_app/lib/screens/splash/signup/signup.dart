@@ -7,6 +7,7 @@ import 'package:moodlysis_app/models/user.dart';
 
 import 'package:moodlysis_app/services/authentication.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
+import 'package:moodlysis_app/services/exceptions.dart';
 
 class SignUpScreen extends StatelessWidget {
   static const route = "/signup";
@@ -187,6 +188,8 @@ class SignUpFormState extends State<SignUpForm> {
               _formData["password"])
           .then((int id) => getUser(http.Client(), id))
           .then((User user) => _handleAuthenticationSuccess(user))
+          .catchError((e, s) => _handleRegistrationError(e, s),
+              test: (e) => e is RegistrationException)
           .catchError((e, s) => _handleConnectionError(e, s),
               test: (e) => e is SocketException)
           .catchError((error, stackTrace) => _handleError(error, stackTrace))
@@ -212,9 +215,26 @@ class SignUpFormState extends State<SignUpForm> {
             context, "/timeline", (r) => false));
   }
 
+  void _handleRegistrationError(dynamic error, StackTrace stackTrace) {
+    // print("Error: $error");
+    // print("StackTrace: $stackTrace");
+
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: RichText(
+          text: TextSpan(children: [
+        TextSpan(
+            text: 'Email already taken',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: ', please try another.'),
+      ])),
+      backgroundColor: Theme.of(context).errorColor,
+    ));
+  }
+
   void _handleConnectionError(dynamic error, StackTrace stackTrace) {
-    print("Error: $error");
-    print("StackTrace: $stackTrace");
+    // print("Error: $error");
+    // print("StackTrace: $stackTrace");
 
     Scaffold.of(context).removeCurrentSnackBar();
     Scaffold.of(context).showSnackBar(SnackBar(

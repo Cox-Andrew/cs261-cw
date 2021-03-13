@@ -147,8 +147,8 @@ class SignInFormState extends State<SignInForm> {
   }
 
   void _handleAuthenticationError(dynamic error, StackTrace stackTrace) {
-    print("Error: $error");
-    print("StackTrace: $stackTrace");
+    // print("Error: $error");
+    // print("StackTrace: $stackTrace");
 
     Scaffold.of(context).removeCurrentSnackBar();
     Scaffold.of(context).showSnackBar(SnackBar(
@@ -162,8 +162,8 @@ class SignInFormState extends State<SignInForm> {
   }
 
   void _handleConnectionError(dynamic error, StackTrace stackTrace) {
-    print("Error: $error");
-    print("StackTrace: $stackTrace");
+    // print("Error: $error");
+    // print("StackTrace: $stackTrace");
 
     Scaffold.of(context).removeCurrentSnackBar();
     Scaffold.of(context).showSnackBar(SnackBar(

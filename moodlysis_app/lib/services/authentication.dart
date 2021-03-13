@@ -19,6 +19,8 @@ Future<int> authenticateUser(http.Client client, String email, String password) 
 Future<int> registerUser(http.Client client, String name, String email, String password) async {
   final Map<String, String> body = {"account-name": name, "email": email, "pass": password};
   final response = await client.post('$backendURI/attendees', body: json.encode(body));
+
+  if (response.statusCode == 400) throw RegistrationException();
   
   return json.decode(response.body)['attendeeID'];
 }
