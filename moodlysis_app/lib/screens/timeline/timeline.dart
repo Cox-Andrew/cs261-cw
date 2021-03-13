@@ -9,7 +9,7 @@ import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 
 class TimelineScreen extends StatefulWidget {
-  static const route = "/timeline";
+  static const route = '/timeline';
 
   @override
   _TimelineScreenState createState() => _TimelineScreenState();
@@ -19,6 +19,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
   List<Event> _liveEvents;
   List<Event> _upcomingEvents;
 
+  //TODO: switch to FutureBuilder
   void _updateEvents() {
     //TODO: error catching e.g. connection failed
     getUserEvents(http.Client(), globals.currentUser).then((events) {
@@ -54,7 +55,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Event Timeline"),
+        title: Text('Event Timeline'),
         actions: [
           IconButton(icon: Icon(Icons.refresh), onPressed: _updateEvents)
         ],
@@ -71,7 +72,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Row(
                       children: [
-                        Text("Live events ",
+                        Text('Live events ',
                             style: Theme.of(context).textTheme.headline4),
                         Icon(Icons.live_tv,
                             color: Colors.red,
@@ -81,15 +82,18 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _liveEvents == null? 0 : _liveEvents.length,
-                        itemBuilder: (context, i) {
-                          Event event = _liveEvents[i];
-                          return SizedBox(
-                              width: MediaQuery.of(context).size.width * 3 / 4,
-                              child: _EventCard(event));
-                        }),
+                    child: _liveEvents == null || _liveEvents.isEmpty
+                        ? NoEventsMessage(isLive: true)
+                        : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _liveEvents.length,
+                            itemBuilder: (context, i) {
+                              Event event = _liveEvents[i];
+                              return SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 3 / 4,
+                                  child: _EventCard(event));
+                            }),
                   ),
                 ],
               ),
@@ -102,7 +106,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     padding: const EdgeInsets.only(top: 14, bottom: 4),
                     child: Row(
                       children: [
-                        Text("Upcoming events ",
+                        Text('Upcoming events ',
                             style: Theme.of(context).textTheme.headline4),
                         Icon(
                           Icons.lock_clock,
@@ -113,15 +117,17 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                        itemCount: _upcomingEvents == null ? 0 : _upcomingEvents.length,
-                        itemBuilder: (context, i) {
-                          Event event = _upcomingEvents[i];
-                          return SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 1 / 5,
-                              child: _EventCard(event));
-                        }),
+                    child: _upcomingEvents == null || _upcomingEvents.isEmpty
+                        ? NoEventsMessage(isLive: false)
+                        : ListView.builder(
+                            itemCount: _upcomingEvents.length,
+                            itemBuilder: (context, i) {
+                              Event event = _upcomingEvents[i];
+                              return SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 5,
+                                  child: _EventCard(event));
+                            }),
                   ),
                 ],
               ),
@@ -146,7 +152,7 @@ class _EventCard extends StatelessWidget {
         onTap: () {
           if (DateTime.now().isAfter(event.schedule.start)) {
             Future.delayed(Duration(milliseconds: 500), () {
-              Navigator.pushNamed(context, "/event",
+              Navigator.pushNamed(context, '/event',
                   arguments: EventScreenArgs(event));
             });
           }
@@ -170,7 +176,7 @@ class _EventCard extends StatelessWidget {
                     size: Theme.of(context).textTheme.bodyText1.fontSize,
                   ),
                   Text(
-                    " ${_humanReadableFormatter(event.schedule.start)} - ${_humanReadableFormatter(event.schedule.end)}",
+                    ' ${_humanReadableFormatter(event.schedule.start)} - ${_humanReadableFormatter(event.schedule.end)}',
                     style: TextStyle(color: Theme.of(context).errorColor),
                   ),
                 ],
@@ -189,10 +195,57 @@ class _EventCard extends StatelessWidget {
   }
 }
 
+class NoEventsMessage extends StatelessWidget {
+  final bool _isLive;
+
+  NoEventsMessage({@required isLive}) : _isLive = isLive;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          _isLive
+              ? 'None of your events are live currently, please come back later...'
+              : "You have no upcoming events...",
+          style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 20),
+          textAlign: TextAlign.center,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          children: [
+            Text(
+              _isLive ? 'or ' : 'please ',
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle1
+                  .copyWith(fontSize: 20, fontStyle: FontStyle.italic),
+            ),
+            InkWell(
+              onTap: () => Navigator.pushReplacementNamed(
+                  context, '/register_event'),
+              child: Text(
+                'register for a new event.',
+                style: Theme.of(context).textTheme.subtitle1.copyWith(
+                      color: Theme.of(context).accentColor,
+                      fontSize: 20,
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 String _humanReadableFormatter(DateTime dateTime) {
-  String formatted = DateFormat("E, MMM d HH:mm").format(dateTime);
+  String formatted = DateFormat('E, MMM d HH:mm').format(dateTime);
   if (dateTime.year != DateTime.now().year) {
-    formatted += " " + dateTime.year.toString();
+    formatted += ' ' + dateTime.year.toString();
   }
   return formatted;
 }
