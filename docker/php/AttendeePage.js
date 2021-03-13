@@ -30,6 +30,34 @@ function showDiv() {
   document.getElementById("msg").style.display= " block";
 }
 
+
+// feedbackIsOpen(function(isOpen, timeStart, timeEnd) {
+  
+// });
+function feedbackIsOpen(callback) {
+
+  var serverTime;
+  var timeStart;
+  var timeEnd;
+  function isOpen() {
+    var isOpen = timeStart < serverTime && serverTime < timeEnd;
+    callback(isOpen, timeStart, timeEnd);
+  }
+
+  var waiting = 2;
+  $.getJSON(endpointToRealAddress("/server-time"), function(s_t) {
+    serverTime = new Date(s_t["server-time"]);
+    if (--waiting == 0) isOpen();
+  });
+  $.getJSON(endpointToRealAddress("/events/" + getCookie("eventID")), function(event) {
+    timeStart = new Date(event.data["time-start"]);
+    timeEnd = new Date(event.data["time-end"]);
+    if (--waiting == 0) isOpen();
+  });
+}
+
+
+
 function submitGeneral() {
   var emoji = document.getElementsByName('emoji');
   var emojiValue = null;
@@ -42,8 +70,19 @@ function submitGeneral() {
   var comments = document.getElementById('comments').value;
 
   // Call backend function here
-  moodInsert(emojiValue);
-  generalInsert(comments);
+  
+  // check to see that the time is valid
+  feedbackIsOpen(function(isOpen, timeStart, timeEnd) {
+    if (isOpen) {
+      if (emojiValue != null) moodInsert(emojiValue);
+      generalInsert(comments);
+    } else {
+      alert("This event is not in progress. It is/was scheduled for between "+timeStart.toLocaleString()+ " and " + timeEnd.toLocaleString() + ".");
+    }
+  });
+
+  return false;
+
 }
 
 function moodInsert(emojiValue) {
