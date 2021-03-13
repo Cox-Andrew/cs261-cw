@@ -169,8 +169,8 @@ function comprepensiveFeedbackSubmissionDisplayFactory(form, responseNumber) {
           responseBlock.appendChild(document.createElement("div")).setAttribute("class", "time-updated");
           answers.appendChild(answer);
         }
-        answers.appendChild(document.createElement("br"));
-        answers.appendChild(document.createElement("br"));
+        question_node.appendChild(document.createElement("br"));
+        question_node.appendChild(document.createElement("br"));
         outputNode.appendChild(question_node);
       }
     });
@@ -178,6 +178,36 @@ function comprepensiveFeedbackSubmissionDisplayFactory(form, responseNumber) {
 
   return outputNode;
 
+}
+
+function addToComprehensiveFeedbackDisplay(form) {
+  var elements = 0;
+
+  while (document.getElementsByClassName("answers")[0].getElementsByClassName("answer")[elements]) {
+    elements++;
+  }
+
+  for (var quest = 0; quest < form.questionIDs.length; quest++) {
+    questionID = form.questionIDs[quest];
+    var answers = document.getElementsByClassName("answers")[quest];
+    var answer = document.createElement("div");
+    answer.className = "answer";
+    answer.appendChild(document.createElement("div")).setAttribute("class", "account-name");
+    var responseBlock = document.createElement("div");
+    answer.appendChild(responseBlock).setAttribute("class","responseBlock")
+    var respDiv = document.createElement("div");
+    respDiv.className = "respDiv";
+    respDiv.appendChild(document.createElement("span")).setAttribute("class", "response");
+    respDiv.appendChild(document.createElement("span")).setAttribute("class", "is-edited");
+    responseBlock.appendChild(respDiv);
+    responseBlock.appendChild(document.createElement("div")).setAttribute("class", "mood-value");
+    responseBlock.appendChild(document.createElement("br"));
+    responseBlock.appendChild(document.createElement("div")).setAttribute("class", "time-updated");
+    answers.appendChild(answer);
+  }
+
+
+  return elements;
 }
 
 
@@ -197,9 +227,8 @@ getAllEventData(eventID, function(ev_data) {
   setInterval(updateFeedback, 5000);
 });
 */
-function updateFeedback(eventFormID, formID, formNo) {
+function pageLoadFeedback(eventFormID, formID, formNo) {
   $.getJSON(endpointToRealAddress("/feedback?eventID=" + eventID), function(data) {
-    console.log(data);
 
     // TODO check it is not already in the document
     var responseNumber = 0;
@@ -208,10 +237,12 @@ function updateFeedback(eventFormID, formID, formNo) {
       if (eventForm.eventFormID == eventFormID) {
         responseNumber++;
       }
+      if (timeOfLastUpdateUnparsed < eventForm["time-updated"]) {
+        timeOfLastUpdateUnparsed = eventForm["time-updated"];
+      }
     });
     var node;
     var totquestions;
-    console.log("updating feedback");
     $.ajax({
       type: "GET",
       url: endpointToRealAddress("/forms/" + formID),
@@ -226,7 +257,6 @@ function updateFeedback(eventFormID, formID, formNo) {
     root.appendChild(node);
 
     if (responseNumber != 0) {
-
       for (var questNo = 0; questNo < totquestions; questNo++) {
         var ans_node = node.getElementsByClassName("answers")[questNo];
         var j=0;
@@ -269,6 +299,69 @@ function updateFeedback(eventFormID, formID, formNo) {
   });
 }
 
+function updateFeedback() {
+  $.getJSON(endpointToRealAddress("/feedback?eventID=" + eventID + "&time-updated-since=" + timeOfLastUpdateUnparsed), function(data) {
+
+    //TODO UPDATE TIME
+    console.log(timeOfLastUpdateUnparsed);
+
+    // find the correct eventform
+    data.list.forEach(eventForm => {
+      if (timeOfLastUpdateUnparsed < eventForm["time-updated"]) {
+        timeOfLastUpdateUnparsed = eventForm["time-updated"];
+      }
+      var thisForm = getCookie("eventForm" + eventForm.eventFormID);
+      var formID = getCookie("eventForm" + thisForm + "FormID");
+      var j = 0;
+      var node = document.getElementById("feedback-container" + thisForm);
+      $.ajax({
+        type: "GET",
+        url: endpointToRealAddress("/forms/" + formID),
+        dataType: "json",
+        async: false,
+        success: function(result, status, xhr){
+          elements = addToComprehensiveFeedbackDisplay(result);
+          totquestions = result["questionIDs"].length;
+          for (var questNo = 0; questNo < totquestions; questNo++) {
+            var ans_node = node.getElementsByClassName("answers")[questNo];
+
+            var an_node = ans_node.getElementsByClassName("answer")[j + elements];
+            setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"] + ": ");
+            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[questNo]["time-updated"]).toLocaleString());
+            var resp_node = an_node.getElementsByClassName("respDiv")[0];
+            setInnerHTMLSanitized(resp_node.getElementsByClassName("response")[0], eventForm.answers[questNo].data["response"] + " ");
+            if (eventForm.answers[questNo]["is-edited"]) {
+              setInnerHTMLSanitized(resp_node.getElementsByClassName("is-edited")[0], "(edited) ");
+            }
+            moodValue = eventForm.answers[questNo]["mood-value"];
+            if (moodValue > 0.5) {
+              emojiHTML = `<span for="emoji5"><img src="emoji5.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > 0.25) {
+              emojiHTML = `<span for="emoji4"><img src="emoji4.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > -0.25) {
+              emojiHTML = `<span for="emoji3"><img src="emoji3.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > -0.5) {
+              emojiHTML = `<span for="emoji2"><img src="emoji2.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > -1.0) {
+              emojiHTML = `<span for="emoji1"><img src="emoji1.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+          }
+        }
+      });
+      j++;
+    });
+  });
+}
+
 var pageForms = [];
 
 
@@ -302,6 +395,8 @@ function getEventFormsFromEvent(event) {
             var title = result.data["title"];
             var hidden = document.createElement("div");
             hidden.className = "hidden"
+            var br = document.createElement("br");
+            hidden.appendChild(br);
             var formName = document.createElement("button");
             formName.className = "formName";
             var temp = document.getElementById("temp" + p);
@@ -357,10 +452,13 @@ function generatePageData(event) {
         currentDiv.appendChild(temp);
         pageForms.push(temp);
         var formID = result["formID"];
-        setInterval(updateFeedback(eventFormID, formID, formNo), 5000);
+        pageLoadFeedback(eventFormID,formID,formNo);
+        setCookie("eventForm" + eventFormID, formNo, 1);
+        setCookie("eventForm" + formNo + "FormID", formID, 1);
       }
     });
   });
+  var intervalID = window.setInterval(function() {updateFeedback()}, 5000);
   getEventFormsFromEvent(event);
 }
 
