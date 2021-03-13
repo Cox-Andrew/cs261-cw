@@ -210,7 +210,7 @@ class NoEventsMessage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.baseline,
           children: [
             Text(
-              _isLive ? 'or ' : 'please ',
+              _isLive ? 'or ' : '',
               style: Theme.of(context)
                   .textTheme
                   .subtitle1
