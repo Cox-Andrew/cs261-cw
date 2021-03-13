@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:moodlysis_app/routes.dart';
 import 'package:moodlysis_app/theme/theme.dart';
+import 'package:moodlysis_app/constants.dart';
 
 void main() {
   runApp(MoodlysisApp());
@@ -16,8 +17,8 @@ class MoodlysisApp extends StatelessWidget {
       },
       child: MaterialApp(
         title: 'Moodlysis',
-        theme: appTheme(),
-        initialRoute: '/',
+        theme: appTheme,
+        initialRoute: splashScreenRoute,
         routes: routes,
         builder: (context, child) => SafeArea(child: child),
       ),

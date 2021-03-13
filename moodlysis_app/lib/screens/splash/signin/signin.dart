@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:moodlysis_app/constants.dart';
 
 import 'package:moodlysis_app/models/user.dart';
 import 'package:moodlysis_app/services/authentication.dart';
@@ -10,8 +11,6 @@ import 'package:moodlysis_app/globals.dart' as globals;
 import 'package:moodlysis_app/services/exceptions.dart';
 
 class SignInScreen extends StatelessWidget {
-  static const route = "/signin";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,9 +140,9 @@ class SignInFormState extends State<SignInForm> {
 
     _focusNode.unfocus();
     Future.delayed(
-        Duration(milliseconds: 1500),
+        Duration(milliseconds: 500),
         () => Navigator.pushNamedAndRemoveUntil(
-            context, "/timeline", (r) => false));
+            context, timelineScreenRoute, (r) => false));
   }
 
   void _handleAuthenticationError(dynamic error, StackTrace stackTrace) {

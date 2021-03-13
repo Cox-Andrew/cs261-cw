@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-ThemeData appTheme() {
+ThemeData get appTheme {
   return ThemeData(
     primarySwatch: Colors.indigo,
     textTheme: TextTheme(

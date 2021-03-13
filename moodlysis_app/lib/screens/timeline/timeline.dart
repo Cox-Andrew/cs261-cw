@@ -3,14 +3,13 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/navigation.dart';
+import 'package:moodlysis_app/constants.dart';
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/screens/timeline/event/arguments.dart';
 import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 
 class TimelineScreen extends StatefulWidget {
-  static const route = '/timeline';
-
   @override
   _TimelineScreenState createState() => _TimelineScreenState();
 }
@@ -135,7 +134,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: MoodlysisBottomNavigationBar(TimelineScreen.route),
+      bottomNavigationBar: MoodlysisBottomNavigationBar(timelineScreenRoute),
     );
   }
 }
@@ -151,10 +150,7 @@ class _EventCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (DateTime.now().isAfter(event.schedule.start)) {
-            Future.delayed(Duration(milliseconds: 500), () {
-              Navigator.pushNamed(context, '/event',
-                  arguments: EventScreenArgs(event));
-            });
+            Navigator.pushNamed(context, eventScreenRoute, arguments: EventScreenArgs(event));
           }
         },
         child: Padding(
@@ -225,7 +221,7 @@ class NoEventsMessage extends StatelessWidget {
             ),
             InkWell(
               onTap: () => Navigator.pushReplacementNamed(
-                  context, '/register_event'),
+                  context, registerEventScreenRoute),
               child: Text(
                 'register for a new event.',
                 style: Theme.of(context).textTheme.subtitle1.copyWith(

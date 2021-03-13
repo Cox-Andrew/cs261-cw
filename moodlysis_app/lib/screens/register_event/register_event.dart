@@ -3,14 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/navigation.dart';
+import 'package:moodlysis_app/constants.dart';
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 import 'package:moodlysis_app/services/exceptions.dart';
 
 class RegisterEventScreen extends StatelessWidget {
-  static const route = "/register_event";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +34,7 @@ class RegisterEventScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar:
-          MoodlysisBottomNavigationBar(RegisterEventScreen.route),
+          MoodlysisBottomNavigationBar(registerEventScreenRoute),
     );
   }
 }

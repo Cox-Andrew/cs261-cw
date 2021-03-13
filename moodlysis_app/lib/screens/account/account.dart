@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:moodlysis_app/components/navigation.dart';
+import 'package:moodlysis_app/constants.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 
 class AccountScreen extends StatelessWidget {
-  static const route = "/account";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +39,7 @@ class AccountScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: MoodlysisBottomNavigationBar(AccountScreen.route),
+      bottomNavigationBar: MoodlysisBottomNavigationBar(accountScreenRoute),
     );
   }
 }
