@@ -7,7 +7,7 @@ class Event {
   String title, description;
   DateTimeRange schedule;
 
-  //TODO: are eventFormIDs actually requried?
+  //TODO: are eventFormIDs actually required?
   List<int> formIDs, eventFormIDs;
 
   Event(this.eventID, this.seriesID, this.title, this.description, DateTime start, DateTime end, this.formIDs, this.eventFormIDs) {
