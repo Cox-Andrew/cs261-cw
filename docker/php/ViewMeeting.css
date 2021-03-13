@@ -3,12 +3,12 @@
     padding: 0px;
     box-sizing: border-box;
   }
-  
+
   html,
   body {
     height: 100%;
   }
-  
+
   body {
     display: flex;
     flex-direction: column;
@@ -19,7 +19,7 @@
     background-position: center;
     color: rgb(240, 240, 240);
   }
-  
+
   nav {
     display: flex;
     justify-content: space-around;
@@ -28,14 +28,14 @@
     background-color: #122a3d;
     font-family: "poppins", sans-serif;
   }
-  
+
   .logo {
     color: rgb(240, 240, 240);
     text-transform: uppercase;
     letter-spacing: 5px;
     font-size: 20px;
   }
-  
+
   .logo a {
     color: rgb(240, 240, 240);
     text-transform: uppercase;
@@ -43,7 +43,7 @@
     letter-spacing: 5px;
     font-size: 20px;
   }
-  
+
   .nav-links {
     display: flex;
     justify-content: space-around;
@@ -73,12 +73,12 @@
     margin: 5px;
     transition: all 0.3s ease;
   }
-  
+
   @media screen and (min-width: 769px) {
     .nav-links a {
       align-self: auto;
       letter-spacing: 3px;
-      padding: 9px 25px; 
+      padding: 9px 25px;
     }
 
     .nav-links a:hover{
@@ -106,13 +106,13 @@
     .left{
       display: block;
       position: relative;
-      width: 40%; 
+      width: 40%;
       float: left;
     }
     .right{
       display: block;
       position: relative;
-      width: 40%; 
+      width: 40%;
       float: right;
       text-align: left;
     }
@@ -125,17 +125,17 @@
     .left{
       display: block;
       position: relative;
-      width: 100%; 
+      width: 100%;
     }
     .right{
       display: block;
       position: relative;
-      width: 100%; 
+      width: 100%;
       padding-left: 5vw;
       text-align: left;
     }
   }
-  
+
   @media screen and (max-width: 768px) {
     body {
       overflow-x: hidden;
@@ -182,19 +182,19 @@
     .left{
       display: block;
       position: relative;
-      width: 100%; 
+      width: 100%;
     }
     .right{
       display: block;
       position: relative;
-      width: 100%; 
+      width: 100%;
     }
   }
-  
+
   .nav-active {
     transform: translateX(0%);
   }
-  
+
   @keyframes navLinkFade {
     from {
       opacity: 0;
@@ -205,7 +205,7 @@
       transform: translateX(0px);
     }
   }
-  
+
   .toggle .line1 {
     transform: rotate(-45deg) translate(-5px, 6px);
   }
@@ -215,7 +215,7 @@
   .toggle .line3 {
     transform: rotate(45deg) translate(-5px, -6px);
   }
-  
+
   .content {
     flex: 1 0 auto;
     padding: 20px;
@@ -247,7 +247,7 @@
       transition: 0.5s ease 0s;
   }
 
-  
+
   .heading{
     font-size: 24px;
     text-align: center;
@@ -297,7 +297,7 @@
   .hidden{
     display: none;
   }
-  
+
   .sub-content{
     flex: 1 0 auto;
     width: 100%;
@@ -324,6 +324,54 @@
     text-align: left;
     color: rgb(240, 240, 240);
     font-size: 14px;
+  }
+
+  .fLeft {
+    float:left;
+    text-align: left;
+  }
+  .answer {
+    width: 100%;
+    padding: 10px 25px;
+    box-sizing: border-box;
+    border-radius: 2px;
+    box-shadow: 4px 4px;
+  }
+  .account-name {
+    position: relative;
+    font-family: sans-serif;
+    font-size: 110%;
+    font-weight: bold;
+  }
+  .responseBlock {
+    position: relative;
+    border-style: dotted;
+    border-width: 1px;
+    padding: 5px;
+  }
+  .respDiv {
+    position: relative;
+    float:left;
+  }
+  .response {
+    position: relative;
+    display: inline;
+    vertical-align: bottom;
+  }
+  .is-edited {
+    position: relative;
+    font-size: small;
+    color: #888;
+    vertical-align: bottom;
+    display: inline;
+  }
+  .mood-value {
+    position: relative;
+    float:right;
+  }
+  .time-updated {
+    position: relative;
+    font-size: x-small;
   }
 
   .footer {

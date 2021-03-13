@@ -147,7 +147,7 @@ function comprepensiveFeedbackSubmissionDisplayFactory(form, responseNumber) {
         var question_text_node = document.createElement("h3");
 
         question_node.setAttribute("class", "question-text");
-        setInnerHTMLSanitized(question_text_node, question.data.text);
+        setInnerHTMLSanitized(question_text_node, (quest+1) + ". " + question.data.text);
         question_node.appendChild(question_text_node);
 
         var answers = document.createElement("div");
@@ -157,12 +157,20 @@ function comprepensiveFeedbackSubmissionDisplayFactory(form, responseNumber) {
             var answer = document.createElement("div");
             answer.className = "answer";
             answer.appendChild(document.createElement("div")).setAttribute("class", "account-name");
-            answer.appendChild(document.createElement("div")).setAttribute("class", "time-updated");
-            answer.appendChild(document.createElement("div")).setAttribute("class", "response");
-            answer.appendChild(document.createElement("div")).setAttribute("class", "is-edited");
-            answer.appendChild(document.createElement("div")).setAttribute("class", "mood-value");
+            var responseBlock = document.createElement("div");
+            answer.appendChild(responseBlock).setAttribute("class","responseBlock")
+            var respDiv = document.createElement("div");
+            respDiv.className = "respDiv";
+            respDiv.appendChild(document.createElement("span")).setAttribute("class", "response");
+            respDiv.appendChild(document.createElement("span")).setAttribute("class", "is-edited");
+            responseBlock.appendChild(respDiv);
+            responseBlock.appendChild(document.createElement("div")).setAttribute("class", "mood-value");
+            responseBlock.appendChild(document.createElement("br"));
+            responseBlock.appendChild(document.createElement("div")).setAttribute("class", "time-updated");
             answers.appendChild(answer);
           }
+          answers.appendChild(document.createElement("br"));
+          answers.appendChild(document.createElement("br"));
         outputNode.appendChild(question_node);
       }
     });
@@ -233,13 +241,34 @@ function updateFeedback(eventFormID, formNo) {
         data.list.forEach(eventForm => {
           if (eventForm.eventFormID == eventFormID) {
             var an_node = ans_node.getElementsByClassName("answer")[j];
-            setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"]);
-            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[j]["time-updated"]).toLocaleString());
-            setInnerHTMLSanitized(an_node.getElementsByClassName("response")[0], eventForm.answers[j].data["response"]);
-            if (eventForm.answers[j]["is-edited"]) {
-              setInnerHTMLSanitized(an_node.getElementsByClassName("is-edited")[0], "(edited)");
+            setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"] + ": ");
+            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[questNo]["time-updated"]).toLocaleString());
+            var resp_node = an_node.getElementsByClassName("respDiv")[0];
+            setInnerHTMLSanitized(resp_node.getElementsByClassName("response")[0], eventForm.answers[questNo].data["response"] + " ");
+            if (eventForm.answers[questNo]["is-edited"]) {
+              setInnerHTMLSanitized(resp_node.getElementsByClassName("is-edited")[0], "(edited) ");
             }
-            setInnerHTMLSanitized(an_node.getElementsByClassName("mood-value")[0], "Sentiment: " + eventForm.answers[j]["mood-value"]);
+            moodValue = eventForm.answers[questNo]["mood-value"];
+            if (moodValue > 0.5) {
+              emojiHTML = `<span for="emoji5"><img src="emoji5.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > 0.25) {
+              emojiHTML = `<span for="emoji4"><img src="emoji4.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > -0.25) {
+              emojiHTML = `<span for="emoji3"><img src="emoji3.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > -0.5) {
+              emojiHTML = `<span for="emoji2"><img src="emoji2.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
+            else if (moodValue > -1.0) {
+              emojiHTML = `<span for="emoji1"><img src="emoji1.png" height="20px" width="20px"/> </span>`
+              an_node.getElementsByClassName("mood-value")[0].innerHTML = emojiHTML;
+            }
             j++;
           }
         });
@@ -312,16 +341,13 @@ function generatePageData(event) {
         formNo++;
         compHTML = `<div class = "sub-content">
           <h3>Comprehensive Feedback</h3>
-          <div id="donutchart" style="width: 50vw;" class = "left"></div>
-          <div id="feedback-container` + formNo +  `" class = "right">
+          <div id="feedback-container` + formNo +  `" class = "fLeft">
             <h4>Questions</h4>
           </div>
         </div>`;
         genHTML = `<div class = "sub-content">
           <h3>General Feedback</h3>
-          <div id="piechart_3d" style="width: 50vw;" class = "left"></div>
-            <!-- general feedback is put into here -->
-            <div id="feedback-container` + formNo +  `" class = "right">
+            <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>
             </div>
         </div>`;
@@ -340,7 +366,6 @@ function generatePageData(event) {
 
         getAllEventData( eventID , function(ev_data) {
           eventData = ev_data;
-          updateFeedback(eventFormID, formNo);
           setInterval(updateFeedback(eventFormID, formNo), 5000);
         });
       }
