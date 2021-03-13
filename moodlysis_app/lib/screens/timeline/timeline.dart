@@ -190,7 +190,7 @@ class _EventCard extends StatelessWidget {
 }
 
 String _humanReadableFormatter(DateTime dateTime) {
-  String formatted = DateFormat("E, MMM d hh:mm").format(dateTime);
+  String formatted = DateFormat("E, MMM d HH:mm").format(dateTime);
   if (dateTime.year != DateTime.now().year) {
     formatted += " " + dateTime.year.toString();
   }
