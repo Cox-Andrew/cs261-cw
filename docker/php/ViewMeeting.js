@@ -29,25 +29,80 @@ function showDiv() {
   document.getElementById("msg").style.display= " block";
 }
 
-
 //general tab
 google.charts.load("current", {packages:["corechart"]});
 google.charts.setOnLoadCallback(drawChart1);
+var pieChartIntervalID = setInterval(function () {drawChart1()}, 5000);
 function drawChart1() {
   // example values
-  var Excellent = 10; //assign excellent to a mood value from backend
-  var VGood = 5;
-  var Good = 4;
-  var NGood = 3;
-  var Bad = 1;
+  var Excellent = 0; //assign excellent to a mood value from backend
+  var VGood = 0;
+  var Good = 0;
+  var NGood = 0;
+  var Bad = 0;
+  var Empty = 1;
+
+  $.ajax({
+    type: "GET",
+    url: endpointToRealAddress("/moods?eventID=" + eventID + "&time-updated-since=" + "2000-01-01T00:00:00"),
+    dataType: "json",
+    async: false,
+    success: function(result, status, xhr){
+      if (result.contains > 0) {
+        Empty = 0;
+      }
+      var totalMood =0;
+      for (var pieCount = 0; pieCount < result.contains; pieCount++) {
+        var moodValue = result.list[pieCount]["mood-value"];
+        if (moodValue > 0.5) {
+          Excellent++;
+        }
+        else if (moodValue > 0.25) {
+          VGood++;
+        }
+        else if (moodValue > -0.25) {
+          Good++;
+        }
+        else if (moodValue > 0.5) {
+          NGood++;
+        }
+        else if (moodValue > -1.0) {
+          Bad++;
+        }
+        totalMood += moodValue;
+      }
+      var avgMoodValue = totalMood/pieCount;
+      if (avgMoodValue > 0.5) {
+        var emoji = document.getElementsByClassName("emoji")[2];
+        emoji.innerHTML = `<span for="emoji5" class="emojiImg"><img src="emoji5.png"/> </span>`;
+      }
+      else if (avgMoodValue > 0.25) {
+        var emoji = document.getElementsByClassName("emoji")[2];
+        emoji.innerHTML = `<span for="emoji4" class="emojiImg"><img src="emoji4.png"/> </span>`;
+      }
+      else if (avgMoodValue > -0.25) {
+        var emoji = document.getElementsByClassName("emoji")[2];
+        emoji.innerHTML = `<span for="emoji3" class="emojiImg"><img src="emoji3.png"/> </span>`;
+      }
+      else if (avgMoodValue > -0.5) {
+        var emoji = document.getElementsByClassName("emoji")[2];
+        emoji.innerHTML = `<span for="emoji2" class="emojiImg"><img src="emoji2.png"/> </span>`;
+      }
+      else if (avgMoodValue > -1.0) {
+        var emoji = document.getElementsByClassName("emoji")[2];
+        emoji.innerHTML = `<span for="emoji1" class="emojiImg"><img src="emoji1.png"/> </span>`;
+      }
+    }
+  });
 
   var data = google.visualization.arrayToDataTable([
     ['Mood', 'Mood value'],
-    ['Excellent', Excellent],
-    ['Very good', VGood],
-    ['Good', Good],
-    ['Not good', NGood],
-    ['Bad', Bad]
+    ['Very Positive', Excellent],
+    ['Positive', VGood],
+    ['Neutral', Good],
+    ['Negative', NGood],
+    ['Very Negative', Bad],
+    ['No Data', Empty]
   ]);
 
   var options = {
@@ -96,7 +151,7 @@ function drawChart() {
             moodCount ++;
           }
         }
-        var avMoodValue = moodValue / moodCount;
+        var avMoodValue = ((moodValue / moodCount) + 1)*50;
         if (moodCount != 0) {
           moodData.push([eventTimeStart, avMoodValue]);
         }
@@ -107,12 +162,18 @@ function drawChart() {
 
 
   var data = google.visualization.arrayToDataTable(moodData);
-  console.log(moodData);
 
   var options = {
     title: 'Average Sentiment Over Time',
     curveType: 'function',
-    legend: { position: 'bottom' }
+    legend: { position: 'bottom' },
+    vAxis: {
+        viewWindow: {
+            min: 0,
+            max: 100
+        },
+        ticks: [0, 25, 50, 75, 100] // display labels every 25
+    }
   };
 
   var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
@@ -342,9 +403,6 @@ function pageLoadFeedback(eventFormID, formID, formNo) {
 function updateFeedback() {
   $.getJSON(endpointToRealAddress("/feedback?eventID=" + eventID + "&time-updated-since=" + timeOfLastUpdateUnparsed), function(data) {
 
-    //TODO UPDATE TIME
-    console.log(timeOfLastUpdateUnparsed);
-
     // find the correct eventform
     data.list.forEach(eventForm => {
       if (timeOfLastUpdateUnparsed < eventForm["time-updated"]) {
@@ -471,6 +529,18 @@ function getEventFormsFromEvent(event) {
 function generatePageData(event) {
   var formNo=0;
   const currentDiv = document.getElementById("content");
+  var inviteCode;
+  $.ajax({
+    type: "GET",
+    url: endpointToRealAddress("/invite-code?eventID=" + eventID),
+    dataType: "json",
+    async: false,
+    success: function(result, status, xhr){
+      inviteCode = result["invite-code"];
+      var moodCode = document.getElementById("invite-code-mood");
+      setInnerHTMLSanitized(moodCode, "Invite Code:" + inviteCode);
+    }
+  });
   Array.from(event.eventFormIDs).forEach(eventFormID => {
     $.ajax({
       type: "GET",
@@ -481,6 +551,7 @@ function generatePageData(event) {
         formNo++;
         if (getCookie("activatedForm" + formNo) == 2) {
           var compHTML = `<div class = "sub-content">
+          <div class ="invite-code">Invite Code:` + inviteCode + `</div>
             <h3>Comprehensive Feedback</h3>
             <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>
@@ -491,8 +562,9 @@ function generatePageData(event) {
           </div>
           `;
         }
-        else if (getCookie("activatedForm" + formNo) == 1) {
+        else if (result["isActive"]) {
           var compHTML = `<div class = "sub-content">
+          <div class ="invite-code">Invite Code:` + inviteCode + `</div>
             <h3>Comprehensive Feedback</h3>
             <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>
@@ -505,6 +577,7 @@ function generatePageData(event) {
         }
         else {
           var compHTML = `<div class = "sub-content">
+          <div class ="invite-code">Invite Code:` + inviteCode + `</div>
             <h3>Comprehensive Feedback</h3>
             <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>
@@ -516,6 +589,7 @@ function generatePageData(event) {
           `;
         }
         var genHTML = `<div class = "sub-content">
+        <div class ="invite-code">Invite Code:` + inviteCode + `</div>
           <h3>General Feedback</h3>
             <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>

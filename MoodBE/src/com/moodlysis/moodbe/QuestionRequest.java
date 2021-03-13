@@ -54,12 +54,14 @@ public class QuestionRequest extends HttpServlet {
 		JSONObject data = new JSONObject();
 		JSONArray options = new JSONArray();
 		JSONParser parser = new JSONParser();
-		try {
-			options = (JSONArray) parser.parse(info.options);
+		/*try {
+			if (info.options != null || info.options != "") {
+				options = (JSONArray) parser.parse(info.options);
+			}
 		} catch (ParseException e) {
 			// TODO Generate correct error
 			e.printStackTrace();
-		}
+		}*/
 		output.put("questionID", info.questionID);
 		output.put("formID", info.formID);
 		data.put("type", info.type);

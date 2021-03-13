@@ -401,6 +401,26 @@
   {
     display: none;
   }
+  .emoji
+  {
+    position: relative;
+    float: left;
+    width: 100%;
+    font-size: x-large;
+    text-align: left;
+  }
+  .emojiImg
+  {
+    position: relative;
+    text-align: left;
+    display: block;
+  }
+  .invite-code
+  {
+    position: relative;
+    text-align: left;
+    display: block;
+  }
 
   .footer {
     flex-shrink: 0;
