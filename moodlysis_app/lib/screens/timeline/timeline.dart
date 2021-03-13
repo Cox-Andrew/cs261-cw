@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/navigation.dart';
@@ -8,6 +7,7 @@ import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/screens/timeline/event/arguments.dart';
 import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
+import 'package:moodlysis_app/utils/events.dart';
 
 class TimelineScreen extends StatefulWidget {
   @override
@@ -148,11 +148,8 @@ class _EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () {
-          if (DateTime.now().isAfter(event.schedule.start)) {
-            Navigator.pushNamed(context, eventScreenRoute, arguments: EventScreenArgs(event));
-          }
-        },
+        onTap: () => Navigator.pushNamed(context, eventScreenRoute,
+            arguments: EventScreenArgs(event)),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -172,7 +169,7 @@ class _EventCard extends StatelessWidget {
                     size: Theme.of(context).textTheme.bodyText1.fontSize,
                   ),
                   Text(
-                    ' ${_humanReadableFormatter(event.schedule.start)} - ${_humanReadableFormatter(event.schedule.end)}',
+                    ' ${event.schedule.humanReadable}',
                     style: TextStyle(color: Theme.of(context).errorColor),
                   ),
                 ],
@@ -236,12 +233,4 @@ class NoEventsMessage extends StatelessWidget {
       ],
     );
   }
-}
-
-String _humanReadableFormatter(DateTime dateTime) {
-  String formatted = DateFormat('E, MMM d HH:mm').format(dateTime);
-  if (dateTime.year != DateTime.now().year) {
-    formatted += ' ' + dateTime.year.toString();
-  }
-  return formatted;
 }
