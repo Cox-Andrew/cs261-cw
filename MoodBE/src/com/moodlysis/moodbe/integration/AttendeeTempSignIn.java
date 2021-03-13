@@ -41,7 +41,7 @@ public class AttendeeTempSignIn {
 			stmt.setString(2, password);
 			rs = stmt.executeQuery();
 			if (!rs.next()) 
-				throw new MoodlysisNotFound("account not found");
+				throw new MoodlysisNotFound("Invalid credentials");
 			return rs.getInt("attendeeID");
 			
 		} catch (SQLException e) {

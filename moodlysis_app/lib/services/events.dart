@@ -1,36 +1,33 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/models/user.dart';
-import 'package:moodlysis_app/test_data.dart';
+import 'package:moodlysis_app/constants.dart';
+import 'package:moodlysis_app/services/exceptions.dart';
 
-final Map<String, int> _testCodeIDs = {
-  'ABCDEFGH': 1,
-  '12345678': 2,
-};
+Future<List<Event>> getUserEvents(http.Client client, User user) async {
+  final response = await client.get('$backendURI/register-event?attendeeID=${user.id}');
 
-final Map<int, Event> _testIDEvents = {
-  1: Event("Alphabet class", "learn ur abcs", DateTime.now().subtract(Duration(minutes: 5)), DateTime.now().add(Duration(minutes: 55))),
-  2: Event("Maths", "algebra hours", DateTime.now().add(Duration(days: 5, hours: 2)), DateTime.now().add(Duration(days: 5, hours: 3))),
-};
+  if (response.statusCode == 404) return List<Event>();
+  final List<dynamic> eventIDs = json.decode(response.body)['eventIDs'];
 
-Future<List<Event>> getUserEvents(User user) async {
-  //TODO: API events request
-  await Future.delayed(Duration(milliseconds: 500));
-  List events = generateEvents(10);
-  return events;
+  return Future.wait(eventIDs.map((eventID) => getEvent(client, eventID)));
 }
 
-Future<int> registerForEvent(String inviteCode) async {
-  //TODO: API event registration
-  await Future.delayed(Duration(milliseconds: 500));
-  if (_testCodeIDs.containsKey(inviteCode)) return _testCodeIDs[inviteCode];
+Future<int> registerForEvent(http.Client client, String inviteCode, User user) async {
+  final Map<String, dynamic> body = {"invite-code": inviteCode, "attendeeID": user.id,};
+  final response = await client.post('$backendURI/register-event', body: json.encode(body));
 
-  return null;
+  if (response.statusCode == 404) throw ResultNotFoundException();
+
+  return json.decode(response.body)['eventID'];
 }
 
-Future<Event> getEvent(int eventID) async {
-  //TODO: request event by ID
-  await Future.delayed(Duration(milliseconds: 500));
-  if (_testIDEvents.containsKey(eventID)) return _testIDEvents[eventID];
+Future<Event> getEvent(http.Client client, int eventID) async {
+  final response = await client.get('$backendURI/events/$eventID');
 
-  return null;
+  if (response.statusCode == 404) throw ResultNotFoundException();
+
+  return Event.fromJson(json.decode(response.body));
 }

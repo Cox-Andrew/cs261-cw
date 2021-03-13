@@ -74,11 +74,24 @@ function blankFormFactory() {
       <form class="event-form-parameters" >
         <label>Start Time:</label><input type="time" class="DateTime time-start"></input><br>
         <label>End Time:</label><input type="time" class="DateTime time-end"></input><br>
-        <input type = "submit" class = "submitForm" value="Save"></input>
+
+        <input type="button" class="submitForm" value="Save"></button>
+
       </form>
+      <div class="question-inputs"></div>
+      <div class="extra-controls">
+        <input type="button" class="addQuestion" value="+ New Question"></button>
+        <select class="questionType" name="questionType">
+          <option value="long">Long Answer</option>
+          <option value="short">Short Answer</option>
+        </select>
+        <input type="button" class="deleteForm" value="Delete Form From Event"></button>
+      </div>
+      
     </div>
   </div>
   `
+  //         <input type = "submit" class = "submitForm" value="Save"></input>
   var wrapper = document.createElement("div");
   wrapper.innerHTML = formhtml;
   var newNode = wrapper.firstChild;
@@ -149,7 +162,19 @@ function createAndDisplayForm(eventFormID, formID, eventForm, form) {
 
   // make form title and description
   var templateNode = blankFormFactory();
-  $(templateNode.getElementsByClassName("submitForm"))
+  $(templateNode.getElementsByClassName("submitForm")).click(function() {
+    submitForm(eventFormID);
+    return false;
+  });
+  $(templateNode.getElementsByClassName("addQuestion")).click(function() {
+    var questionType = templateNode.getElementsByClassName("questionType")[0].value;
+    addQuestionToEventForm(eventFormID, questionType);
+    return false;
+  });
+  $(templateNode.getElementsByClassName("deleteForm")).click(function() {
+    deleteEventForm(eventFormID);
+    return false;
+  });
 
   templateNode.setAttribute("id", "eventForm" + eventFormID);
   var formNode = templateNode.getElementsByClassName("form")[0];
@@ -176,11 +201,12 @@ function createAndDisplayForm(eventFormID, formID, eventForm, form) {
   for (const i in form.questions) {
     var question = form.questions[i];
     var questionID = form.questionIDs[i];
-    createQuestion(question, questionID, formNode, parseInt(i)+1);
+    createQuestion(question, eventFormID, formNode.getElementsByClassName("question-inputs")[0], parseInt(i)+1);
   }
 
   // add a bubble at the top of the screen
   var bubbleNode = blankBubbleFactory();
+  bubbleNode.setAttribute("id", "eventForm" + eventFormID + "bubble");
   setInnerHTMLSanitized(bubbleNode, form.data.title);
   document.getElementById("heading").prepend(bubbleNode);
   $(bubbleNode).click(function() {
@@ -196,7 +222,7 @@ function createAndDisplayForm(eventFormID, formID, eventForm, form) {
 
 }
 
-function createQuestion(question, questionID, appendTo, questionDisplayNumber) {
+function createQuestion(question, eventFormID, appendTo, questionDisplayNumber) {
   var questionWrapper = blankQuestionFactory(question.data.type == "multi");
 
   // add text like "Question 1 - multi" in the <label>
@@ -206,7 +232,7 @@ function createQuestion(question, questionID, appendTo, questionDisplayNumber) {
   setInnerHTMLSanitized(questionWrapper.getElementsByTagName("textarea")[0], question.data.text);
 
   // set the id of the form element
-  questionWrapper.getElementsByTagName("textarea")[0].setAttribute("id", "question" + questionID);
+  questionWrapper.getElementsByTagName("textarea")[0].setAttribute("id", "eventForm" + eventFormID + "question" + question.questionID);
 
   // add options TODO this doesn't work but we're not implementing multichoice anyway
   if (question.data.type == "multi") {
@@ -236,7 +262,7 @@ function createQuestion(question, questionID, appendTo, questionDisplayNumber) {
 function newFormRequestToBackend(callback) {
 
   // insert placeholder null values in eventForms and forms
-  var nextIndex = eventData.eventFormIDs.length + 1;
+  var nextIndex = eventData.eventFormIDs.length;
 
   eventData.formIDs[nextIndex] = null;
   eventData.eventFormIDs[nextIndex] = null;
@@ -258,6 +284,7 @@ function newFormRequestToBackend(callback) {
     $.getJSON(endpointToRealAddress("/forms/" + formID), function(form) {
       eventData.forms[nextIndex] = form;
       form["formID"] = formID; // need to add because it is missing from the response
+      form.questions = [];
       if (--remaining_leaf_requests == 0) callback(nextIndex);
     });
 
@@ -334,10 +361,10 @@ function submitForm(eventFormID) {
 
   // n
 
-  var form = eventData.forms[eventData.eventFormIDs.indexof(eventFormID)];
+  var form = eventData.forms[eventData.eventFormIDs.indexOf(eventFormID)];
   form.questions.forEach(question => {
     // check if the question has been edited in the webpage
-    var textInQuestionBox = documentForm.getElementById("question" + question.questionID).value;
+    var textInQuestionBox = document.getElementById("eventForm" + eventFormID + "question" + question.questionID).value;
     if (textInQuestionBox != question.data.text) {
       // change the representation in eventData
       question.data.text = textInQuestionBox;
@@ -361,6 +388,67 @@ function submitForm(eventFormID) {
   // get all the data from the webpage. compare it to eventData, then update if necessary
 
 
+}
+
+function addQuestionToEventForm(eventFormID, questionType) {
+  var formIndex = eventData.eventFormIDs.indexOf(eventFormID);
+  var formID = eventData.formIDs[formIndex];
+  var questionIDs = eventData.forms[formIndex].questionIDs;
+  var lastQuestionID = questionIDs[questionIDs.length - 1];
+  if (lastQuestionID == null) lastQuestionID = 0;
+  $.post(endpointToRealAddress("/questions"), JSON.stringify({
+    "formID": formID,
+    "preceding-questionID": lastQuestionID, 
+    "data": {
+      "type": questionType,
+      "text": "",
+      "options": []
+    }
+  }), function(data) {
+    var questionID = data.questionID;
+    // retrieve data again
+    $.getJSON(endpointToRealAddress("/questions/"+questionID), function(question) {
+      var insertQuestionAtIndex = eventData.forms[formIndex].questionIDs.length;
+      eventData.forms[formIndex].questions[insertQuestionAtIndex] = question;
+      eventData.forms[formIndex].questionIDs[insertQuestionAtIndex] = questionID;
+      var formNode = document.getElementById("eventForm" + eventFormID).getElementsByClassName("form")[0];
+      createQuestion(question, eventFormID, formNode.getElementsByClassName("question-inputs")[0], insertQuestionAtIndex + 1);
+    });
+  });
+}
+
+function deleteEventForm(eventFormID) {
+  var formIndex = eventData.eventFormIDs.indexOf(eventFormID);
+  $.ajax({
+    url: endpointToRealAddress("/event-forms/"+ eventFormID),
+    type: 'DELETE',
+    success: function(result) {
+      var bubbleToDelete = document.getElementById("eventForm" + eventFormID + "bubble");
+      bubbleToDelete.parentElement.removeChild(bubbleToDelete);
+      // for (const i in pageBubbles) {
+      //   if (pageBubbles[i].id == "eventForm" + eventFormID + "bubble") {
+      //     // delete bubble from page
+      //     pageBubbles[i].parentNode.removeChild(pageBubbles[i]);
+
+      //     pageBubbles = pageBubbles.splice(i, 1);
+      // }}
+      for (const i in pageForms) {
+        if (pageForms[i].id == "eventForm" + eventFormID) {
+          // delete form from page
+          pageForms[i].parentNode.removeChild(pageForms[i]);
+          pageForms.splice(i, 1);
+          break;
+      }}
+
+
+      // delete from eventData
+      eventData.forms.splice(formIndex, 1);
+      eventData.formIDs.splice(formIndex, 1);
+      eventData.eventForms.splice(formIndex, 1);
+      eventData.eventFormIDs.splice(formIndex, 1);
+
+    }
+  });
 }
 
 

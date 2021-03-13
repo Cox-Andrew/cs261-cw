@@ -24,7 +24,7 @@ public interface AttendeeInterface {
 	public AttendeeInfo getAttendeeInfo(int attendeeID, int verificationAttendeeID) throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError;
 	
 	// POST /v0/attendees
-	public int newAttendee(String name, String pass, String email, LocalDateTime expires) throws MoodlysisInternalServerError;
+	public int newAttendee(String name, String pass, String email, LocalDateTime expires) throws MoodlysisInternalServerError, MoodlysisBadRequest;
 	
 	public boolean editAttendee(int attendeeID, String name, String pass, String email, int verificationAttendeeID) throws MoodlysisForbidden, MoodlysisNotFound, MoodlysisInternalServerError;
 	

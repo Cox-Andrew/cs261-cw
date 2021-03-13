@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/navigation.dart';
 import 'package:moodlysis_app/models/event.dart';
@@ -19,9 +20,10 @@ class _TimelineScreenState extends State<TimelineScreen> {
   List<Event> _upcomingEvents;
 
   void _updateEvents() {
-    getUserEvents(globals.currentUser).then((events) {
-      List<Event> liveEvents = [];
-      List<Event> upcomingEvents = [];
+    //TODO: error catching e.g. connection failed
+    getUserEvents(http.Client(), globals.currentUser).then((events) {
+      List<Event> liveEvents = List<Event>();
+      List<Event> upcomingEvents = List<Event>();
 
       for (Event event in events) {
         //TODO: implement past events archive
@@ -188,7 +190,7 @@ class _EventCard extends StatelessWidget {
 }
 
 String _humanReadableFormatter(DateTime dateTime) {
-  String formatted = DateFormat("E, MMM d hh:mm").format(dateTime);
+  String formatted = DateFormat("E, MMM d HH:mm").format(dateTime);
   if (dateTime.year != DateTime.now().year) {
     formatted += " " + dateTime.year.toString();
   }

@@ -1,5 +1,6 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
+import com.moodlysis.moodbe.requestexceptions.MoodlysisBadRequest;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
@@ -16,7 +17,7 @@ public interface HostInterface {
 	public hostInfo getHost(int hostID) throws MoodlysisInternalServerError, MoodlysisNotFound;
 	
 	//  POST /v0/hosts	
-	public int newHost(String name, String pass, String email) throws MoodlysisInternalServerError;
+	public int newHost(String name, String pass, String email) throws MoodlysisInternalServerError, MoodlysisBadRequest;
 	
 	//  PUT /v0/hosts/{hostID}
 	public boolean editHost(int hostID, String name, String pass, String email) throws MoodlysisInternalServerError, MoodlysisNotFound;

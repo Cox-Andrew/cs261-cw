@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/navigation.dart';
+import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/services/events.dart';
+import 'package:moodlysis_app/globals.dart' as globals;
+import 'package:moodlysis_app/services/exceptions.dart';
 
 class RegisterEventScreen extends StatelessWidget {
   static const route = "/register_event";
@@ -30,7 +34,8 @@ class RegisterEventScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: MoodlysisBottomNavigationBar(RegisterEventScreen.route),
+      bottomNavigationBar:
+          MoodlysisBottomNavigationBar(RegisterEventScreen.route),
     );
   }
 }
@@ -112,40 +117,63 @@ class _JoinFormState extends State<JoinForm> {
       _formKey.currentState.save();
 
       setState(() => _loading = true);
-      registerForEvent(_inviteCode).then((eventID) {
-        if (eventID == null) {
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: RichText(
-                text: TextSpan(children: [
-                  TextSpan(text: 'Invalid code', style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: ', please try again.'),
-                ])),
-            backgroundColor: Theme.of(context).errorColor,
-          ));
-          return;
-        }
-
-        FocusScope.of(context).unfocus();
-        _formKey.currentState.reset();
-
-        getEvent(eventID).then((event) {
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(text: 'Successfully registered for '),
-                  TextSpan(
-                      text: event.title,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-            backgroundColor: Colors.green,
-          ));
-        });
-      }).whenComplete(() => setState(() => _loading = false));
+      registerForEvent(http.Client(), _inviteCode, globals.currentUser)
+          .then((eventID) => getEvent(http.Client(), eventID))
+          .then((event) => _handleRegistrationSuccess(event))
+          .catchError((e, s) => _handleInvalidCode(e, s),
+              test: (e) => e is ResultNotFoundException)
+          .catchError((e, s) => _handleError(e, s))
+          .whenComplete(() => setState(() => _loading = false));
     }
+  }
+
+  void _handleRegistrationSuccess(Event event) {
+    FocusScope.of(context).unfocus();
+    _formKey.currentState.reset();
+
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: RichText(
+          text: TextSpan(children: [
+        TextSpan(text: 'Successfully registered for '),
+        TextSpan(
+            text: event.title, style: TextStyle(fontWeight: FontWeight.bold)),
+      ])),
+      backgroundColor: Colors.green,
+    ));
+  }
+
+  void _handleInvalidCode(dynamic error, StackTrace stackTrace) {
+    print("Error: $error");
+    print("StackTrace: $stackTrace");
+
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: RichText(
+          text: TextSpan(children: [
+        TextSpan(
+            text: 'Invalid code',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: ', please try again.'),
+      ])),
+      backgroundColor: Theme.of(context).errorColor,
+    ));
+  }
+
+  void _handleError(dynamic error, StackTrace stackTrace) {
+    print("Error: $error");
+    print("StackTrace: $stackTrace");
+
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: RichText(
+          text: TextSpan(children: [
+        TextSpan(
+            text: 'Something went wrong',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: ', please try again.'),
+      ])),
+      backgroundColor: Theme.of(context).errorColor,
+    ));
   }
 }

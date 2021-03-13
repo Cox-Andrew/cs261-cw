@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:moodlysis_app/models/user.dart';
 import 'package:moodlysis_app/services/authentication.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
+import 'package:moodlysis_app/services/exceptions.dart';
 
 class SignInScreen extends StatelessWidget {
   static const route = "/signin";

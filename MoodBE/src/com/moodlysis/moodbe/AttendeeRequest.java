@@ -171,6 +171,9 @@ public class AttendeeRequest extends HttpServlet {
 		} catch (MoodlysisInternalServerError e){
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
+		} catch (MoodlysisBadRequest e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+			return;
 		} finally {
 			try {
 				conn.close();

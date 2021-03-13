@@ -4,10 +4,10 @@ var hostIDString = getCookie("hostID");
 if (hostIDString == "") {
 	window.location.href = "/HostSignin.html"
 }
-var hostID = parseInt(hostIDString);
+var eventID = parseInt(hostIDString);
 
 
-$.getJSON(endpointToRealAddress("/series?hostID=" + hostID), function(data) {
+$.getJSON(endpointToRealAddress("/series?hostID=" + eventID), function(data) {
 	data.seriesIDs.forEach(seriesID => {
 		var newLi = document.createElement("li");
 		var newA = document.createElement("a");
