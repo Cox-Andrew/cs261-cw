@@ -59,29 +59,69 @@ function drawChart1() {
   chart.draw(data, options);
 }
 
-//comprehensive tab
 google.charts.load("current", {packages:["corechart"]});
-google.charts.setOnLoadCallback(drawChart2);
-function drawChart2() {
-  //example values
-  var q1 = 10; //assign q1 to a mood value from backend
-  var q2 = 5;
-  var q3 = 2;
-  var data = google.visualization.arrayToDataTable([
-    ['Question', 'Mood value'],
-    ['Q1', q1],
-    ['Q2', q2],
-    ['Q3', q3]
-  ]);
+google.charts.setOnLoadCallback(drawChart);
+var chartIntervalID = setInterval(function () {drawChart()}, 5000);
+
+function drawChart() {
+  var eventTimeStart = null;
+  var eventTimeEnd = null;
+  //GET mood data
+  $.ajax({
+    type: "GET",
+    url: endpointToRealAddress("/events/" + eventID),
+    dataType: "json",
+    async: false,
+    success: function(result, status, xhr){
+      eventTimeStart = new Date(result.data["time-start"]);
+      eventTimeEnd = new Date(result.data["time-end"]);
+    }
+  });
+
+  var moodData = [['Time Submitted','Average Mood Value']];
+
+  $.ajax({
+    type: "GET",
+    url: endpointToRealAddress("/moods?eventID=" + eventID + "&time-updated-since=" + "2000-01-01T00:00:00"),
+    dataType: "json",
+    async: false,
+    success: function(result, status, xhr){
+      while (eventTimeStart < eventTimeEnd) {
+        var moodValue = 0;
+        var moodCount = 0;
+        eventTimeInterval = new Date(eventTimeStart.getTime() + 60000);
+        for (var countDate = 0; countDate < result.contains; countDate++) {
+          if (new Date(result.list[countDate]["time-submitted"]) < eventTimeInterval && new Date(result.list[countDate]["time-submitted"]) > eventTimeStart) {
+            moodValue += result.list[countDate]["mood-value"];
+            moodCount ++;
+          }
+        }
+        var avMoodValue = moodValue / moodCount;
+        if (moodCount != 0) {
+          moodData.push([eventTimeStart, avMoodValue]);
+        }
+        eventTimeStart = eventTimeInterval;
+      }
+    }
+  });
+
+
+  var data = google.visualization.arrayToDataTable(moodData);
+  console.log(moodData);
 
   var options = {
-    title: 'Mood analysis',
-    pieHole: 0.4,
+    title: 'Average Sentiment Over Time',
+    curveType: 'function',
+    legend: { position: 'bottom' }
   };
 
-  var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+  var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
   chart.draw(data, options);
 }
+
+
+
 
 
 var eventIDString = getCookie("eventID");
@@ -264,7 +304,7 @@ function pageLoadFeedback(eventFormID, formID, formNo) {
           if (eventForm.eventFormID == eventFormID) {
             var an_node = ans_node.getElementsByClassName("answer")[j];
             setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"] + ": ");
-            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[questNo]["time-updated"]).toLocaleString());
+            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[questNo]["time-updated"]).toLocaleTimeString());
             var resp_node = an_node.getElementsByClassName("respDiv")[0];
             setInnerHTMLSanitized(resp_node.getElementsByClassName("response")[0], eventForm.answers[questNo].data["response"] + " ");
             if (eventForm.answers[questNo]["is-edited"]) {
@@ -327,7 +367,7 @@ function updateFeedback() {
 
             var an_node = ans_node.getElementsByClassName("answer")[j + elements];
             setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"] + ": ");
-            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[questNo]["time-updated"]).toLocaleString());
+            setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[questNo]["time-updated"]).toLocaleTimeString());
             var resp_node = an_node.getElementsByClassName("respDiv")[0];
             setInnerHTMLSanitized(resp_node.getElementsByClassName("response")[0], eventForm.answers[questNo].data["response"] + " ");
             if (eventForm.answers[questNo]["is-edited"]) {
@@ -377,6 +417,21 @@ function switchForms(newOpenForm) {
 function getEventFormsFromEvent(event) {
   const currentDiv = document.getElementById("heading");
   var p=0;
+  var title = "Mood Analysis";
+  var hidden = document.createElement("div");
+  hidden.className = "hidden"
+  var br = document.createElement("br");
+  hidden.appendChild(br);
+  var formName = document.createElement("button");
+  formName.className = "formName";
+  var temp = document.getElementById("temp0");
+  pageForms.push(temp);
+  $(formName).click(function() {
+    switchForms(temp);
+  });
+  setInnerHTMLSanitized(formName, title);
+  currentDiv.appendChild(formName);
+  currentDiv.appendChild(hidden);
   Array.from(event.eventFormIDs).forEach(eventFormID => {
     $.ajax({
       type: "GET",
@@ -430,6 +485,8 @@ function generatePageData(event) {
             <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>
             </div>
+            <br>
+            <br>
             <button type = "button" class = "activateForm" id = "btnFeed` + formNo + `" onclick="test2(` + formNo +`,` + eventFormID + `)" disabled="disabled">Form has ended</button>
           </div>
           `;
@@ -440,6 +497,8 @@ function generatePageData(event) {
             <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>
             </div>
+            <br>
+            <br>
             <button type = "button" class = "activateForm" id = "btnFeed` + formNo + `" onclick="test2(` + formNo +`,` + eventFormID + `)">End form</button>
           </div>
           `;
@@ -450,6 +509,8 @@ function generatePageData(event) {
             <div id="feedback-container` + formNo +  `" class = "fLeft">
               <h4>Questions</h4>
             </div>
+            <br>
+            <br>
             <button type = "button" class = "activateForm" id = "btnFeed` + formNo + `" onclick="test(` + formNo +`,` + eventFormID + `)">Activate</button>
           </div>
           `;

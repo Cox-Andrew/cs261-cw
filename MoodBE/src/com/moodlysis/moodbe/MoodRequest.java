@@ -176,7 +176,7 @@ public class MoodRequest extends HttpServlet {
 	private String getMoodListJSON(MoodListInfo info) {
 		JSONObject output = new JSONObject();
 		output.put("eventID", info.eventID);
-		output.put("time-submitted-since", info.timeSubmittedSince);
+		output.put("time-submitted-since", info.timeSubmittedSince.toString());
 		output.put("contains", info.list.size());
 		JSONArray list = new JSONArray();
 		for (Mood.MoodInfo moodInfo: info.list) {
