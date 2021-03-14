@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:moodlysis_app/screens/timeline/event/arguments.dart';
 import 'package:moodlysis_app/utils/events.dart';
+import 'package:moodlysis_app/globals.dart' as globals;
 
 class EventScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final EventScreenArgs args = ModalRoute.of(context).settings.arguments;
-    bool _live = args.event.schedule.start.isBefore(DateTime.now());
+    bool _live = globals.currentEvent.schedule.start.isBefore(DateTime.now());
 
     return Scaffold(
       appBar: AppBar(
@@ -26,7 +26,7 @@ class EventScreen extends StatelessWidget {
                       text: 'Welcome to ',
                       style: TextStyle(fontWeight: FontWeight.normal)),
                   TextSpan(
-                      text: args.event.title,
+                      text: globals.currentEvent.title,
                       style: TextStyle(color: Theme.of(context).primaryColor)),
                   TextSpan(
                       text: '!',
@@ -37,7 +37,7 @@ class EventScreen extends StatelessWidget {
               ),
             ),
             Text(
-              args.event.description,
+              globals.currentEvent.description,
               style: Theme.of(context).textTheme.subtitle1,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -46,7 +46,7 @@ class EventScreen extends StatelessWidget {
             Row(children: [
               Icon(Icons.calendar_today,
                   size: Theme.of(context).textTheme.subtitle1.fontSize),
-              Text(' ${args.event.schedule.humanReadable}',
+              Text(' ${globals.currentEvent.schedule.humanReadable}',
                   style: Theme.of(context)
                       .textTheme
                       .subtitle1

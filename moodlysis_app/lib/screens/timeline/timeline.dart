@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:moodlysis_app/components/navigation.dart';
 import 'package:moodlysis_app/constants.dart';
 import 'package:moodlysis_app/models/event.dart';
-import 'package:moodlysis_app/screens/timeline/event/arguments.dart';
 import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 import 'package:moodlysis_app/utils/events.dart';
@@ -148,8 +147,10 @@ class _EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, eventScreenRoute,
-            arguments: EventScreenArgs(event)),
+        onTap: () {
+          globals.currentEvent = event;
+          Navigator.pushNamed(context, eventScreenRoute);
+        },
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
