@@ -265,6 +265,7 @@
     width: auto;
   }
 }
+
 @media (max-width: 415px) {
   .fullscreen_video {
       display: none;
