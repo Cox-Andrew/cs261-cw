@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/forms.dart';
-import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/constants/constants.dart';
+import 'package:moodlysis_app/services/forms.dart';
 import 'package:moodlysis_app/utils/error_handlers.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 

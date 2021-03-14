@@ -34,29 +34,3 @@ Future<Event> getEvent(http.Client client, int eventID) async {
 
   return Event.fromJson(json.decode(response.body));
 }
-
-Future<void> sendMood(http.Client client, double moodValue, int eventID) async {
-  final Map<String, dynamic> body = {
-    "mood-value": moodValue,
-    "eventID": eventID,
-  };
-  await client.post('$backendURI/moods', body: json.encode(body));
-
-  //TODO: what errors can this throw
-}
-
-Future<int> sendFeedback(http.Client client, User user, int eventID, int eventFormID, int questionID, String answer, bool isAnonymous) async{
-  final Map<String, dynamic> body = {
-    'attendeeID': user.id,
-    'eventID': eventID,
-    'eventFormID': eventFormID,
-    'questionID': questionID,
-    'data': {
-      'response': answer,
-      'isAnonymous': isAnonymous,
-    }
-  };
-  final response = await client.post('$backendURI/answers', body: json.encode(body));
-
-  return json.decode(response.body)['answerID'];
-}
