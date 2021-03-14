@@ -475,8 +475,8 @@ function getComprehensive() {
 
                           if (--remainingQuestionIDsToProcess == 0) {
                             // now all questions are downloaded, so now we can insert them in the correct order
-                            elsWhoseChildrenWillBeInsertedToCurrentDiv.forEach(iWantToDie => {
-                              iWantToDie.childNodes.forEach(insertToDoc => {
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv.forEach(questionItems => {
+                              questionItems.childNodes.forEach(insertToDoc => {
                                 currentDiv.appendChild(insertToDoc);
                               });
                             });
