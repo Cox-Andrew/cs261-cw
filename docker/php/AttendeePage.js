@@ -157,157 +157,365 @@ setInnerHTMLSanitized(noForm, "There is no feedback form right now" );
 
 var intervalID = window.setInterval(getComprehensive, 5000);
 
+// function getComprehensive() {
+//   const currentDiv = document.getElementById("CForm");
+//   boolform = true;
+//   eventID = getCookie("eventID");
+//   $.ajax({
+//     type: "GET",
+//     url: endpointToRealAddress("/events/" + eventID),
+//     dataType: "json",
+//     async: false,
+//     success: function(result, status, xhr){
+//       eventFormIDs = result.eventFormIDs
+//     }
+//   });
+//   Array.from(eventFormIDs).forEach(eventFormID => {
+//     $.ajax({
+//       type: "GET",
+//       url: endpointToRealAddress("/event-forms/" + eventFormID),
+//       dataType: "json",
+//       async: false,
+//       success: function(result, status, xhr){
+//         activity = result["isActive"];
+//         formID = result["formID"];
+//         if (activity && formID != 0) {
+//           boolform = false;
+//           if (removeForm(eventFormID)) {
+//             if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
+//               form = document.getElementById("CForm");
+//               form.setAttribute("onsubmit","submitComprehensive(); return false");
+//             }
+//             else {
+//               form = document.getElementById("CForm");
+//               form.setAttribute("onsubmit","editComprehensive(); return false");
+//             }
+//             var remNoForm = document.getElementById("noForm");
+//             if (remNoForm != null) {
+//               remNoForm.remove();
+//             }
+//             setCookie("eventFormID", eventFormID , 1);
+//             $.ajax({
+//               type: "GET",
+//               url: endpointToRealAddress("/forms/" + formID),
+//               dataType: "json",
+//               async: false,
+//               success: function(result, status, xhr){
+//                 questionIDs = result["questionIDs"];
+//                 i = 1;
+//                 Array.from(questionIDs).forEach(questionID => {
+//                   $.ajax({
+//                     type: "GET",
+//                     url: endpointToRealAddress("/questions/" + questionID),
+//                     dataType: "json",
+//                     async: false,
+//                     success: function(result, status, xhr){
+//                       setCookie("questionID" + i, questionID , 1);
+//                       type = result.data["type"];
+//                       text = result.data["text"];
+//                       options = result.data["options"];
+//                       var br = document.createElement("br");
+//                       br.setAttribute("id","br");
+//                       var questionDiv = document.createElement("div");
+//                       questionDiv.className = "question1";
+//                       var questionLabel = document.createElement("Label");
+//                       questionLabel.setAttribute("id", "formLabel");
+//                       setInnerHTMLSanitized(questionLabel, text );
+//                       questionDiv.appendChild(questionLabel);
+//                       if (type == "long") {
+//                         var questionEntry = document.createElement("textarea");
+//                         questionEntry.className = "textarea";
+//                         questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+//                         questionEntry.setAttribute("id","ques" + i);
+//                         questionEntry.setAttribute("rows","2");
+//                         questionEntry.setAttribute("cols","15");
+//                         questionEntry.setAttribute("placeholder"," ");
+//                         currentDiv.appendChild(questionDiv);
+//                         currentDiv.appendChild(br);
+//                         currentDiv.appendChild(questionEntry);
+//                         var br = document.createElement("br");
+//                         br.setAttribute("id","br");
+//                         currentDiv.appendChild(br);
+//                       }
+//                       else if (type == "short") {
+//                         //TODO only enter two words + make distinguishable
+//                         var questionEntry = document.createElement("textarea");
+//                         questionEntry.className = "textarea";
+//                         questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+//                         questionEntry.setAttribute("id","ques" + i);
+//                         questionEntry.setAttribute("rows","2");
+//                         questionEntry.setAttribute("cols","15");
+//                         questionEntry.setAttribute("placeholder"," ");
+//                         currentDiv.appendChild(questionDiv);
+//                         currentDiv.appendChild(br);
+//                         currentDiv.appendChild(questionEntry);
+//                         var br = document.createElement("br");
+//                         br.setAttribute("id","br");
+//                         currentDiv.appendChild(br);
+//                       }
+//                       else if (type == "options") {
+//                         //TODO
+//                       }
+//                       else if (type == "rating") {
+//                         //TODO
+//                       }
+//                     }
+//                   });
+//                   i++;
+//                 });
+//                 var checkbox = document.createElement("div");
+//                 checkbox.className = "checkbox";
+//                 checkbox.setAttribute("id","AnonComp");
+//                 var checkinput = document.createElement("input");
+//                 var checktext = document.createTextNode(" Anonymous");
+//                 checkinput.setAttribute("type","checkbox");
+//                 checkinput.setAttribute("name","anonymous");
+//                 checkinput.setAttribute("id","AnonymousComp");
+//                 checkinput.setAttribute("placeholder","Anonymous");
+//                 checkbox.appendChild(checkinput);
+//                 checkbox.appendChild(checktext);
+//                 currentDiv.appendChild(checkbox);
+
+//                 var br = document.createElement("br");
+//                 currentDiv.appendChild(br);
+
+//                 var onlySubmitOnce = document.createElement("div");
+//                 onlySubmitOnce.setAttribute("id","msgFeed");
+//                 setInnerHTMLSanitized(onlySubmitOnce, "You can edit your feedback in 5 seconds." );
+//                 currentDiv.appendChild(onlySubmitOnce);
+//                 var submitButton = document.createElement("input");
+//                 submitButton.setAttribute("id","btnFeed");
+//                 submitButton.setAttribute("class","submitFeed");
+//                 submitButton.setAttribute("type","submit");
+//                 if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
+//                   submitButton.setAttribute("value","Submit");
+//                 } else {
+//                   submitButton.setAttribute("value","Edit Submission");
+//                 }
+//                 currentDiv.appendChild(submitButton);
+//                 return;
+//               }
+//             });
+//           }
+//         }
+//       }
+//     });
+//   });
+//   if (boolform) {
+//     removeForm(0);
+//     currentDiv.appendChild(noForm);
+//   }
+//   return;
+
+// }
+var getComprehensiveIsBusy = false;
+
 function getComprehensive() {
+
+  if (getComprehensiveIsBusy) return;
+  getComprehensiveIsBusy = true;
+
   const currentDiv = document.getElementById("CForm");
   boolform = true;
   eventID = getCookie("eventID");
+
+  function callOnceDone() {
+    if (boolform) {
+      removeForm(0);
+      currentDiv.appendChild(noForm);
+    }
+    getComprehensiveIsBusy = false;
+  }
+
   $.ajax({
     type: "GET",
     url: endpointToRealAddress("/events/" + eventID),
     dataType: "json",
-    async: false,
     success: function(result, status, xhr){
-      eventFormIDs = result.eventFormIDs
-    }
-  });
-  Array.from(eventFormIDs).forEach(eventFormID => {
-    $.ajax({
-      type: "GET",
-      url: endpointToRealAddress("/event-forms/" + eventFormID),
-      dataType: "json",
-      async: false,
-      success: function(result, status, xhr){
-        activity = result["isActive"];
-        formID = result["formID"];
-        if (activity && formID != 0) {
-          boolform = false;
-          if (removeForm(eventFormID)) {
-            if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
-              form = document.getElementById("CForm");
-              form.setAttribute("onsubmit","submitComprehensive(); return false");
-            }
-            else {
-              form = document.getElementById("CForm");
-              form.setAttribute("onsubmit","editComprehensive(); return false");
-            }
-            var remNoForm = document.getElementById("noForm");
-            if (remNoForm != null) {
-              remNoForm.remove();
-            }
-            setCookie("eventFormID", eventFormID , 1);
-            $.ajax({
-              type: "GET",
-              url: endpointToRealAddress("/forms/" + formID),
-              dataType: "json",
-              async: false,
-              success: function(result, status, xhr){
-                questionIDs = result["questionIDs"];
-                i = 1;
-                Array.from(questionIDs).forEach(questionID => {
-                  $.ajax({
-                    type: "GET",
-                    url: endpointToRealAddress("/questions/" + questionID),
-                    dataType: "json",
-                    async: false,
-                    success: function(result, status, xhr){
-                      setCookie("questionID" + i, questionID , 1);
-                      type = result.data["type"];
-                      text = result.data["text"];
-                      options = result.data["options"];
-                      var br = document.createElement("br");
-                      br.setAttribute("id","br");
-                      var questionDiv = document.createElement("div");
-                      questionDiv.className = "question1";
-                      var questionLabel = document.createElement("Label");
-                      questionLabel.setAttribute("id", "formLabel");
-                      setInnerHTMLSanitized(questionLabel, text );
-                      questionDiv.appendChild(questionLabel);
-                      if (type == "long") {
-                        var questionEntry = document.createElement("textarea");
-                        questionEntry.className = "textarea";
-                        questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
-                        questionEntry.setAttribute("id","ques" + i);
-                        questionEntry.setAttribute("rows","2");
-                        questionEntry.setAttribute("cols","15");
-                        questionEntry.setAttribute("placeholder"," ");
-                        currentDiv.appendChild(questionDiv);
-                        currentDiv.appendChild(br);
-                        currentDiv.appendChild(questionEntry);
-                        var br = document.createElement("br");
-                        br.setAttribute("id","br");
-                        currentDiv.appendChild(br);
-                      }
-                      else if (type == "short") {
-                        //TODO only enter two words + make distinguishable
-                        var questionEntry = document.createElement("textarea");
-                        questionEntry.className = "textarea";
-                        questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
-                        questionEntry.setAttribute("id","ques" + i);
-                        questionEntry.setAttribute("rows","2");
-                        questionEntry.setAttribute("cols","15");
-                        questionEntry.setAttribute("placeholder"," ");
-                        currentDiv.appendChild(questionDiv);
-                        currentDiv.appendChild(br);
-                        currentDiv.appendChild(questionEntry);
-                        var br = document.createElement("br");
-                        br.setAttribute("id","br");
-                        currentDiv.appendChild(br);
-                      }
-                      else if (type == "options") {
-                        //TODO
-                      }
-                      else if (type == "rating") {
-                        //TODO
+      eventFormIDs = result.eventFormIDs;
+
+      var remainingEventFormIDsToProcess = eventFormIDs.length; //  so that the "if (boolform) .." section doesn't get run until we are done
+      if (remainingEventFormIDsToProcess == 0) {
+        callOnceDone();
+      }
+
+      Array.from(eventFormIDs).forEach(eventFormID => {
+        $.ajax({
+          type: "GET",
+          url: endpointToRealAddress("/event-forms/" + eventFormID),
+          dataType: "json",
+          success: function(result, status, xhr){
+            activity = result["isActive"];
+            formID = result["formID"];
+            if (activity && formID != 0) {
+              boolform = false;
+              if (removeForm(eventFormID)) {
+                if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
+                  form = document.getElementById("CForm");
+                  form.setAttribute("onsubmit","submitComprehensive(); return false");
+                }
+                else {
+                  form = document.getElementById("CForm");
+                  form.setAttribute("onsubmit","editComprehensive(); return false");
+                }
+                var remNoForm = document.getElementById("noForm");
+                if (remNoForm != null) {
+                  remNoForm.remove();
+                }
+                setCookie("eventFormID", eventFormID , 1);
+                $.ajax({
+                  type: "GET",
+                  url: endpointToRealAddress("/forms/" + formID),
+                  dataType: "json",
+                  success: function(result, status, xhr){
+
+                    var checkbox = document.createElement("div");
+                    checkbox.className = "checkbox";
+                    checkbox.setAttribute("id","AnonComp");
+                    var checkinput = document.createElement("input");
+                    var checktext = document.createTextNode(" Anonymous");
+                    checkinput.setAttribute("type","checkbox");
+                    checkinput.setAttribute("name","anonymous");
+                    checkinput.setAttribute("id","AnonymousComp");
+                    checkinput.setAttribute("placeholder","Anonymous");
+                    checkbox.appendChild(checkinput);
+                    checkbox.appendChild(checktext);
+                    currentDiv.appendChild(checkbox);
+    
+                    var br = document.createElement("br");
+                    currentDiv.appendChild(br);
+    
+                    var onlySubmitOnce = document.createElement("div");
+                    onlySubmitOnce.setAttribute("id","msgFeed");
+                    setInnerHTMLSanitized(onlySubmitOnce, "You can edit your feedback in 5 seconds." );
+                    currentDiv.appendChild(onlySubmitOnce);
+                    var submitButton = document.createElement("input");
+                    submitButton.setAttribute("id","btnFeed");
+                    submitButton.setAttribute("class","submitFeed");
+                    submitButton.setAttribute("type","submit");
+                    if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
+                      submitButton.setAttribute("value","Submit");
+                    } else {
+                      submitButton.setAttribute("value","Edit Submission");
+                    }
+                    currentDiv.appendChild(submitButton);
+                    
+                    
+                    questionIDs = result["questionIDs"];
+
+                    var remainingQuestionIDsToProcess = questionIDs.length;
+                    if (remainingQuestionIDsToProcess == 0) {
+                      if (--remainingEventFormIDsToProcess == 0) {
+                        callOnceDone();
                       }
                     }
-                  });
-                  i++;
+
+                    // need to make sure the questions are inserted in the correct order - insert them into this list first, then loop through in turn and add to currentDiv
+                    var elsWhoseChildrenWillBeInsertedToCurrentDiv = [];
+
+                    Array.from(questionIDs).forEach(function(questionID, j) {
+                      var i = j+1;
+                      $.ajax({
+                        type: "GET",
+                        url: endpointToRealAddress("/questions/" + questionID),
+                        dataType: "json",
+                        success: function(result, status, xhr){
+                          setCookie("questionID" + i, questionID , 1);
+                          type = result.data["type"];
+                          text = result.data["text"];
+                          options = result.data["options"];
+                          var br = document.createElement("br");
+                          br.setAttribute("class","br");
+                          var questionDiv = document.createElement("div");
+                          questionDiv.className = "question1";
+                          var questionLabel = document.createElement("Label");
+                          questionLabel.setAttribute("id", "formLabel");
+                          setInnerHTMLSanitized(questionLabel, text );
+                          questionDiv.appendChild(questionLabel);
+
+                          elsWhoseChildrenWillBeInsertedToCurrentDiv[j] = document.createElement("div");
+
+                          if (type == "long") {
+                            var questionEntry = document.createElement("textarea");
+                            questionEntry.className = "textarea";
+                            questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+                            questionEntry.setAttribute("id","ques" + i);
+                            questionEntry.setAttribute("rows","2");
+                            questionEntry.setAttribute("cols","15");
+                            questionEntry.setAttribute("placeholder"," ");
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(questionDiv);
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(br);
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(questionEntry);
+                            var br = document.createElement("br");
+                            br.setAttribute("class","br");
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(br);
+                          }
+                          else if (type == "short") {
+                            //TODO only enter two words + make distinguishable
+                            var questionEntry = document.createElement("textarea");
+                            questionEntry.className = "textarea";
+                            questionEntry.setAttribute("style",'font-size: 16px; font-family: "poppins", sans-serif');
+                            questionEntry.setAttribute("id","ques" + i);
+                            questionEntry.setAttribute("rows","2");
+                            questionEntry.setAttribute("cols","15");
+                            questionEntry.setAttribute("placeholder"," ");
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(questionDiv);
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(br);
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(questionEntry);
+                            var br = document.createElement("br");
+                            br.setAttribute("class","br");
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv[j].appendChild(br);
+                          }
+                          else if (type == "options") {
+                            //TODO
+                          }
+                          else if (type == "rating") {
+                            //TODO
+                          }
+
+                          if (--remainingQuestionIDsToProcess == 0) {
+                            // now all questions are downloaded, so now we can insert them in the correct order
+                            elsWhoseChildrenWillBeInsertedToCurrentDiv.forEach(iWantToDie => {
+                              iWantToDie.childNodes.forEach(insertToDoc => {
+                                currentDiv.appendChild(insertToDoc);
+                              });
+                            });
+                            if (--remainingEventFormIDsToProcess == 0) {
+                              callOnceDone();
+                            }
+                          }
+
+                        }
+                      });
+                    });
+                    return;
+                  }
                 });
-                var checkbox = document.createElement("div");
-                checkbox.className = "checkbox";
-                checkbox.setAttribute("id","AnonComp");
-                var checkinput = document.createElement("input");
-                var checktext = document.createTextNode(" Anonymous");
-                checkinput.setAttribute("type","checkbox");
-                checkinput.setAttribute("name","anonymous");
-                checkinput.setAttribute("id","AnonymousComp");
-                checkinput.setAttribute("placeholder","Anonymous");
-                checkbox.appendChild(checkinput);
-                checkbox.appendChild(checktext);
-                currentDiv.appendChild(checkbox);
-
-                var br = document.createElement("br");
-                currentDiv.appendChild(br);
-
-                var onlySubmitOnce = document.createElement("div");
-                onlySubmitOnce.setAttribute("id","msgFeed");
-                setInnerHTMLSanitized(onlySubmitOnce, "You can edit your feedback in 5 seconds." );
-                currentDiv.appendChild(onlySubmitOnce);
-                var submitButton = document.createElement("input");
-                submitButton.setAttribute("id","btnFeed");
-                submitButton.setAttribute("class","submitFeed");
-                submitButton.setAttribute("type","submit");
-                if (("" + getCookie("eventFormID") + "a" + getCookie("attendeeID")) != getCookie("submittedEventFormID")) {
-                  submitButton.setAttribute("value","Submit");
-                } else {
-                  submitButton.setAttribute("value","Edit Submission");
-                }
-                currentDiv.appendChild(submitButton);
-                return;
-              }
-            });
+              } else if (--remainingEventFormIDsToProcess == 0) {
+                callOnceDone();
+              } 
+            } else if (--remainingEventFormIDsToProcess == 0) {
+              callOnceDone();
+            } 
           }
-        }
-      }
-    });
+        });
+      });
+    }
   });
-  if (boolform) {
-    removeForm(0);
-    currentDiv.appendChild(noForm);
-  }
+
   return;
 
 }
+
+
+
+
+
+
+
+
+
+
 
 function editComprehensive() {
   i = 1;
@@ -341,13 +549,16 @@ function removeForm(eventFormID) {
   i = 1;
   check = false;
   if (refreshCheckID != eventFormID) {
+    Array.from(document.getElementsByClassName("br")).forEach(br => {
+      br.remove();
+    })
     while(document.getElementById("ques" + i)) {
       formQ = document.getElementById("ques" + i);
       formQ.remove();
-      br = document.getElementById("br");
-      br.remove();
-      br = document.getElementById("br");
-      br.remove();
+      // br = document.getElementById("br");
+      // br.remove();
+      // br = document.getElementById("br");
+      // br.remove();
       labelQ = document.getElementById("formLabel");
       labelQ.remove();
       i++;
