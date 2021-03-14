@@ -284,16 +284,17 @@ function comprepensiveFeedbackSubmissionDisplayFactory(form, responseNumber) {
 
 }
 
-function addToComprehensiveFeedbackDisplay(form) {
+function addToComprehensiveFeedbackDisplay(form, formNo) {
   var elements = 0;
+  root = document.getElementById("feedback-container" + formNo);
 
-  while (document.getElementsByClassName("answers")[0].getElementsByClassName("answer")[elements]) {
+  while (root.getElementsByClassName("answers")[0].getElementsByClassName("answer")[elements]) {
     elements++;
   }
 
   for (var quest = 0; quest < form.questionIDs.length; quest++) {
     questionID = form.questionIDs[quest];
-    var answers = document.getElementsByClassName("answers")[quest];
+    var answers = root.getElementsByClassName("answers")[quest];
     var answer = document.createElement("div");
     answer.className = "answer";
     answer.appendChild(document.createElement("div")).setAttribute("class", "account-name");
@@ -426,7 +427,7 @@ function updateFeedback() {
         dataType: "json",
         async: false,
         success: function(result, status, xhr){
-          elements = addToComprehensiveFeedbackDisplay(result);
+          elements = addToComprehensiveFeedbackDisplay(result, thisForm);
           totquestions = result["questionIDs"].length;
           for (var questNo = 0; questNo < totquestions; questNo++) {
             var ans_node = node.getElementsByClassName("answers")[questNo];
