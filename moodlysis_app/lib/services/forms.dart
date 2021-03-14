@@ -40,19 +40,19 @@ Future<Question> getQuestion(http.Client client, int questionID) async {
   return Question.fromJson(json.decode(response.body));
 }
 
-Future<Form> getForm(http.Client client, int formID) async {
+Future<EventForm> getForm(http.Client client, int formID) async {
   final response = await client.get('$backendURI/forms/$formID');
-  return Form.fromJson(json.decode(response.body));
+  return EventForm.fromJson(json.decode(response.body));
 }
 
-Future<Form> getActiveForm(http.Client client, Event event) async {
+Future<EventForm> getActiveForm(http.Client client, Event event) async {
   // Ignores first as guaranteed to be general feedback form
   for (int eventFormID in event.eventFormIDs.sublist(1)) {
     final response = await client.get('$backendURI/event-forms/$eventFormID');
     final Map<String, dynamic> parsed = json.decode(response.body);
 
     if (parsed['isActive'] as bool) {
-      final Form form = await getForm(client, parsed['formID']);
+      final EventForm form = await getForm(client, parsed['formID']);
       form.eventFormID = eventFormID;
       form.questions = await Future.wait(
           form.questionIDs.map((id) => getQuestion(client, id)));
