@@ -109,7 +109,8 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
             .then((v) => _handleMoodSuccess())
             .catchError((e, s) => handleConnectionError(context, e, s),
                 test: (e) => e is SocketException)
-            .catchError((e, s) => handleError(context, e, s));
+            .catchError((e, s) => handleError(context, e, s))
+            .whenComplete(() => setState(() => _loading = false));
       }
       if (_formData['comment'] != '') {
         sendFeedback(
@@ -123,9 +124,9 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
             .then((int answerID) => _handleFeedbackSuccess(answerID))
             .catchError((e, s) => handleConnectionError(context, e, s),
                 test: (e) => e is SocketException)
-            .catchError((e, s) => handleError(context, e, s));
+            .catchError((e, s) => handleError(context, e, s))
+            .whenComplete(() => setState(() => _loading = false));
       }
-      setState(() => _loading = false);
     }
   }
 
