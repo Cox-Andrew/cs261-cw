@@ -121,7 +121,7 @@ var chartIntervalID = setInterval(function () {drawChart()}, 5000);
 function drawChart() {
   var eventTimeStart = null;
   var eventTimeEnd = null;
-  var drawChartCheck = true;
+  var drawChartCheck = false;
   //GET mood data
   $.ajax({
     type: "GET",
@@ -156,9 +156,6 @@ function drawChart() {
         if (moodCount != 0) {
           moodData.push([eventTimeStart, avMoodValue]);
           drawChartCheck = true;
-        }
-        else if (moodCount == 0) {
-          drawChartCheck = false;
         }
         eventTimeStart = eventTimeInterval;
       }
@@ -370,7 +367,12 @@ function pageLoadFeedback(eventFormID, formID, formNo) {
         data.list.forEach(eventForm => {
           if (eventForm.eventFormID == eventFormID) {
             var an_node = ans_node.getElementsByClassName("answer")[j];
-            setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"] + ": ");
+            if (eventForm["account-name"] != null) {
+              setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"] + ": ");
+            }
+            else {
+              setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], "Anonymous: ");
+            }
             setInnerHTMLSanitized(an_node.getElementsByClassName("time-updated")[0], "Time Submitted: " + new Date(eventForm.answers[questNo]["time-updated"]).toLocaleTimeString());
             var resp_node = an_node.getElementsByClassName("respDiv")[0];
             setInnerHTMLSanitized(resp_node.getElementsByClassName("response")[0], eventForm.answers[questNo].data["response"] + " ");
