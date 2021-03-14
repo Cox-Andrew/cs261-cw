@@ -25,7 +25,7 @@ function createMeeting(title, date, stime, ftime, desc) {
   var parsedTimeEnd = new Date(event.data["time-end"]);
 
   if (parsedTimeStart.getTime() >= parsedTimeEnd.getTime()) {
-    document.getElementById("error").innerHTML = "Meeting End Time must be after Meeting Start Time";
+    document.getElementById("error").innerHTML = "Event End Time must be after Event Start Time";
     return false;
   }
 

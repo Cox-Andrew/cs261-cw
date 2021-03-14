@@ -11,7 +11,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
     <link rel="stylesheet" href="JoinMeeting.css" />
-    <title>Join Meeting</title>
+    <title>Join Event</title>
   </head>
   <body>
     <nav>
@@ -29,7 +29,7 @@
           <a href="AttendeeAccount.html">Manage Account</a>
         </li>
         <form method = "POST" action = "">
-          <button name = "EndSession" class = "EndSession">End Session</button>
+          <button name = "EndSession" class = "EndSession">End Series</button>
       </form>
       </ul>
       <div class="burger">
@@ -41,11 +41,11 @@
 
     <div class="content">
       <div class="join-meeting">
-        <h1>Join a meeting</h1>
+        <h1>Join an event</h1>
         <form name="myForm" action="" onsubmit="submitForm(); return false" method="POST">
-          <label>Meeting Id: </label>
+          <label>Event Id: </label>
           <div class="txtb">
-            <input type="text" name="mname" id="mname" placeholder="Meeting Id" required>
+            <input type="text" name="mname" id="mname" placeholder="Event Id" required>
           </div>
           <br>
           <div class="checkbox">

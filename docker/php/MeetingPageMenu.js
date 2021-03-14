@@ -20,7 +20,7 @@ function deleteEvent() {
 		url: endpointToRealAddress("/events/" + hostID),
 		type: "DELETE",
 		success: function() {
-			document.getElementsByTagName("body")[0].prepend("meeting deleted");
+			document.getElementsByTagName("body")[0].prepend("event deleted");
 			window.location.href = "/SessionPage.html";
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {

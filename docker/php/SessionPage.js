@@ -2,7 +2,7 @@
 
 var seriesIDString = getCookie("seriesID");
 if (seriesIDString == "") {
-	alert("no session selected");
+	alert("no series selected");
 	window.location.href = "/SessionList.html";
 }
 var sessionID = parseInt(seriesIDString);
