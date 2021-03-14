@@ -9,6 +9,7 @@ import 'package:moodlysis_app/models/user.dart';
 import 'package:moodlysis_app/services/authentication.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 import 'package:moodlysis_app/services/exceptions.dart';
+import 'package:moodlysis_app/utils/error_handlers.dart';
 
 class SignUpScreen extends StatelessWidget {
   @override
@@ -189,9 +190,9 @@ class SignUpFormState extends State<SignUpForm> {
           .then((User user) => _handleAuthenticationSuccess(user))
           .catchError((e, s) => _handleRegistrationError(e, s),
               test: (e) => e is RegistrationException)
-          .catchError((e, s) => _handleConnectionError(e, s),
+          .catchError((e, s) => handleConnectionError(context, e, s),
               test: (e) => e is SocketException)
-          .catchError((error, stackTrace) => _handleError(error, stackTrace))
+          .catchError((e, s) => handleError(context, e, s))
           .whenComplete(() => setState(() => _loading = false));
     }
   }
@@ -226,40 +227,6 @@ class SignUpFormState extends State<SignUpForm> {
             text: 'Email already taken',
             style: TextStyle(fontWeight: FontWeight.bold)),
         TextSpan(text: ', please try another.'),
-      ])),
-      backgroundColor: Theme.of(context).errorColor,
-    ));
-  }
-
-  void _handleConnectionError(dynamic error, StackTrace stackTrace) {
-    // print("Error: $error");
-    // print("StackTrace: $stackTrace");
-
-    Scaffold.of(context).removeCurrentSnackBar();
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: RichText(
-          text: TextSpan(children: [
-        TextSpan(
-            text: 'Connection failed',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        TextSpan(text: ', please try again.'),
-      ])),
-      backgroundColor: Theme.of(context).errorColor,
-    ));
-  }
-
-  void _handleError(dynamic error, StackTrace stackTrace) {
-    print("Error: $error");
-    print("StackTrace: $stackTrace");
-
-    Scaffold.of(context).removeCurrentSnackBar();
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: RichText(
-          text: TextSpan(children: [
-        TextSpan(
-            text: 'Something went wrong',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        TextSpan(text: ', please try again.'),
       ])),
       backgroundColor: Theme.of(context).errorColor,
     ));
