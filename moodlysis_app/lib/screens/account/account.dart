@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:moodlysis_app/components/navigation.dart';
-import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/constants.dart';
+import 'package:moodlysis_app/constants/constants.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 
 class AccountScreen extends StatelessWidget {

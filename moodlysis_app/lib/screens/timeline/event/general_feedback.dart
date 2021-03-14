@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:moodlysis_app/components/forms.dart';
 import 'package:moodlysis_app/services/events.dart';
-import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/constants.dart';
+import 'package:moodlysis_app/constants/constants.dart';
 import 'package:moodlysis_app/utils/error_handlers.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 
@@ -34,51 +35,69 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
                 style: Theme.of(context).textTheme.headline5),
           ),
           Divider(),
-          Text(
-            'Choose an emoji which represents your mood (optional)',
-            style: Theme.of(context).textTheme.subtitle1,
+          MoodSelector(
+            label: 'Choose an emoji which represents your mood (optional)',
+            key: _moodKey,
           ),
-          //TODO: lots of pain has gone into trying to make this a form field, should still be done
-          Padding(
-            padding: const EdgeInsets.only(top: 8, bottom: 8),
-            child: MoodSelector(key: _moodKey),
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
-              labelText: "Comment (optional)",
-              border: OutlineInputBorder(),
-            ),
-            maxLength: 100,
-            maxLengthEnforced: true,
-            keyboardType: TextInputType.multiline,
-            maxLines: 4,
-            onSaved: (String val) => _formData['comment'] = val,
-          ),
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, children: [
-            Expanded(
-              flex: 4,
-              child: ElevatedButton(
-                onPressed: _loading ? null : _submitGeneralFeedback,
-                child: Text(
-                  'Submit',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.normal),
-                ),
+          _commentField,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            children: [
+              Expanded(
+                flex: 4,
+                child: _submitButton,
               ),
-            ),
-            Expanded(
-                flex: 5,
-                child: CheckboxFormField(
-                  title: const Text(
-                    'Anonymous',
-                    style: TextStyle(fontSize: 20),
-                    textAlign: TextAlign.right,
-                  ),
-                  onSaved: (bool val) => _formData['isAnonymous'] = val,
-                )),
-          ]),
+              Expanded(
+                  flex: 5,
+                  child: _anonymityButton,
+              ),
+            ],
+          ),
         ],
       ),
     );
+  }
+
+  CheckboxFormField get _anonymityButton {
+    return CheckboxFormField(
+      title: const Text(
+        'Anonymous',
+        style: TextStyle(fontSize: 20),
+        textAlign: TextAlign.right,
+      ),
+      onSaved: (bool val) => _formData['isAnonymous'] = val,
+    );
+  }
+
+  ElevatedButton get _submitButton {
+    return ElevatedButton(
+      onPressed: _loading ? null : _submitGeneralFeedback,
+      child: Text(
+        'Submit',
+        style:
+        TextStyle(fontSize: 30, fontWeight: FontWeight.normal),
+      ),
+    );
+  }
+
+  TextFormField get _commentField {
+    return TextFormField(
+      decoration: const InputDecoration(
+        labelText: "Comment (optional)",
+        border: OutlineInputBorder(),
+      ),
+      maxLength: 100,
+      maxLengthEnforced: true,
+      keyboardType: TextInputType.multiline,
+      maxLines: 4,
+      onSaved: (String val) => _formData['comment'] = val,
+      validator: _validateComment,
+    );
+  }
+
+  String _validateComment(String comment) {
+    if (comment.length > 100) return 'Max length 100 characters';
+    return null;
   }
 
   void _submitGeneralFeedback() {
@@ -100,16 +119,16 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
       }
       if (_formData['comment'] != '') {
         sendFeedback(
-            http.Client(),
-            globals.currentUser,
-            globals.currentEvent.eventID,
-            globals.currentEvent.eventFormIDs[0],
-            0,
-            _formData['comment'],
-            _formData['isAnonymous'])
+                http.Client(),
+                globals.currentUser,
+                globals.currentEvent.eventID,
+                globals.currentEvent.eventFormIDs[0],
+                0,
+                _formData['comment'],
+                _formData['isAnonymous'])
             .then((int answerID) => _handleFeedbackSuccess(answerID))
             .catchError((e, s) => handleConnectionError(context, e, s),
-            test: (e) => e is SocketException)
+                test: (e) => e is SocketException)
             .catchError((e, s) => handleError(context, e, s));
       }
       setState(() => _loading = false);
@@ -118,8 +137,7 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
 
   void _handleMoodSuccess() {
     Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-          'Mood successfully submitted'),
+      content: Text('Mood successfully submitted'),
       backgroundColor: Colors.green,
     ));
   }
@@ -132,93 +150,75 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
   }
 }
 
-class CheckboxFormField extends FormField<bool> {
-  CheckboxFormField(
-      {Widget title,
-      FormFieldSetter<bool> onSaved,
-      FormFieldValidator<bool> validator,
-      bool initialValue = false,
-      AutovalidateMode autovalidateMode})
-      : super(
-          onSaved: onSaved,
-          validator: validator,
-          initialValue: initialValue,
-          autovalidateMode: autovalidateMode,
-          builder: (FormFieldState<bool> state) {
-            return CheckboxListTile(
-              dense: state.hasError,
-              title: title,
-              value: state.value,
-              onChanged: state.didChange,
-              subtitle: state.hasError
-                  ? Builder(
-                      builder: (BuildContext context) => Text(
-                        state.errorText,
-                        style: TextStyle(color: Theme.of(context).errorColor),
-                      ),
-                    )
-                  : null,
-              controlAffinity: ListTileControlAffinity.trailing,
-            );
-          },
-        );
-}
-
 class MoodSelector extends StatefulWidget {
-  MoodSelector({Key key}) : super(key: key);
+  final String label;
+
+  MoodSelector({this.label, Key key}) : super(key: key);
 
   @override
   MoodSelectorState createState() => MoodSelectorState();
 }
 
 class MoodSelectorState extends State<MoodSelector> {
-  List<bool> _isSelected = [false, false, false, false, false];
+  final List<bool> _isSelected = [false, false, false, false, false];
   Sentiment value;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: ToggleButtons(
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        borderColor: Theme.of(context).hintColor,
-        selectedBorderColor: Theme.of(context).primaryColor,
-        constraints: BoxConstraints(
-            minWidth: (MediaQuery.of(context).size.width - 46) / 5,
-            minHeight: (MediaQuery.of(context).size.width - 46) / 10),
-        children: [
-          Icon(
-            Icons.sentiment_very_dissatisfied,
-            color: Colors.red,
+    return Column(
+      children: [
+        this.widget.label != null
+            ? Text(
+                this.widget.label,
+                style: Theme.of(context).inputDecorationTheme.labelStyle,
+              )
+            : null,
+        //TODO: lots of pain has gone into trying to make this a form field, should still be done
+        Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 8),
+          child: ToggleButtons(
+            borderRadius: BorderRadius.all(Radius.circular(4)),
+            borderColor: Theme.of(context).hintColor,
+            selectedBorderColor: Theme.of(context).primaryColor,
+            constraints: BoxConstraints(
+                minWidth: (MediaQuery.of(context).size.width - 46) / 5,
+                minHeight: (MediaQuery.of(context).size.width - 46) / 10),
+            children: [
+              Icon(
+                Icons.sentiment_very_dissatisfied,
+                color: Colors.red,
+              ),
+              Icon(
+                Icons.sentiment_dissatisfied,
+                color: Colors.orange,
+              ),
+              Icon(
+                Icons.sentiment_neutral,
+                color: Colors.yellow,
+              ),
+              Icon(
+                Icons.sentiment_satisfied,
+                color: Colors.lightGreen,
+              ),
+              Icon(
+                Icons.sentiment_very_satisfied,
+                color: Colors.green,
+              ),
+            ],
+            onPressed: (int selectedIndex) {
+              setState(() {
+                for (int i = 0; i < _isSelected.length; i++) {
+                  _isSelected[i] = i == selectedIndex ? !_isSelected[i] : false;
+                }
+                value = _isSelected[selectedIndex]
+                    ? Sentiment.values[selectedIndex]
+                    : null;
+              });
+            },
+            isSelected: _isSelected,
           ),
-          Icon(
-            Icons.sentiment_dissatisfied,
-            color: Colors.orange,
-          ),
-          Icon(
-            Icons.sentiment_neutral,
-            color: Colors.yellow,
-          ),
-          Icon(
-            Icons.sentiment_satisfied,
-            color: Colors.lightGreen,
-          ),
-          Icon(
-            Icons.sentiment_very_satisfied,
-            color: Colors.green,
-          ),
-        ],
-        onPressed: (int selectedIndex) {
-          setState(() {
-            for (int i = 0; i < _isSelected.length; i++) {
-              _isSelected[i] = i == selectedIndex ? !_isSelected[i] : false;
-            }
-            value = _isSelected[selectedIndex]
-                ? Sentiment.values[selectedIndex]
-                : null;
-          });
-        },
-        isSelected: _isSelected,
-      ),
+        ),
+      ],
     );
   }
 }
