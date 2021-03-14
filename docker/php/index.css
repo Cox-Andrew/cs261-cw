@@ -171,6 +171,7 @@
     font-size: 20px;
     text-transform: uppercase;
   }
+
   .host a {
     color: #122a3d;
     align-self: auto;
@@ -231,6 +232,7 @@
   height: 120%;
   top: 0%;
 }
+    
 .bg-image{
   display: none;
 }
