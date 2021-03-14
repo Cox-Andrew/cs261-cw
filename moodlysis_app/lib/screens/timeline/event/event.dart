@@ -86,8 +86,28 @@ class FeedbackTabs extends StatelessWidget {
                   Icon(Icons.feedback, color: Theme.of(context).primaryColor)),
         ]),
         body: TabBarView(children: [
-          SingleChildScrollView(child: GeneralFeedbackForm()),
-          SingleChildScrollView(child: ComprehensiveFeedbackForm()),
+          SingleChildScrollView(child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text("General feedback",
+                    style: Theme.of(context).textTheme.headline5),
+              ),
+              Divider(),
+              GeneralFeedbackForm(),
+            ],
+          )),
+          SingleChildScrollView(child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text("Comprehensive feedback",
+                    style: Theme.of(context).textTheme.headline5),
+              ),
+              Divider(),
+              ComprehensiveFeedbackForm(),
+            ],
+          )),
         ]),
       ),
     );

@@ -29,12 +29,6 @@ class GeneralFeedbackFormState extends State<GeneralFeedbackForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text("General feedback",
-                style: Theme.of(context).textTheme.headline5),
-          ),
-          Divider(),
           MoodSelector(
             label: 'Choose an emoji which represents your mood (optional)',
             key: _moodKey,
@@ -166,6 +160,7 @@ class MoodSelectorState extends State<MoodSelector> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         this.widget.label != null
             ? Text(
