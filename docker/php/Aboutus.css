@@ -70,6 +70,7 @@
     cursor: pointer;
     z-index: 1;
   }
+
   .burger div {
     width: 25px;
     height: 3px;
