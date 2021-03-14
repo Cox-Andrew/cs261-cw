@@ -10,7 +10,8 @@ class Event {
   //TODO: are eventFormIDs actually required?
   List<int> formIDs, eventFormIDs;
 
-  Event(this.eventID, this.seriesID, this.title, this.description, DateTime start, DateTime end, this.formIDs, this.eventFormIDs) {
+  Event(this.eventID, this.seriesID, this.title, this.description,
+      DateTime start, DateTime end, this.formIDs, this.eventFormIDs) {
     this.schedule = DateTimeRange(start: start, end: end);
   }
 
