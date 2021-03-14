@@ -58,12 +58,14 @@ class EventScreen extends StatelessWidget {
                 ? Expanded(child: FeedbackTabs())
                 : Expanded(
                     child: Align(
-                        alignment: FractionalOffset(0.5, 0.3),
-                        child: Text(
-                          "This event hasn't started yet.",
-                          style: Theme.of(context).textTheme.headline3,
-                          textAlign: TextAlign.center,
-                        ))),
+                      alignment: FractionalOffset(0.5, 0.3),
+                      child: Text(
+                        "This event hasn't started yet.",
+                        style: Theme.of(context).textTheme.headline3,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),
@@ -86,7 +88,8 @@ class FeedbackTabs extends StatelessWidget {
                   Icon(Icons.feedback, color: Theme.of(context).primaryColor)),
         ]),
         body: TabBarView(children: [
-          SingleChildScrollView(child: Column(
+          SingleChildScrollView(
+              child: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
@@ -97,7 +100,8 @@ class FeedbackTabs extends StatelessWidget {
               GeneralFeedbackForm(),
             ],
           )),
-          SingleChildScrollView(child: Column(
+          SingleChildScrollView(
+              child: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
