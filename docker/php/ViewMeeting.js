@@ -368,7 +368,7 @@ function pageLoadFeedback(eventFormID, formID, formNo) {
         data.list.forEach(eventForm => {
           if (eventForm.eventFormID == eventFormID) {
             var an_node = ans_node.getElementsByClassName("answer")[j];
-            if (eventForm["account-name"] != null) {
+            if (eventForm["account-name"] != null && eventForm["account-name"] != "null") {
               setInnerHTMLSanitized(an_node.getElementsByClassName("account-name")[0], eventForm["account-name"] + ": ");
             }
             else {
