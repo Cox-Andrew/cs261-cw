@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/components/navigation.dart';
-import 'package:moodlysis_app/constants.dart';
+import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/constants.dart';
 import 'package:moodlysis_app/models/event.dart';
 import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/globals.dart' as globals;

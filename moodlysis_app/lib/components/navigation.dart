@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodlysis_app/constants.dart';
+import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/constants.dart';
 
 const List<String> _routes = [timelineScreenRoute, registerEventScreenRoute, accountScreenRoute];
 

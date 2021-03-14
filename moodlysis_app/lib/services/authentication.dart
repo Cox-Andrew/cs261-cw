@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:moodlysis_app/models/user.dart';
-import 'package:moodlysis_app/constants.dart';
+import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/constants.dart';
 import 'package:moodlysis_app/services/exceptions.dart';
 
 Future<int> authenticateUser(http.Client client, String email, String password) async {

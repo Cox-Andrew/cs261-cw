@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:moodlysis_app/routes.dart';
-import 'package:moodlysis_app/theme/theme.dart';
-import 'package:moodlysis_app/constants.dart';
+import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/routes.dart';
+import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/theme.dart';
+import 'file:///C:/Users/valsp/source/repos/cs261-cw/moodlysis_app/lib/constants/constants.dart';
 
 void main() {
   runApp(MoodlysisApp());
