@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="ViewMeeting.css" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
+    <title>Home</title>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="HostHomepage.html"><h4>MOODLYSIS</h4></a>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Aboutus.html">About us</a>
+        </li>
+        <li>
+          <a href="faq.html">FAQs</a>
+        </li>
+        <li>
+        <form method = "POST" action = "">
+            <button name = "logout" class = "logout">Log out</button>
+        </form>
+        </li>
+      </ul>
+      <div class="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
+
+    <div class="content" id="content">
+      <div class = "heading" id = "heading">
+      </div>
+      <div class  = "general" id  = "temp0">
+        <div class = "sub-content">
+          <div class = "invite-code" id = "invite-code-mood">Invite Code:</div>
+          <h3>Sentiment Analysis</h3>
+          <br>
+          <div id="piechart_3d" class = "left"></div>
+          <div id="curve_chart" class = "right"></div>
+          <br>
+          <div id="emoji" class= "emoji" style="height=20% width=20%"><br> Average Sentiment Of The Event</div>
+          <div id="emoji" class= "emoji" style="height=20% width=20%"><br></div>
+          <div id="emoji" class= "emoji" style="height=20% width=20%"><br></div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+      Moodlysis-Mood Analysis Application
+      </div>
+    </footer>
+    <script src="app.js"></script>
+    <script src="ViewMeeting.js"></script>
+  </body>
+</html>

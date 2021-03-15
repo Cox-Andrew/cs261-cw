@@ -1,0 +1,260 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+  }
+  
+  html,
+  body {
+    height: 100%;
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    background-image: radial-gradient(ellipse at bottom, #1a2737 0%,#09090a 100%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    color: rgb(240, 240, 240);
+  }
+  
+  nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-height: 15vh;
+    background-color: #122a3d;
+    font-family: "poppins", sans-serif;
+  }
+  
+  .logo {
+    color: rgb(240, 240, 240);
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    font-size: 20px;
+  }
+  
+  .logo a {
+    color: rgb(240, 240, 240);
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 5px;
+    font-size: 20px;
+  }
+  
+  .nav-links {
+    display: flex;
+    justify-content: space-around;
+    z-index: 1;
+  }
+  .nav-links li {
+    list-style: none;
+  }
+  .nav-links a {
+    color: rgb(240, 240, 240);
+    text-decoration: none;
+    letter-spacing: 3px;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+  .burger {
+    display: none;
+    cursor: pointer;
+    z-index: 1;
+  }
+  .burger div {
+    width: 25px;
+    height: 3px;
+    background-color: rgb(240, 240, 240);
+    margin: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  @media screen and (min-width: 769px) {
+    .nav-links a {
+      align-self: auto;
+      letter-spacing: 3px;
+      padding: 9px 25px; 
+    }
+
+    .nav-links a:hover{
+        cursor: pointer;
+        transition: 0.5s ease 0s;
+    }
+    .EndSession{
+        background-color: transparent;
+        align-self: auto;
+        color: #a1865b;
+        border: 0px solid transparent;
+        padding: 0px 25px;
+        font-family: "poppins", sans-serif;
+        text-decoration: none;
+        letter-spacing: 3px;
+        font-weight: bold;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+    .EndSession:hover{
+        cursor: pointer;
+        transition: 0.5s ease 0s;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .nav-links {
+      width: 60%;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    body {
+      overflow-x: hidden;
+    }
+    .nav-links {
+      position: fixed;
+      right: 0;
+      height: 100vh;
+      top: 0;
+      background-color: #122a3d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 48%;
+      transform: translateX(100%);
+      transition: transform 0.5s ease-in;
+      text-align: center;
+      padding-bottom: 20px;
+    }
+    .nav-links li {
+      opacity: 0;
+    }
+    .burger {
+      display: block;
+    }
+    .EndSession{
+        background-color: transparent;
+        align-self: auto;
+        color: rgb(240, 240, 240);
+        border: 0px solid transparent;
+        padding: 0px 25px;
+        font-family: "poppins", sans-serif;
+        text-decoration: none;
+        letter-spacing: 3px;
+        font-weight: bold;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+    .EndSession:hover{
+        cursor: pointer;
+        transition: 0.5s ease 0s;
+    }
+  }
+  
+  .nav-active {
+    transform: translateX(0%);
+  }
+  
+  @keyframes navLinkFade {
+    from {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+  }
+  
+  .toggle .line1 {
+    transform: rotate(-45deg) translate(-5px, 6px);
+  }
+  .toggle .line2 {
+    opacity: 0;
+  }
+  .toggle .line3 {
+    transform: rotate(45deg) translate(-5px, -6px);
+  }
+  
+  .content {
+    flex: 1 0 auto;
+    padding: 20px;
+    font-family: "poppins", sans-serif;
+    display: inline;
+    justify-content: center;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+  }
+
+  .account
+  {
+    text-decoration: none;
+    color: rgb(240,240,240);
+    padding: 70px 0;
+    padding-left: 5vh;
+    font-size: 18px;
+    line-height: 10vh;
+    flex: 1 0 auto;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgb(190, 190, 190);
+  }
+
+  .account a
+  {
+    text-decoration: none;
+    color: rgb(240, 240, 240);
+  }
+
+  .fullname, .email
+  {
+    display: inline;
+  }
+  .DeleteAcc
+  {
+    margin-left: -5vh;
+    text-align: center;
+  }
+  .delete{
+    background-color: transparent;
+    align-self: auto;
+    color: #a1865b;
+    border: 0px solid transparent;
+    font-family: "poppins", sans-serif;
+    text-decoration: none;
+    letter-spacing: 3px;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+   letter-spacing: 3px;
+   text-align: center;
+  }
+  .delete:hover{
+    cursor: pointer;
+    transition: 0.5s ease 0s;
+  }
+
+  .footer {
+    flex-shrink: 0;
+    min-height: 15vh;
+    background: #122a3d;
+    font-family: "poppins", sans-serif;
+  }
+  .footer .footer-content {
+    display: flex;
+    padding: 7vh;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgb(240, 240, 240);
+    text-decoration: none;
+    letter-spacing: 3px;
+    font-size: 14px;
+  }

@@ -9,7 +9,9 @@ In order to host our system on your local machine you must have:
 
 Installation steps:
 
-Copy the 4 images supplied with our code:
+In our repository run buildimages.sh from docker/install
+
+After creating the 4 images supplied with our code:
 
 + web
 + backend

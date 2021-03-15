@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/0.8.4/purify.min.js"></script>
+    <link rel="stylesheet" href="AttendeePage.css"/>
+    <title>Home</title>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="AttendeeHomepage.html"><h4>MOODLYSIS</h4></a>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Aboutus.html">About us</a>
+        </li>
+        <li>
+          <a href="faq.html">FAQs</a>
+        </li>
+        <form method = "POST" action = "">
+          <button name = "EndSession" class = "EndSession">End Session</button>
+        </form>
+      </ul>
+      <div class="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
+
+    <div class="content">
+      <div class = "heading">
+        <button onclick="general()">General Feedback</button>
+        <div class = "hidden"><br></div>
+        <button onclick="feedback()">Comprehensive Feedback</button>
+      </div>
+
+      <div class  = "general" id  = "general">
+        <div class = "form">
+          <h3>General feedback</h3>
+          <form id = "GForm" onsubmit="return submitGeneral();">
+            <label>Choose the emoji which represents your mood<br><br></label>
+            <ul class = "emojiList">
+              <li>
+                <input type="radio" id="emoji1" value="-1.0" name = "emoji" required/>
+                <label for="emoji1"><img src="emoji1.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji2" value="-0.5" name = "emoji"/>
+                <label for="emoji2"><img src="emoji2.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji3" value="0.0" name = "emoji"/>
+                <label for="emoji3"><img src="emoji3.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji4" value="0.5" name = "emoji"/>
+                <label for="emoji4"><img src="emoji4.png" height="40px" width="40px"/></label>
+              </li>
+              <li>
+                <input type="radio" id="emoji5" value="1.0" name = "emoji"/>
+                <label for="emoji5"><img src="emoji5.png" height="40px" width="40px"/></label>
+              </li>
+            </ul>
+            <label><br>Comments<br></label>
+            <textarea class = "textarea" style='font-size: 16px; font-family: "poppins", sans-serif' id="comments" rows="5" cols="15" placeholder="Enter your comments" required></textarea>
+            <div class="checkbox">
+              <input type="checkbox" name="anonymous" id="AnonymousGeneral" placeholder="Anonymous">
+              Anonymous
+            </div>
+            <br>
+            <div id="msgGen">
+              <h5>Please wait for 15 seconds to resubmit</h5>
+            </div>
+            <input type="submit" class="submitGen" id="btnGen" value="Submit">
+          </form>
+          <!-- <form onsubmit="alert(4)">
+            <input type="submit"></input>
+          </form> -->
+          <script>
+            $(document).ready(function () {
+                $("#GForm").submit(function (e) {
+                  e.preventDefault();
+                  $("#btnGen").attr("disabled", true);
+                  $("#btnGen").css("background-color","rgb(122, 120, 120)");
+                  $("#btnGen").css("cursor","no-drop");
+                  $("#msgGen").css("display","block");
+                  setTimeout(function(){
+                    $("#btnGen").attr("disabled", false);
+                    $("#btnGen").css("background-color","transparent");
+                    $("#btnGen").css("cursor","pointer");
+                    $("#msgGen").css("display","none");
+                  }, 15000);
+                  return false;
+
+                });
+            });
+        </script>
+        </div>
+      </div>
+      <div class = "feedback" id  = "feedback">
+        <div class = "form">
+          <h4>Comprehensive feedback</h4>
+          <form id="CForm" action="#" method="POST" onsubmit="submitComprehensive(); return false">
+          </form>
+          <script>
+              $(document).ready(function () {
+                  $("#CForm").submit(function (e) {
+                    e.preventDefault();
+                    $("#btnFeed").attr("disabled", true);
+                    $("#btnFeed").css("background-color","rgb(122, 120, 120)");
+                    $("#btnFeed").css("cursor","no-drop");
+                    $("#msgFeed").css("display","block");
+                    setTimeout(function(){
+                      $("#btnFeed").attr("disabled", false);
+                      $("#btnFeed").css("background-color","transparent");
+                      $("#btnFeed").css("cursor","pointer");
+                      $("#msgFeed").css("display","none");
+                    }, 5000);
+                    return true;
+                  });
+              });
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+      Moodlysis-Mood Analysis Application
+      </div>
+    </footer>
+    <script src="app.js"></script>
+    <script src="AttendeePage.js"></script>
+  </body>
+</html>
