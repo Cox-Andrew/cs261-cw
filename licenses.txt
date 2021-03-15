@@ -1,0 +1,70 @@
+ Docker
+     https://www.docker.com/legal/docker-software-end-user-license-agreement
+
+ Jetty
+
+     http://www.eclipse.org/jetty/licenses.php
+
+ Vader
+
+     https://pypi.org/project/vaderSentiment/
+
+ Python
+
+     https://docs.python.org/3/license.html$#$psf-license
+
+ DOMPurify
+
+     https://github.com/cure53/DOMPurify/blob/main/LICENSE
+
+ Flask
+
+     https://flask.palletsprojects.com/en/0.12.x/license
+
+ Apache
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ php
+
+     https://www.php.net/license/index.php
+
+ NGINX
+
+     http://nginx.org/LICENSE
+
+ postgres
+
+     https://www.postgresql.org/about/licence/
+
+ jQuery
+
+     https://jquery.org/license/
+
+ json org.json.simple
+
+     https://code.google.com/archive/p/json-simple/
+
+ ubuntu
+
+     https://ubuntu.com/licensing
+
+ flutter
+
+     https://github.com/flutter/flutter/blob/master/LICENSE
+
+ dart
+
+     https://github.com/dart-lang/usage/blob/master/LICENSE
+
+ java
+
+     https://www.oracle.com/downloads/licenses/javaee-licenses.html
+
+ alpine linux
+
+     https://pkgs.alpinelinux.org/packages
+
+ video: digital-marketing-team-leader-explains-strategy-on-whiteboard-9069
+
+     https://mixkit.co/license/
