@@ -6,6 +6,7 @@ import 'package:moodlysis_app/components/forms.dart';
 
 import 'package:moodlysis_app/models/form.dart';
 import 'package:moodlysis_app/models/question.dart';
+import 'package:moodlysis_app/services/events.dart';
 import 'package:moodlysis_app/services/forms.dart';
 import 'package:moodlysis_app/globals.dart' as globals;
 import 'package:moodlysis_app/utils/error_handlers.dart';
@@ -26,7 +27,10 @@ class ComprehensiveFeedbackFormState extends State<ComprehensiveFeedbackForm> {
 
   @override
   void initState() {
-    getActiveForm(http.Client(), globals.currentEvent)
+    http.Client client = http.Client();
+    getEvent(client, globals.currentEvent.eventID)
+        .then((event) => globals.currentEvent = event)
+        .then((_) => getActiveForm(client, globals.currentEvent))
         .then((form) => setState(() => _activeForm = form))
         .catchError((e, s) => handleConnectionError(context, e, s),
             test: (e) => e is SocketException)
