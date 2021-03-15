@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,8 +17,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Answer;
-import com.moodlysis.moodbe.GeneralRequest;
-import com.moodlysis.moodbe.requestexceptions.MoodlysisForbidden;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
 
@@ -60,7 +58,7 @@ public class AnswerRequest extends HttpServlet{
 		}
 		
 		int attendeeID;
-		int eventID;
+		//int eventID;
 		int eventFormID;
 		int questionID;
 		String questionResponse;
@@ -69,7 +67,7 @@ public class AnswerRequest extends HttpServlet{
 		try {
 			
 			attendeeID = (int) Integer.parseInt(postObject.get("attendeeID").toString());
-			eventID = (int)Integer.parseInt(postObject.get("eventID").toString());
+			//eventID = (int)Integer.parseInt(postObject.get("eventID").toString());
 			eventFormID = (int) Integer.parseInt(postObject.get("eventFormID").toString());
 			questionID = (int) Integer.parseInt(postObject.get("questionID").toString());
 			JSONObject data = (JSONObject) postObject.get("data");
@@ -84,7 +82,7 @@ public class AnswerRequest extends HttpServlet{
 		
 		// get the current time
 		Instant now = Instant.now();
-		LocalDateTime timeSubmitted = LocalDateTime.now();
+		//LocalDateTime timeSubmitted = LocalDateTime.now();
 		
 		Connection conn = DatabaseConnection.getConnection();
 		Answer answer = new Answer(response.getWriter(), conn);

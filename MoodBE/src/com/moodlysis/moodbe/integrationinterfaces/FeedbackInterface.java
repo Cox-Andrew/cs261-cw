@@ -1,9 +1,6 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.LinkedList;
 
 import com.moodlysis.moodbe.integrationinterfaces.AnswerInterface.AnswerInfo;

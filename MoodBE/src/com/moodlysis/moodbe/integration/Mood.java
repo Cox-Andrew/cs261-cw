@@ -10,10 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedList;
 
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.MoodInterface;
-import com.moodlysis.moodbe.integrationinterfaces.FeedbackInterface.FeedbackInfo;
-import com.moodlysis.moodbe.integrationinterfaces.FeedbackInterface.SubmissionInfo;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 
 public class Mood implements MoodInterface {

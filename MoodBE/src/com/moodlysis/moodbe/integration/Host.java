@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.HostInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisBadRequest;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;

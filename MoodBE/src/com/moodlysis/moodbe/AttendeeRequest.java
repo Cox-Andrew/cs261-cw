@@ -3,7 +3,7 @@ package com.moodlysis.moodbe;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,13 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.moodlysis.moodbe.integration.Attendee;
-import com.moodlysis.moodbe.integration.Event;
 import com.moodlysis.moodbe.requestexceptions.*;
 
 // GET /v0/events/{eventID}

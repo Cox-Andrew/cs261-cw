@@ -6,11 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.AttendeeInterface;
 import com.moodlysis.moodbe.requestexceptions.*;
 
@@ -261,7 +258,6 @@ public class Attendee implements AttendeeInterface {
 		
 		String strStmt;
 		PreparedStatement stmt;
-		ResultSet rs;
 		
 		try {
 			conn.setAutoCommit(false);

@@ -221,8 +221,8 @@ public class EventFormRequest extends HttpServlet {
 		int eventFormID = GeneralRequest.getIDFromPath(request, response);
 		int previousID = -1;
 		Boolean isActive = false;
-		LocalDateTime timeStart = null;
-		LocalDateTime timeEnd = null;
+		//LocalDateTime timeStart = null;
+		//LocalDateTime timeEnd = null;
 		try {
 			JSONObject putObject = (JSONObject) putParser.parse(jsonData); //can directly use reader rather than string
 			/*
@@ -242,12 +242,13 @@ public class EventFormRequest extends HttpServlet {
 			if (putObject.get("preceding-eventFormID") != null) {
 				previousID = Integer.parseInt(putObject.get("preceding-eventFormID").toString());
 			}
+			/*
 			if (putObject.get("time-start") != null) {
 				timeStart = LocalDateTime.parse(putObject.get("time-start").toString());
 			}
 			if (putObject.get("time-end") != null) {
 				timeEnd = LocalDateTime.parse(putObject.get("time-end").toString());
-			}
+			}*/
 		} catch(ParseException e) {
 			//TODO
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.toString());

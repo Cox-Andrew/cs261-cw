@@ -7,15 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.LinkedList;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,12 +18,8 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.json.simple.JSONArray;
 
-
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.AnswerInterface;
-import com.moodlysis.moodbe.integrationinterfaces.EventInterface.EventInfo;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisBadRequest;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisForbidden;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;

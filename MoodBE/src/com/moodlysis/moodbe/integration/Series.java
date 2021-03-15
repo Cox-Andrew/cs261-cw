@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import com.moodlysis.moodbe.integrationinterfaces.SeriesInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.GeneralRequest;
 
 public class Series implements SeriesInterface {

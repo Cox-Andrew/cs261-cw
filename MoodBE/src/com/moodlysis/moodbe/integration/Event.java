@@ -8,11 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.sql.Date;
 //import java.util.Date; RAISES ERROR
 import java.util.LinkedList;
 
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.EventInterface;
 import com.moodlysis.moodbe.requestexceptions.*;
 
@@ -104,7 +102,6 @@ public class Event implements EventInterface {
 		
 		String strStmt;
 		PreparedStatement stmt;
-		ResultSet rs;
 				
 		try {
 			conn.setAutoCommit(false);
@@ -173,7 +170,6 @@ public class Event implements EventInterface {
 		
 		String strStmt;
 		PreparedStatement stmt;
-		ResultSet rs;
 				
 		try {
 			conn.setAutoCommit(false);
@@ -233,7 +229,6 @@ public class Event implements EventInterface {
 		
 		String strStmt;
 		PreparedStatement stmt;
-		ResultSet rs;
 		
 		try {
 			conn.setAutoCommit(false);

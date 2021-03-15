@@ -7,10 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.LinkedList;
 
-import com.moodlysis.moodbe.DatabaseConnection;
 import com.moodlysis.moodbe.integrationinterfaces.FeedbackInterface;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisInternalServerError;
 import com.moodlysis.moodbe.requestexceptions.MoodlysisNotFound;
@@ -26,12 +24,12 @@ public class Feedback implements FeedbackInterface {
 		this.writer = writer;
 	}
 
-	
+	/*
 	private FeedbackInfo getFeedbackOfAnswerIDs(int[] answerIDs) {
 		
 		return null;
 	}
-
+	 */
 
 
 	@Override
@@ -116,10 +114,10 @@ public class Feedback implements FeedbackInterface {
 			stmt.setInt(1, attendeeID);
 			stmt.setInt(2, eventID);
 			rs = stmt.executeQuery();
-			
+			/*
 			int currentEventFormID = -1;
 			int currentAttendeeID = -1;
-			
+			*/
 			FeedbackAttendeeInfo feedbackAttendeeInfo = new FeedbackAttendeeInfo();
 			feedbackAttendeeInfo.eventID = eventID;
 			feedbackAttendeeInfo.list = new LinkedList<SubmissionInfo>();
@@ -242,10 +240,10 @@ public class Feedback implements FeedbackInterface {
 			stmt.setTimestamp(1, java.sql.Timestamp.valueOf(since));
 			stmt.setInt(2, eventID);
 			rs = stmt.executeQuery();
-			
+			/*
 			int currentEventFormID = -1;
 			int currentAttendeeID = -1;
-			
+			*/
 			FeedbackInfo feedbackInfo = new FeedbackInfo();
 			feedbackInfo.eventID = eventID;
 			feedbackInfo.timeUpdatedSince = since;

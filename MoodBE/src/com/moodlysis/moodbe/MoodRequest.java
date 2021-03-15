@@ -3,7 +3,7 @@ package com.moodlysis.moodbe;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.Instant;
+//import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -18,8 +18,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.moodlysis.moodbe.integration.Answer;
-import com.moodlysis.moodbe.integration.Feedback;
 import com.moodlysis.moodbe.integration.Mood;
 import com.moodlysis.moodbe.integrationinterfaces.MoodInterface.MoodListInfo;
 import com.moodlysis.moodbe.requestexceptions.*;
@@ -146,7 +144,7 @@ public class MoodRequest extends HttpServlet {
 		}
 		
 		// get the current time
-		Instant now = Instant.now();
+		//Instant now = Instant.now();
 		LocalDateTime timeSubmitted = LocalDateTime.now();
 		
 		Connection conn = DatabaseConnection.getConnection();

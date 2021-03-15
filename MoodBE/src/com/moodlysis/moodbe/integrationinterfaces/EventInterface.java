@@ -1,12 +1,8 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.time.LocalDateTime;
-
-import javax.servlet.http.HttpServletResponse;
 
 import com.moodlysis.moodbe.requestexceptions.*;
 

@@ -53,7 +53,7 @@ public class QuestionRequest extends HttpServlet {
 		JSONObject output = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONArray options = new JSONArray();
-		JSONParser parser = new JSONParser();
+		//JSONParser parser = new JSONParser();
 		/*try {
 			if (info.options != null || info.options != "") {
 				options = (JSONArray) parser.parse(info.options);

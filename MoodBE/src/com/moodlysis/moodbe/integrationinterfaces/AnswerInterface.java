@@ -1,10 +1,7 @@
 package com.moodlysis.moodbe.integrationinterfaces;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import com.moodlysis.moodbe.requestexceptions.*;
 
