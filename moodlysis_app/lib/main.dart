@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:moodlysis_app/constants/routes.dart';
 import 'package:moodlysis_app/constants/theme.dart';
@@ -11,6 +12,10 @@ void main() {
 class MoodlysisApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return GestureDetector(
       onTap: () {
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
