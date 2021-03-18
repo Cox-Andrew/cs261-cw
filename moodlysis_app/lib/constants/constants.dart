@@ -1,5 +1,3 @@
-import 'dart:core';
-
 const String backendURI = 'http://192.168.1.171:8001/v0';
 
 const String splashScreenRoute = '/';

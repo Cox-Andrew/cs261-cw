@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import 'package:moodlysis_app/constants/constants.dart';
 import 'package:moodlysis_app/screens/screens.dart';
